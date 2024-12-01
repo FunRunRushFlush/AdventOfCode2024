@@ -3,8 +3,16 @@ namespace Day01;
 
 internal record Input
 {
+    public string SimExampleInput = """
+        3   4
+        4   3
+        2   5
+        1   3
+        3   9
+        3   3
+        """;
     public string InputString = """
-                40885   43247
+        40885   43247
         14780   86274
         35132   49508
         87895   32621
