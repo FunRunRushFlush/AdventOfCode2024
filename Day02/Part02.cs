@@ -19,7 +19,7 @@ public static class Part02
          
             for (int i = 0; i < numbers.Length; i++)
             {
-                //TOOD: Reference vs ValueType Bug --> Doku
+                //TODO: Reference vs ValueType Bug --> Doku
                 var copyNumbers = numbers.ToList();
                 copyNumbers.RemoveAt(i);
                 int[] dumperedReports = copyNumbers.ToArray();
