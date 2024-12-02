@@ -1,11 +1,10 @@
-using System.Diagnostics;
+﻿
 namespace Day02;
 
 public static class Part01
 {
-    public static void Result(string input)
+    public static int Result(string input)
     {
-        Stopwatch sw = Stopwatch.StartNew();
         string[] lines = input
         .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
         .ToArray();
@@ -25,10 +24,61 @@ public static class Part01
                 safeReports++;
             }
         }
-
-        sw.Stop();
-        Console.WriteLine($"safeReports {safeReports}, Time {sw.ElapsedMilliseconds}");
+        Console.WriteLine($"safeReports {safeReports}");
+        return safeReports;
     }
+
+
+    public static int Result_Improved(string input)
+    {
+        var data = InputParser(input);
+
+        int safeReports = 0;
+        foreach (int[] numbers in data)        
+        {
+            if (CheckIfSafe(numbers))
+            {
+                safeReports++;
+            }
+        }
+        Console.WriteLine($"safeReports {safeReports}");
+        return safeReports;
+    }
+
+    public static int[][] InputParser(string input)
+    {
+        List<int[]> data = new List<int[]>();
+
+        foreach (var line in input.AsSpan().EnumerateLines())
+        {
+            var innerData = new List<int>();
+
+            foreach (var range in line.Split(' '))
+            {
+                innerData.Add(IntParser(line[range]));
+            }
+
+            data.Add(innerData.ToArray());
+        }
+
+        return data.ToArray();
+    }
+
+    // Simpler IntParser der perfomanter ist als Int.Parse()
+    // WARNUNG: Aufkosten von Robustheit(kein edgecases etc...)
+    // https://youtu.be/EWmufbVF2A4?feature=shared&t=880 
+    private static int IntParser(ReadOnlySpan<Char> span)
+    {
+        int temp = 0;
+        for (int i = 0; i < span.Length; i++)
+        {
+            // Der ASCII-Wert des Zeichens (z. B. '3' → ASCII 51) wird von dem ASCII-Wert von '0' (ASCII 48) subtrahiert.
+            // Dadurch wird der numerische Wert des Zeichens erhalten (z. B. '3' → 3).
+            temp = temp * 10 + (span[i] - '0');
+        }
+        return temp;
+    }
+
 
     private static bool CheckIfSafe(int[] intArray)
     {
