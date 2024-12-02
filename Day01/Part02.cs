@@ -2,7 +2,6 @@ using System.Diagnostics;
 
 public static class Part02
 {
-
     public static void Result(string input)
     {
 
@@ -38,5 +37,4 @@ public static class Part02
 
         Console.WriteLine($"similarityScore {similarityScore}, Time {sw.ElapsedMilliseconds}");
     }
-
 }

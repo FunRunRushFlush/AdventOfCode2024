@@ -2,7 +2,6 @@ using System.Diagnostics;
 
 public static class Part01
 {
-
     public static void Result(string input)
     {
         Stopwatch sw = Stopwatch.StartNew();
@@ -36,5 +35,4 @@ public static class Part01
         sw.Stop();
         Console.WriteLine($"Distance {distance}, Time {sw.ElapsedMilliseconds}");
     }
-
 }
