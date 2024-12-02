@@ -1,2 +1,8 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using Day02;
+
+string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "InputData/Input.txt");
+string input = File.ReadAllText(path);
+
+Part01.Result(input);
+Part02.Result(input);
+
