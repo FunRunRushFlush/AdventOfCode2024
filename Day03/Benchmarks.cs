@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 
 
-namespace Day02;
+namespace Day03;
 
 [ShortRunJob]
 [MemoryDiagnoser]
@@ -21,41 +21,65 @@ public class Benchmarks
     [Benchmark]
     public void Part01_Result()
     {
-        Day02.Part01.Result(inputRaw);
+        Day03.Part01.Result(inputRaw);
     }
 
     [Benchmark]
     public void Part01_Result_Improved()
     {
-        Day02.Part01.Result_Improved(inputRaw);
+        Day03.Part01.Result_Improved(inputRaw);
+    }
+    [Benchmark]
+    public void Part01_Result_Improved_02()
+    {
+        Day03.Part01.Result_Improved_02(inputRaw);
+    }
+    [Benchmark]
+    public void Part01_Result_Improved_03()
+    {
+        Day03.Part01.Result_Improved_03(inputRaw);
     }
     [Benchmark]
     public void Part02_Result()
     {
-        Day02.Part02.Result(inputRaw);
+        Day03.Part02.Result(inputRaw);
     }
 
     [Benchmark]
-    public void Part02_Result_Improved()
+    public void Part02_CheckIfCharIsNum()
     {
-        Day02.Part02.Result_Improved(inputRaw);
+        foreach (char ch in inputRaw)
+        {
+            CheckIfCharIsNum(ch);
+        }
     }
-
-
-    [Benchmark]
-    public void Part01_LinqParser()
-    {
-        int[][] lines = inputRaw
-    .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-    .Select(line => line.Split(' ').Select(int.Parse).ToArray())
-    .ToArray();
-    }
+        private static bool CheckIfCharIsNum(char input) => ((input - '0') >= 0 && (input - '0') <= 9) ? true : false;
 
     [Benchmark]
-    public void Part01_CustomParser()
+    public void Part02_IsDigit()
     {
-        Day02.Part01.InputParser(inputRaw);
+        foreach (char ch in inputRaw)
+        {
+            char.IsDigit(ch);
+        }
     }
+
+
+
+    //[Benchmark]
+    //public void Part01_LinqParser()
+    //{
+    //    int[][] lines = inputRaw
+    //.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+    //.Select(line => line.Split(' ').Select(int.Parse).ToArray())
+    //.ToArray();
+    //}
+
+    //[Benchmark]
+    //public void Part01_CustomParser()
+    //{
+    //    Day03.Part01.InputParser(inputRaw);
+    //}
 
 
 

@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Diagnostics.Runtime.Utilities;
 using System.Text.RegularExpressions;
 
 namespace Day03;
@@ -6,44 +7,51 @@ public static class Part02
 {
     public static int Result(string input)
     {
-
         // https://learn.microsoft.com/de-de/dotnet/api/system.text.regularexpressions.regex.match?view=net-8.0
         string doPattern = @"do\(\)";
-        string dontPattern = @"don't\(\)";
-
-        List<int> dontIndex = new List<int>();
+  
         Regex doReg = new Regex(doPattern);
-        Regex dontReg = new Regex(dontPattern);
-        foreach (Match match in dontReg.Matches(input))
+
+        var test = doReg.Split(input);
+
+        int counter = 0;
+        for( int i=0; i<test.Length; i++)
         {
-
-            bool doBool = true; 
-            int start = match.Index;
-
-            int result = 0;
-        input.Substring(result, input.Length - result);
-        foreach (string line in lines)
-        {
-            string pattern = @"mul\(\d{1,3},\d{1,3}\)";
-            Regex mulReg = new Regex(pattern);
-
-          
+            var line = test[i].Split("don't()").FirstOrDefault();
+            counter +=CalculateMul(line);
 
         }
-
-        //sw.Stop();
-        Console.WriteLine($"safeReports {safeReports}");
-        return safeReports;
+ 
+        return counter;
     }
 
-    public static int Result_Improved(string input)
+    private static int CalculateMul(string stringInput)
     {
+        string pattern = @"mul\(\d{1,3},\d{1,3}\)";
+        Regex reg = new Regex(pattern);
+        int result = 0;
+        foreach (Match match in reg.Matches(stringInput))
+        {
+            var value = match.Value.Split(new[] { '(', ')', ',', }, StringSplitOptions.RemoveEmptyEntries);
 
-        int safeReports = 0;
+            int num1 = int.Parse(value[1]);
+            int num2 = int.Parse(value[2]);
 
-        Console.WriteLine($"safeReports {safeReports}");
-        return safeReports;
+            int multRes = num1 * num2;
+            result += multRes;
+
+        }
+        return result;
+
     }
+    //public static int Result_Improved(string input)
+    //{
+
+        
+
+
+    //    return safeReports;
+    //}
     private static ReadOnlySpan<int> CreateSlicedSpan(ReadOnlySpan<int> span, int skipIndex)
     {
         if (skipIndex == 0)
