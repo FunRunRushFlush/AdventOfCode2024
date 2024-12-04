@@ -7,12 +7,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-	<ItemGroup>
-		<None Include="InputData\Input.txt">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
 
 	<ItemGroup>
 		<PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
@@ -20,7 +14,7 @@
 
 
 	<ItemGroup>
-		<None Update="InputData\Part01Example.txt">
+		<None Update="InputData\Part01Example_02.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
