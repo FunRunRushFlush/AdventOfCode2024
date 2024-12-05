@@ -1,74 +1,280 @@
 ﻿
+using CommunityToolkit.HighPerformance;
 using Microsoft.Diagnostics.Runtime.Utilities;
 using System.Text.RegularExpressions;
 
 namespace Day04;
 public static class Part02
 {
-    public static int Result(string input)
+    public static int Result(ReadOnlySpan<string> input)
     {
-        // https://learn.microsoft.com/de-de/dotnet/api/system.text.regularexpressions.regex.match?view=net-8.0
-        string doPattern = @"do\(\)";
-  
-        Regex doReg = new Regex(doPattern);
+        int rows = input.Length;
+        int cols = input[0].Length;
+        XmasState state = XmasState.None;
+        XmasBackwardsState stateBackwards = XmasBackwardsState.None;
 
-        var test = doReg.Split(input);
+        Span2D<char> input2D = new char[rows, cols];
 
-        int counter = 0;
-        for( int i=0; i<test.Length; i++)
+        Span2D<int> inputLog2D = new int[rows, cols];
+
+
+
+        for (int i = 0; i < rows; i++)
         {
-            var line = test[i].Split("don't()").FirstOrDefault();
-            counter +=CalculateMul(line);
+            for (int j = 0; j < cols; j++)
+            {
+                input2D[i, j] = input[i][j];
+            }
+        }
+
+
+      
+
+        int diaRow = 0, diaCol = 0;
+        for (int i = 0; i < cols; i++)
+        {
+            diaCol = i;
+
+            while (diaCol < cols && diaRow < rows)
+            {
+                var current = input2D[diaRow, diaCol];
+                inputLog2D[diaRow, diaCol]++;
+                state = UpdateXmasState(state, current);
+                stateBackwards = UpdateXmasBackwardsState(stateBackwards, current);
+                if (stateBackwards == XmasBackwardsState.M)
+                {
+                    //inputLog2D[diaRow - 2, diaCol - 2]++;
+                    inputLog2D[diaRow - 1, diaCol - 1]++;
+                    //inputLog2D[diaRow, diaCol]++;
+                    stateBackwards = XmasBackwardsState.None;
+                }
+                else if (state == XmasState.S)
+                {
+                    //inputLog2D[diaRow - 2, diaCol - 2]++;
+                    inputLog2D[diaRow - 1, diaCol - 1]++;
+                    //inputLog2D[diaRow, diaCol]++;
+                    state = XmasState.None;
+                }
+                diaRow++;
+                diaCol++;
+            PrintCheckedState(inputLog2D, input2D);
+            }
+            state = XmasState.None;
+            stateBackwards = XmasBackwardsState.None;
+            diaRow = 0;
 
         }
- 
-        return counter;
-    }
 
-    private static int CalculateMul(string stringInput)
-    {
-        string pattern = @"mul\(\d{1,3},\d{1,3}\)";
-        Regex reg = new Regex(pattern);
-        int result = 0;
-        foreach (Match match in reg.Matches(stringInput))
+
+        diaRow = 0; diaCol = 0;
+        for (int i = 1; i < rows; i++)
         {
-            var value = match.Value.Split(new[] { '(', ')', ',', }, StringSplitOptions.RemoveEmptyEntries);
-
-            int num1 = int.Parse(value[1]);
-            int num2 = int.Parse(value[2]);
-
-            int multRes = num1 * num2;
-            result += multRes;
+            diaRow = i;
+            while (diaCol < cols && diaRow < rows)
+            {
+                var current = input2D[diaRow, diaCol];
+                inputLog2D[diaRow, diaCol]++;
+                state = UpdateXmasState(state, current);
+                stateBackwards = UpdateXmasBackwardsState(stateBackwards, current);
+                if (stateBackwards == XmasBackwardsState.M)
+                {
+                    //inputLog2D[diaRow - 2, diaCol - 2]++;
+                    inputLog2D[diaRow - 1, diaCol - 1]++;
+                    //inputLog2D[diaRow, diaCol]++;
+                    stateBackwards = XmasBackwardsState.None;
+                }
+                else if (state == XmasState.S)
+                {
+                    //inputLog2D[diaRow - 2, diaCol - 2]++;
+                    inputLog2D[diaRow - 1, diaCol - 1]++;
+                    //inputLog2D[diaRow, diaCol]++;
+                    state = XmasState.None;
+                }
+                diaRow++;
+                diaCol++;
+            PrintCheckedState(inputLog2D, input2D);
+            }
+            state = XmasState.None;
+            stateBackwards = XmasBackwardsState.None;
+            diaCol = 0;
 
         }
-        return result;
+
+        diaRow = rows; diaCol = 0;
+        for (int i = rows - 1; i > 0; i--)
+        {
+            diaRow = i;
+            while (diaCol < cols && diaRow >= 0)
+            {
+                var current = input2D[diaRow, diaCol];
+                inputLog2D[diaRow, diaCol]++;
+                state = UpdateXmasState(state, current);
+                stateBackwards = UpdateXmasBackwardsState(stateBackwards, current);
+                if (stateBackwards == XmasBackwardsState.M)
+                {
+                    //inputLog2D[diaRow + 2, diaCol - 2]++;
+                    inputLog2D[diaRow + 1, diaCol - 1]++;
+                    //inputLog2D[diaRow, diaCol]++;
+                    stateBackwards = XmasBackwardsState.None;
+                }
+                else if (state == XmasState.S)
+                {
+                    //inputLog2D[diaRow + 2, diaCol - 2]++;
+                    inputLog2D[diaRow + 1, diaCol - 1]++;
+                    //inputLog2D[diaRow, diaCol]++;
+                    state = XmasState.None;
+                }
+                diaRow--;
+                diaCol++;
+            PrintCheckedState(inputLog2D, input2D);
+            }
+            state = XmasState.None;
+            stateBackwards = XmasBackwardsState.None;
+            diaCol = 0;
+
+        }
+
+        diaRow = rows - 1; diaCol = 0;
+        for (int i = 1; i < cols; i++)
+        {
+            diaCol = i;
+            while (diaCol < cols && diaRow >= 0)
+            {
+                var current = input2D[diaRow, diaCol];
+                inputLog2D[diaRow, diaCol] += 1;
+                state = UpdateXmasState(state, current);
+                stateBackwards = UpdateXmasBackwardsState(stateBackwards, current);
+                if (stateBackwards == XmasBackwardsState.M)
+                {
+                    //inputLog2D[diaRow + 2, diaCol - 2]++;
+                    inputLog2D[diaRow + 1, diaCol - 1]++;
+                    //inputLog2D[diaRow, diaCol]++;
+                    stateBackwards = XmasBackwardsState.None;
+                }
+                else if (state == XmasState.S)
+                {
+                    //inputLog2D[diaRow + 2, diaCol - 2]++;
+                    inputLog2D[diaRow + 1, diaCol - 1]++;
+                    //inputLog2D[diaRow, diaCol]++;
+                    state = XmasState.None;
+                }
+                diaRow--;
+                diaCol++;
+            PrintCheckedState(inputLog2D, input2D);
+            }
+            state = XmasState.None;
+            stateBackwards = XmasBackwardsState.None;
+            diaRow = rows - 1;
+
+        }
+
+
+
+        PrintCheckedState(inputLog2D, input2D);
+
+
+        return CountXCheckedState(inputLog2D); 
+    }
+
+    private static void PrintCheckedState(Span2D<int> span,Span2D<char> input)
+    {
+        //int rows = span.Height;
+        //int cols = span.Width;
+        //Console.Write("#######################");
+        //Console.WriteLine();
+        //for (int i = 0; i < rows; i++)
+        //{
+        //    for (int j = 0; j < cols; j++)
+        //    {
+        //        var value = span[i, j];
+        //        var charValue = input[i, j];
+        //        SetConsoleColor(value);
+        //        Console.Write(value);
+        //        Console.ResetColor();
+        //        Console.Write(" ");
+        //    }
+        //    Console.WriteLine();
+        //}
+        //Console.Write("#######################");
 
     }
-    //public static int Result_Improved(string input)
-    //{
-
-        
-
-
-    //    return safeReports;
-    //}
-    private static ReadOnlySpan<int> CreateSlicedSpan(ReadOnlySpan<int> span, int skipIndex)
+    private static int CountXCheckedState(Span2D<int> span)
     {
-        if (skipIndex == 0)
-            return span.Slice(1); 
+        var xCounter = 0;
+        int rows = span.Height;
+        int cols = span.Width;
 
-        if (skipIndex == span.Length - 1)
-            return span.Slice(0, span.Length - 1); 
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                var value = span[i, j];
+                if (value >= 4) xCounter++;
 
-   
-        return CombineSlices(span.Slice(0, skipIndex), span.Slice(skipIndex + 1));
+
+            }
+
+        }
+        return xCounter;
     }
-    private static int[] CombineSlices(ReadOnlySpan<int> part1, ReadOnlySpan<int> part2)
+    static void SetConsoleColor(int value)
     {
-        int[] result = new int[part1.Length + part2.Length];
-        part1.CopyTo(result);
-        part2.CopyTo(result.AsSpan(part1.Length));
-        return result;
+        // Mapping von Zahlen auf Farben
+        switch (value)
+        {
+            case 1: Console.ForegroundColor = ConsoleColor.Blue; break;
+            case 2: Console.ForegroundColor = ConsoleColor.Green; break;
+            case 3: Console.ForegroundColor = ConsoleColor.Red; break;
+            case 4: Console.ForegroundColor = ConsoleColor.Yellow; break;
+            case 5: Console.ForegroundColor = ConsoleColor.Magenta; break;
+            case 6: Console.ForegroundColor = ConsoleColor.Red; break;
+            default: Console.ForegroundColor = ConsoleColor.White; break;
+        }
+    }
+
+
+    private static XmasState UpdateXmasState(XmasState currentState, char currentChar)
+    {
+        var nextState = currentState switch
+        {
+            XmasState.None when currentChar == 'M' => XmasState.M,
+            XmasState.M when currentChar == 'A' => XmasState.A,
+            XmasState.A when currentChar == 'S' => XmasState.S,
+            _ when currentChar == 'M' => XmasState.M,
+            _ => XmasState.None
+        };
+        //Console.WriteLine($"Char: {currentChar}, CurrentState: {currentState}, NextState: {nextState}");
+        return nextState;
+    }
+
+    private static XmasBackwardsState UpdateXmasBackwardsState(XmasBackwardsState currentState, char currentChar)
+    {
+        return currentState switch
+        {
+            XmasBackwardsState.None when currentChar == 'S' => XmasBackwardsState.S,
+            XmasBackwardsState.S when currentChar == 'A' => XmasBackwardsState.A,
+            XmasBackwardsState.A when currentChar == 'M' => XmasBackwardsState.M,
+            _ when currentChar == 'S' => XmasBackwardsState.S,
+            _ => XmasBackwardsState.None
+        };
+    }
+
+    [Flags]
+    enum XmasState
+    {
+        None = 0,
+        M = 1,
+        A = 2,
+        S = 4
+    }
+    [Flags]
+    enum XmasBackwardsState
+    {
+        None = 0,
+        S = 1,
+        A = 2,
+        M = 4,
+
     }
 
 
