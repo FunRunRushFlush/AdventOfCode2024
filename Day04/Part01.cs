@@ -223,7 +223,7 @@ public static class Part01
         //Console.WriteLine();
         //for (int i = 0; i < rows; i++)
         //{
-        //    for (int j = 1; j < cols; j++)
+        //    for (int j = 0; j < cols; j++)
         //    {
         //        SetConsoleColor(span[i, j]);
         //        Console.Write(span[i, j]);
