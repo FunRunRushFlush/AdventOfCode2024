@@ -2,7 +2,7 @@
 using CommunityToolkit.HighPerformance;
 
 
-namespace Day05;
+namespace Day06;
 
 //[ShortRunJob]
 [MemoryDiagnoser]

@@ -1,9 +1,7 @@
 ﻿
 using CommunityToolkit.HighPerformance;
-using Microsoft.Diagnostics.Runtime.Utilities;
-using System;
-using System.Text;
-using System.Text.RegularExpressions;
+using MethodTimer;
+
 
 namespace Day05;
 
@@ -14,7 +12,7 @@ public static class Part01
         InputParser(rawInput, out ReadOnlySpan2D<bool> rules2D,
        out ReadOnlySpan<int[]> parsedInput);
         int midCounter = 0;
-        for (int i = 0; i < parsedInput.Length-1; i++)
+        for (int i = 0; i < parsedInput.Length; i++)
         {
             bool exitedEarly = false;
 
@@ -22,7 +20,7 @@ public static class Part01
             {
                 var num1 = parsedInput[i][j];
                 var num2 = parsedInput[i][j+1];
-                Console.Write(parsedInput[i][j]);
+                //Console.Write(parsedInput[i][j]);
                 if (rules2D[num1, num2])
                 {
                     continue;
@@ -32,8 +30,6 @@ public static class Part01
                     exitedEarly = true;
                     break;
                 }
-
-
             }
             
             if(!exitedEarly)
@@ -41,38 +37,94 @@ public static class Part01
                 midCounter += parsedInput[i][parsedInput[i].Length / 2]; 
             }  
             
-            Console.WriteLine();
+            //Console.WriteLine();
         }
 
-
-        Console.WriteLine("midCounter: {0}", midCounter);
+        //Console.WriteLine("midCounter: {0}", midCounter);
         return midCounter;
     }
 
-    private static void InputParser(
-       string[] rawInput,
+    public static int Result_Improved01(ReadOnlySpan<string> rawInput)
+    {
+        InputParser(rawInput, out ReadOnlySpan2D<bool> rules2D,
+       out ReadOnlySpan<int[]> parsedInput);
+        int midCounter = 0;
+        for (int i = 0; i < parsedInput.Length; i++)
+        {
+            bool exitedEarly = false;
+
+            for (int j = 0; j < parsedInput[i].Length - 1; j++)
+            {
+                //var num1 = parsedInput[i][j];
+                //var num2 = parsedInput[i][j + 1];
+                //Console.Write(parsedInput[i][j]);
+                if (rules2D[parsedInput[i][j], parsedInput[i][j + 1]])
+                {
+                    continue;
+                }
+                else if (rules2D[parsedInput[i][j + 1], parsedInput[i][j]])
+                {
+                    exitedEarly = true;
+                    break;
+                }
+            }
+
+            if (!exitedEarly)
+            {
+                midCounter += parsedInput[i][parsedInput[i].Length / 2];
+            }
+
+            //Console.WriteLine();
+        }
+
+        //Console.WriteLine("midCounter: {0}", midCounter);
+        return midCounter;
+    }
+    [Time]
+    public static void InputParser(
+       ReadOnlySpan<string> rawInput,
        out ReadOnlySpan2D<bool> rules2D,
        out ReadOnlySpan<int[]> parsedInput)
     {
-        int separatorIndex = Array.IndexOf(rawInput, string.Empty);
+        int separatorIndex = Array.IndexOf(rawInput.ToArray(), string.Empty);
 
         Span2D<bool> rules = new bool[100, 100];
         for (int i = 0; i < separatorIndex; i++)
         {
-            var test = rawInput[i].Split('|');
+            var test = rawInput[i].Split('|').AsSpan();
             rules[int.Parse(test[0]), int.Parse(test[1])] = true;
         }
         rules2D = rules;
 
 
-        var input = rawInput.AsSpan(separatorIndex + 1);
+        var input = rawInput.Slice(separatorIndex + 1);
+        Span<int[]> parsedInpu = new int[input.Length][];
+        for (int i = 0; i < input.Length; i++)
+        {
+            parsedInpu[i] = input[i].Split(',').Select(int.Parse).ToArray(); 
+        }
+        parsedInput = parsedInpu;
+    }
+    public static void InputParserNoOut(
+   ReadOnlySpan<string> rawInput)
+    {
+        int separatorIndex = Array.IndexOf(rawInput.ToArray(), string.Empty);
+
+        Span2D<bool> rules = new bool[100, 100];
+        for (int i = 0; i < separatorIndex; i++)
+        {
+            var test = rawInput[i].Split('|').AsSpan();
+            rules[int.Parse(test[0]), int.Parse(test[1])] = true;
+        }
+
+
+
+        var input = rawInput.Slice(separatorIndex + 1);
         Span<int[]> parsedInpu = new int[input.Length][];
         for (int i = 0; i < input.Length; i++)
         {
             parsedInpu[i] = input[i].Split(',').Select(int.Parse).ToArray();
         }
-        parsedInput = parsedInpu;
-
 
     }
 }
