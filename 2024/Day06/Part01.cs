@@ -1,6 +1,5 @@
 ﻿
 using CommunityToolkit.HighPerformance;
-using MethodTimer;
 using System.Data;
 using System.Drawing;
 

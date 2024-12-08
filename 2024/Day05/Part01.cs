@@ -1,6 +1,6 @@
 ﻿
 using CommunityToolkit.HighPerformance;
-using MethodTimer;
+
 
 
 namespace Day05;
@@ -80,7 +80,7 @@ public static class Part01
         //Console.WriteLine("midCounter: {0}", midCounter);
         return midCounter;
     }
-    [Time]
+
     public static void InputParser(
        ReadOnlySpan<string> rawInput,
        out ReadOnlySpan2D<bool> rules2D,
