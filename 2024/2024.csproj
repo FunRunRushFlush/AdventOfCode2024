@@ -13,9 +13,22 @@
 		<PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.2" />
 	</ItemGroup>
 
+<!--
+
+-->
+	<PropertyGroup>
+		<DefineConstants>LOGGING_ENABLED</DefineConstants>
+	</PropertyGroup>
+
+
 
 	<ItemGroup>
-    <Folder Include="Day02\" />
-  </ItemGroup>
+	  <None Update="Day08\InputData\Input.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Day08\InputData\Part01Example.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 
 </Project>
