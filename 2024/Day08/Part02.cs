@@ -1,43 +1,91 @@
 using System.Diagnostics;
 
-namespace Day01;
+namespace Day08;
 
 
 public static class Part02
 {
-    public static void Result(string input)
+    public static void Result(ReadOnlySpan<string> input)
     {
+        var inputHeightY = input.Length;
+        var inputWidthX = input[0].Length;
 
-        Stopwatch sw = Stopwatch.StartNew();
-        int[] numbers = input
-            .Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(int.Parse)
-            .ToArray();
+        var dicAntenna = new Dictionary<char, List<(int Y, int X)>>();
+        HashSet<(int x, int y)> dicAntinodes = new HashSet<(int, int)>();
 
 
-        int[] number01 = new int[numbers.Length / 2];
-        int[] number02 = new int[numbers.Length / 2];
-
-        int ind = 0;
-        for (int i = 0; i < numbers.Length; i += 2)
+        for (int y = 0; y < input.Length; y++)
         {
+            for (int x = 0; x < input[0].Length; x++)
+            {
+                char charCheck = input[y][x];
+                if (charCheck == '.' || charCheck == '#') continue;
 
-            number01[ind] = numbers[i];
-            number02[ind] = numbers[i + 1];
-            ind++;
+                if (!dicAntenna.ContainsKey(charCheck))
+                {
+                    dicAntenna[charCheck] = new List<(int Y, int X)>();
+                }
+                dicAntenna[charCheck].Add((y, x));
+
+            }
         }
 
-        int similarityScore = 0;
-        for (int i = 0; i < number01.Length; i++)
+        foreach (var element in dicAntenna)
         {
-            int checkingInt = number01[i];
-            int localSimilarityScore = checkingInt * number02.Count(x => x == checkingInt);
+            var list = element.Value;
 
-            similarityScore += localSimilarityScore;
+            for (int i = 0; i < list.Count - 1; i++)
+            {
+                for (int j = i + 1; j < list.Count; j++)
+                {
+                    GlobalLog.Log($"##### New Calc I:{i} j: {j} #########");
+                    GlobalLog.Log($"tuple1 = list[i]: Y:{list[i].Y} X:{list[i].X}");
+                    GlobalLog.Log($"tuple2 = list[j]: Y:{list[j].Y} X:{list[j].X}");
+                    var tuple1 = list[i];
+                    var tuple2 = list[j];
+                    dicAntinodes.Add(tuple1);
+                    dicAntinodes.Add(tuple2);
+
+                    bool tuple1Posible = true;
+                    bool tuple2Posible = true;
+                    var diffY = tuple2.Y - tuple1.Y;
+                    var diffX = tuple2.X - tuple1.X;
+                    int mult = 1;
+                    while (tuple1Posible || tuple2Posible)
+                    {
+                        GlobalLog.Log($"tuple1.Y: {tuple1.Y}");
+                        GlobalLog.Log($"tuple2.Y: {tuple2.Y}");
+                        var antinode01 = (tuple1.Y - diffY * mult, tuple1.X - diffX * mult);
+                        var antinode02 = (tuple2.Y + diffY * mult, tuple2.X + diffX * mult);
+                        if ((antinode01.Item1 >= 0 && antinode01.Item2 >= 0)
+                            && (antinode01.Item1 < inputHeightY && antinode01.Item2 < inputWidthX))
+                        {
+                        GlobalLog.Log($"antinode01: Y:{antinode01.Item1},X:{antinode01.Item2} ");
+                            dicAntinodes.Add(antinode01);
+                        }
+                        else
+                        {
+                            tuple1Posible = false;
+                        }
+
+                        if ((antinode02.Item1 >= 0 && antinode02.Item2 >= 0)
+                            && (antinode02.Item1 < inputHeightY && antinode02.Item2 < inputWidthX))
+                        {
+                        GlobalLog.Log($"antinode02: Y:{antinode02.Item1},X:{antinode02.Item2} ");
+                            dicAntinodes.Add(antinode02);
+                        }
+                        else
+                        {
+                            tuple2Posible = false;
+                        }
+                        mult++;
+                    }
+                }
+
+            }
         }
+            int antinodesCounter = dicAntinodes.Count;
 
-        sw.Stop();
-
-        Console.WriteLine($"similarityScore {similarityScore}, Time {sw.ElapsedMilliseconds}");
+            GlobalLog.Log($"antinodesCounter: {antinodesCounter}");
     }
 }

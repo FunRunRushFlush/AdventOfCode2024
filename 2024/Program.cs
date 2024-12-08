@@ -1,5 +1,6 @@
 ﻿
 
+using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
 string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day08/InputData/Input.txt");
@@ -7,9 +8,11 @@ string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day08/InputDa
 var inputLines = File.ReadAllLines(path);
 
 
-BenchmarkAction.
+BenchmarkRunner.Run<Benchmarks>();
 
 
 
 
 Day08.Part01.Result(inputLines);
+
+Day08.Part02.Result(inputLines);

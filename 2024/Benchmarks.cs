@@ -30,7 +30,7 @@ public class Benchmarks
     [Benchmark]
     public void Part02_Result()
     {
-        Day08.Part01.Result_Char(input);
+        Day08.Part02.Result(input);
     }
 
 
