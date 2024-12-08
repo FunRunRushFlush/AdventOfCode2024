@@ -2,7 +2,7 @@
 using CommunityToolkit.HighPerformance;
 
 
-namespace Day05;
+namespace Day07;
 
 [ShortRunJob]
 [MemoryDiagnoser]
@@ -34,9 +34,6 @@ public class Benchmarks
     {
         Part02.Result(input);
     }
-
-   
-
 
 
 

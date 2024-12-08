@@ -26,13 +26,41 @@ public static class Part02
                 }
                 else if (rules2D[num2, num1])
                 {
+                    //Console.WriteLine(i);
                     exitedEarly = true;
                     break;
                 }
             }
 
-            if (!exitedEarly)
+            if (exitedEarly)
             {
+                restart:
+                for (int j = 0; j < parsedInput[i].Length; j++)
+                {
+                    for (int k = 0; k < parsedInput[i].Length; k++)
+                    {
+                        if (j == k) continue;
+                        if (j > k) continue;
+
+                        var num1 = parsedInput[i][j];
+                        var num2 = parsedInput[i][k];
+                        //Console.WriteLine($" parsedInput[{i}][{j}]: {parsedInput[i][j]}");
+                        //Console.WriteLine($" parsedInput[{i}][{k}]: {parsedInput[i][j]}");
+                        if (rules2D[num1, num2])
+                        {
+                            continue;
+                        }
+                        else if (rules2D[num2, num1])
+                        {
+                            parsedInput[i][j] = num2;
+                            parsedInput[i][k] = num1;
+
+                            //Console.WriteLine($" parsedInput[{i}][{j}]: {parsedInput[i][j]}");
+                            //Console.WriteLine($" parsedInput[{i}][{k}]: {parsedInput[i][j]}");
+                            goto restart;
+                        }
+                    }
+                }
                 midCounter += parsedInput[i][parsedInput[i].Length / 2];
             }
 
@@ -66,11 +94,11 @@ public static class Part02
         {
             var print = input[i].Split(',').Select(int.Parse).ToArray();
             parsedInpu[i] = print;
-            foreach (var number in print)
-            {
-                Console.Write($"{number} ");
-            }
-            Console.WriteLine();
+            //foreach (var number in print)
+            //{
+            //    Console.Write($"{number} ");
+            //}
+            //Console.WriteLine();
         }
         parsedInput = parsedInpu;
 

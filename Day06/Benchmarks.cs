@@ -4,7 +4,7 @@ using CommunityToolkit.HighPerformance;
 
 namespace Day06;
 
-//[ShortRunJob]
+[ShortRunJob]
 [MemoryDiagnoser]
 [RankColumn]
 public class Benchmarks
@@ -23,68 +23,22 @@ public class Benchmarks
 
 
     }
-    //[Benchmark]
-    //public void Part01_Result()
-    //{
-    //    Part01.Result(input);
-    //}
-
-    //[Benchmark]
-    //public void Part01_Result_Improved01()
-    //{
-    //    Part01.Result_Improved01(input);
-    //}
+    [Benchmark]
+    public void Part01_Result()
+    {
+        Part01.Result(input);
+    }
 
     [Benchmark]
-    public void Part01_Parser()
+    public void Part02_Result()
     {
-        Part01.InputParser( input,
-       out ReadOnlySpan2D<bool> rules2D,
-       out ReadOnlySpan<int[]> parsedInput);
+        Part02.Result(input);
     }
     [Benchmark]
-    public void Part01_ParserNoOut()
+    public void Part02_Result_Improved01()
     {
-        Part01.InputParserNoOut(input);
+        Part02.Result_Improved01(input);
     }
-    //[Benchmark]
-    //public void Part01_Result_Improved_02()
-    //{
-    //    Part01.Result_Improved_02(inputRaw);
-    //}
-    //[Benchmark]
-    //public void Part01_Result_Improved_03()
-    //{
-    //    Part01.Result_Improved_03(inputRaw);
-    //}
-    //[Benchmark]
-    //public void Part02_Result()
-    //{
-    //    Part02.Result(inputRaw);
-    //}
-
-    //[Benchmark]
-    //public void Part02_CheckIfCharIsNum()
-    //{
-    //    foreach (char ch in inputRaw)
-    //    {
-    //        CheckIfCharIsNum(ch);
-    //    }
-    //}
-    //private static bool CheckIfCharIsNum(char input) => ((input - '0') >= 0 && (input - '0') <= 9) ? true : false;
-
-    //[Benchmark]
-    //public void Part02_IsDigit()
-    //{
-    //    foreach (char ch in inputRaw)
-    //    {
-    //        char.IsDigit(ch);
-    //    }
-    //}
-
-
-
-
 
 
 }

@@ -13,15 +13,11 @@ string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "InputData/Inp
 
 var lines = File.ReadAllLines(path);
 
-await Task.Delay(2000);
+
 BenchmarkRunner.Run<Benchmarks>();
-Part01.Result(lines);
-Part01.Result(lines);
-Part01.Result(lines);
-Part01.Result(lines);
-Part01.Result(lines);
-Part01.Result(lines);
-//Part02.Result(input);
+//Part01.Result(lines);
+
+//Part02.Result(lines);
 
 //Console.WriteLine("Part01.Result(input); {0}", Part01.Result(inputLinesAsSpan));
 //Console.WriteLine("Part01.Result_Improved(input); {0}", Part01.Result_Improved(inputSpan));
