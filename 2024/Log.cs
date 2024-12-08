@@ -1,5 +1,4 @@
-﻿#define LOGGING_ENABLED
-
+﻿
 public static class GlobalLog
 {
     [System.Diagnostics.Conditional("LOGGING_ENABLED")]
