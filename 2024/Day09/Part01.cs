@@ -1,0 +1,83 @@
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Diagnostics;
+namespace Day09;
+public static class Part01
+{
+    public static void Result(ReadOnlySpan<char> input)
+    {
+        var lastFileIndex = 0;
+        if ((input.Length - 1) % 2 == 0)
+        {
+            lastFileIndex = input.Length - 1;
+        }
+        else if ((input.Length - 2) % 2 == 0)
+        {
+            lastFileIndex = input.Length - 2;
+        }
+        var lastFileNum = CharToInt(input[lastFileIndex]);
+        var fileIndex = 0;
+        var spaceIndex = 0;
+        var checksumIndex = 0;
+        long checksum = 0;
+        for (int i = 0; i < lastFileIndex; i++)
+        {
+            if(i%2==0)
+            {
+                var num = CharToInt(input[i]);
+                GlobalLog.Log($"### num: {num} x fileIndex:{fileIndex} ### ");
+                for (int j = 0; j < num; j++)
+                {
+                    var addingChecksum = checksumIndex * fileIndex;
+                    GlobalLog.Log($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and fileIndex I:{fileIndex}");
+                    checksum += addingChecksum;
+                    checksumIndex++;
+                }
+                fileIndex++;
+            }
+            else
+            {
+                var spaceNum = CharToInt(input[i]);
+                GlobalLog.Log($"### spaceNum: {spaceNum} x lastFileIndex/2:{lastFileIndex/2} ###");
+
+                for (int j = 0; j < spaceNum; j++)
+                {
+                    while(lastFileNum == 0)
+                    {
+                        lastFileIndex -= 2;
+                        if (lastFileIndex < i) break;
+                        lastFileNum = CharToInt(input[lastFileIndex]);
+                    }
+                        if (lastFileIndex < i) break;
+                    var addingChecksum = checksumIndex * lastFileIndex/2;
+                    GlobalLog.Log($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and lastFileIndex/2:{lastFileIndex / 2}");
+                    checksum += addingChecksum;
+                    checksumIndex++;
+                    lastFileNum--;
+                }
+            }
+            
+        }
+        GlobalLog.Log($"checksum: {checksum}");
+        GlobalLog.Log($"lastFileNum: {lastFileNum}");
+        if (lastFileNum != 0)
+        {
+            for (int j = 0; j < lastFileNum; j++)
+            {
+                var addingChecksum = checksumIndex * lastFileIndex/2;
+                GlobalLog.Log($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and Index I:{lastFileIndex}");
+                checksum += addingChecksum;
+                checksumIndex++;
+            }
+        }
+
+        GlobalLog.Log($"checksum: {checksum}");
+    }
+
+    private static int CharToInt(char c)
+    {
+        return (int)(c - '0');
+    }
+
+}
+

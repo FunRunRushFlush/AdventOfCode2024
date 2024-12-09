@@ -14,7 +14,6 @@
 	</ItemGroup>
 
 <!--
-
 		<DefineConstants>LOGGING_ENABLED</DefineConstants>
 -->
 	<PropertyGroup>
@@ -30,6 +29,15 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Day08\InputData\Part01Example.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Day09\InputData\Input.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Day09\InputData\Part01Example.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Day09\InputData\Part02Example.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

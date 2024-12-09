@@ -24,14 +24,10 @@ public class Benchmarks
     [Benchmark]
     public void Part01_Result()
     {
-        Day08.Part01.Result(input);
+        Day09.Part01.Result(inputRaw);
     }
 
-    [Benchmark]
-    public void Part02_Result()
-    {
-        Day08.Part02.Result(input);
-    }
+
 
 
 
