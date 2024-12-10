@@ -13,12 +13,13 @@
 		<PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.2" />
 	</ItemGroup>
 
-<!--
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 		<DefineConstants>LOGGING_ENABLED</DefineConstants>
--->
-	<PropertyGroup>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<DefineConstants></DefineConstants>
+	</PropertyGroup>
 
 
 	<ItemGroup>
@@ -29,6 +30,15 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Day08\InputData\Part01Example.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Day10\InputData\Input.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Day10\InputData\Part01Example.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Day10\InputData\Part02Example.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Day09\InputData\Input.txt">
