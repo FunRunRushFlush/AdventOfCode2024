@@ -11,10 +11,11 @@ var inputLines = File.ReadAllText(path);
 
 BenchmarkRunner.Run<Benchmarks>();
 
-var numchar = char.IsDigit( inputLines[0]);
 
-var num = (int)inputLines[0];
+//long solution = Day09.Part01.Result(inputLines);
 
-Day09.Part01.Result(inputLines);
+var solution = Day09.Part02.Result(inputLines);
+
+Console.WriteLine(solution);
 
 

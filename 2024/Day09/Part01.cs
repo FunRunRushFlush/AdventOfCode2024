@@ -1,10 +1,8 @@
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Diagnostics;
+
 namespace Day09;
 public static class Part01
 {
-    public static void Result(ReadOnlySpan<char> input)
+    public static long Result(ReadOnlySpan<char> input)
     {
         var lastFileIndex = 0;
         if ((input.Length - 1) % 2 == 0)
@@ -17,7 +15,6 @@ public static class Part01
         }
         var lastFileNum = CharToInt(input[lastFileIndex]);
         var fileIndex = 0;
-        var spaceIndex = 0;
         var checksumIndex = 0;
         long checksum = 0;
         for (int i = 0; i < lastFileIndex; i++)
@@ -70,8 +67,8 @@ public static class Part01
                 checksumIndex++;
             }
         }
-
         GlobalLog.Log($"checksum: {checksum}");
+        return checksum;
     }
 
     private static int CharToInt(char c)
