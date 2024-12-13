@@ -22,18 +22,18 @@ public class Benchmarks
     [Benchmark]
     public void Part01_Result()
     {
-        Day11.Part01.Result(inputRaw);
+        Day12.Part01.Result(input);
     }
-    [Benchmark]
-    public void Part01_Result_Improved()
-    {
-        Day11.Part01.Result_Improved(inputRaw);
-    }
-    [Benchmark]
-    public void Part02_Result()
-    {
-        Day11.Part02.Result(inputRaw);
-    }
+    //[Benchmark]
+    //public void Part01_Result_Improved()
+    //{
+    //    Day11.Part01.Result_Improved(inputRaw);
+    //}
+    //[Benchmark]
+    //public void Part02_Result()
+    //{
+    //    Day11.Part02.Result(inputRaw);
+    //}
     //[Benchmark]
     //public void Part02_Result()
     //{
