@@ -14,7 +14,7 @@ public class Benchmarks
     [GlobalSetup]
     public void Setup()
     {
-        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day11/InputData/Input.txt");
+        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day12/InputData/Input.txt");
         inputRaw = File.ReadAllText(path);
     
          input = File.ReadAllLines(path);

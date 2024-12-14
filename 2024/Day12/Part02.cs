@@ -1,3 +1,7 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.ConstrainedExecution;
+
 namespace Day12;
 
 public static class Part02
@@ -12,6 +16,8 @@ public static class Part02
     {
         region = new Dictionary<(int Y, int X), char>();
         allRegion = new Dictionary<(int Y, int X), char>();
+        Dictionary<(int Y, int X), (bool Visited, HashSet<Direction> BorderDir)> border = new();
+        HashSet<Direction> tempBorderList = new HashSet<Direction>();
         field = input.ToArray();
         int boundery = 0;
         int fence = 0;
@@ -28,21 +34,67 @@ public static class Part02
                 CheckForRegion(postion, input[y][x]);
                 foreach (var cel in region)
                 {
-                    GlobalLog.Log($"cel: Y:{cel.Key.Y} X:{cel.Key.X}");
-                    boundery = 4;
+                    GlobalLog.Log($"region-cel: Y:{cel.Key.Y} X:{cel.Key.X}");
+
                     for (int dir = 0; dir < 4; dir++)
                     {
                         var offsetPos = SetOffsetCoord((Direction)dir, cel.Key);
-                        if (region.ContainsKey(offsetPos)) boundery--;
+                        if (!region.ContainsKey(offsetPos)) border.TryAdd(offsetPos, (false, new HashSet<Direction>()));
 
                     }
-                    GlobalLog.Log($"boundery: {boundery}");
-                    fence += boundery;
+                    
                 }
-                GlobalLog.Log($"FenceCounter: {fence}");
-                GlobalLog.Log($" Price: {Price} += {fence} * {region.Count};");
+                if (input[y][x] == 'V')
+                { 
 
-                Price += fence * region.Count;
+                }
+                foreach (var cel in border)
+                {
+                    //GlobalLog.Log($"Border-cel: Y:{cel.Key.Y} X:{cel.Key.X}");
+                    //BorderCheck
+                    for (int dir = 0; dir < 4; dir++)
+                    {
+                        var offsetPos = SetOffsetCoord((Direction)dir, cel.Key);
+                        if (region.ContainsKey(offsetPos)) tempBorderList.Add((Direction)dir);
+                    }
+                    border[cel.Key] = (true, tempBorderList);
+                    GlobalLog.Log($"border[{cel.Key}]: {tempBorderList.Count}");
+                    var temp = new HashSet<Direction>(tempBorderList);
+                    for (int dir = 0; dir < 4; dir++)
+                    {
+
+                        var offsetPos = SetOffsetCoord((Direction)dir, cel.Key);
+             
+                        if (border.ContainsKey(offsetPos) && border[offsetPos].Visited==true)
+                        {
+                            //GlobalLog.Log($"tempBorderList.RemoveWhere: {temp.Count}");
+                            foreach (var dirHas in border[offsetPos].BorderDir)
+                            {
+                                GlobalLog.Log($"temp.RemoveWhere: {dirHas} for Y:{offsetPos.Y} X:{offsetPos.X}");
+                                temp.Remove(dirHas);
+                            }
+
+                            GlobalLog.Log($"After_tempBorderList.RemoveWhere: {temp.Count}");
+                        };
+                    }
+                    fence += temp.Count;
+                    GlobalLog.Log($"fence: {fence} += {temp.Count}");
+                    tempBorderList = new();
+                    temp = new();
+
+                }
+
+
+
+
+
+                    GlobalLog.Log($"FenceCounter: {fence}");
+                var tempPrice= fence * region.Count;
+                GlobalLog.Log($"###################################################");
+                GlobalLog.Log($"### Price: {tempPrice} = {region.Count} * {fence}; ###");
+                GlobalLog.Log($"###################################################");
+
+                Price += tempPrice;
 
                 fence = 0;
                 foreach (var item in region)
@@ -53,6 +105,7 @@ public static class Part02
                     }
                 }
                 region.Clear();
+                border.Clear();
             }
         }
         return Price;
@@ -71,10 +124,7 @@ public static class Part02
                     if (!CheckBounderys(offsetPos)) continue;
                     CheckForRegion(offsetPos, v);
                 }
-
             }
-
-
         }
     }
 
