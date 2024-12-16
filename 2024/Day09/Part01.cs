@@ -22,11 +22,11 @@ public static class Part01
             if(i%2==0)
             {
                 var num = CharToInt(input[i]);
-                GlobalLog.Log($"### num: {num} x fileIndex:{fileIndex} ### ");
+                GlobalLog.LogLine($"### num: {num} x fileIndex:{fileIndex} ### ");
                 for (int j = 0; j < num; j++)
                 {
                     var addingChecksum = checksumIndex * fileIndex;
-                    GlobalLog.Log($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and fileIndex I:{fileIndex}");
+                    GlobalLog.LogLine($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and fileIndex I:{fileIndex}");
                     checksum += addingChecksum;
                     checksumIndex++;
                 }
@@ -35,7 +35,7 @@ public static class Part01
             else
             {
                 var spaceNum = CharToInt(input[i]);
-                GlobalLog.Log($"### spaceNum: {spaceNum} x lastFileIndex/2:{lastFileIndex/2} ###");
+                GlobalLog.LogLine($"### spaceNum: {spaceNum} x lastFileIndex/2:{lastFileIndex/2} ###");
 
                 for (int j = 0; j < spaceNum; j++)
                 {
@@ -47,7 +47,7 @@ public static class Part01
                     }
                         if (lastFileIndex < i) break;
                     var addingChecksum = checksumIndex * lastFileIndex/2;
-                    GlobalLog.Log($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and lastFileIndex/2:{lastFileIndex / 2}");
+                    GlobalLog.LogLine($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and lastFileIndex/2:{lastFileIndex / 2}");
                     checksum += addingChecksum;
                     checksumIndex++;
                     lastFileNum--;
@@ -55,19 +55,19 @@ public static class Part01
             }
             
         }
-        GlobalLog.Log($"checksum: {checksum}");
-        GlobalLog.Log($"lastFileNum: {lastFileNum}");
+        GlobalLog.LogLine($"checksum: {checksum}");
+        GlobalLog.LogLine($"lastFileNum: {lastFileNum}");
         if (lastFileNum != 0)
         {
             for (int j = 0; j < lastFileNum; j++)
             {
                 var addingChecksum = checksumIndex * lastFileIndex/2;
-                GlobalLog.Log($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and Index I:{lastFileIndex}");
+                GlobalLog.LogLine($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and Index I:{lastFileIndex}");
                 checksum += addingChecksum;
                 checksumIndex++;
             }
         }
-        GlobalLog.Log($"checksum: {checksum}");
+        GlobalLog.LogLine($"checksum: {checksum}");
         return checksum;
     }
 

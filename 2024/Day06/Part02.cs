@@ -29,7 +29,7 @@ public static class Part02
                     continue; 
                 }
 
-                GlobalLog.Log($"#_@: Y:{i} X:{j}");
+                GlobalLog.LogLine($"#_@: Y:{i} X:{j}");
 
                 while (loop)
                 {
@@ -38,7 +38,7 @@ public static class Part02
                         (xDir, yDir) = guard.CheckPathKord();
                         if (rawInput[yDir][xDir] == '#' || (yDir, xDir) == (i, j))
                         {
-                            GlobalLog.Log($"Blocker @: Y:{yDir} X:{xDir}");
+                            GlobalLog.LogLine($"Blocker @: Y:{yDir} X:{xDir}");
                             dirClear = false;
                         }
 
@@ -47,7 +47,7 @@ public static class Part02
                             (xDir, yDir) = guard.CheckPathKord();
                             if (rawInput[yDir][xDir] == '#' || (yDir,xDir) ==(i,j) )
                             {
-                                GlobalLog.Log($"Blocker @: Y:{yDir} X:{xDir}");
+                                GlobalLog.LogLine($"Blocker @: Y:{yDir} X:{xDir}");
                                 guard.TurnRight();
                             }
                             else
@@ -65,7 +65,7 @@ public static class Part02
                             loop = false;
                         }
 
-                        GlobalLog.Log($"GuardPosition : Y:{pos.Y} X:{pos.X}");
+                        GlobalLog.LogLine($"GuardPosition : Y:{pos.Y} X:{pos.X}");
                     }
                     catch (IndexOutOfRangeException ex)
                     {

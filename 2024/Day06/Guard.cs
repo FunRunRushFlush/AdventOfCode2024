@@ -46,11 +46,11 @@ public class Guard
         if (coordinates.Add((x, y)))
         {
             uniqueCoordinatCounter++;
-            GlobalLog.Log($"Koordinate ({x}, {y}) hinzugefügt.");
+            GlobalLog.LogLine($"Koordinate ({x}, {y}) hinzugefügt.");
         }
         else
         {
-            GlobalLog.Log($"Koordinate ({x}, {y}) ist ein Duplikat und wurde nicht hinzugefügt.");
+            GlobalLog.LogLine($"Koordinate ({x}, {y}) ist ein Duplikat und wurde nicht hinzugefügt.");
         }
     }
 

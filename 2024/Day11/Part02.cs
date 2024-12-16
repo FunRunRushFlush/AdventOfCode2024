@@ -21,7 +21,7 @@ public static class Part02
             StoneCounter += CheckStoneRule(element, 0);
         }
 
-        GlobalLog.Log($"StoneCounter: {StoneCounter} - Result_Rec");
+        GlobalLog.LogLine($"StoneCounter: {StoneCounter} - Result_Rec");
         return StoneCounter;
     }
 

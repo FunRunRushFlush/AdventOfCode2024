@@ -31,7 +31,7 @@ public static class Part01
                 CheckForRegion(postion, input[y][x]);
                 foreach(var cel in region)
                 {
-                    GlobalLog.Log($"cel: Y:{cel.Key.Y} X:{cel.Key.X}");
+                    GlobalLog.LogLine($"cel: Y:{cel.Key.Y} X:{cel.Key.X}");
                     boundery = 4;
                     for (int dir = 0; dir < 4; dir++)
                     {
@@ -39,11 +39,11 @@ public static class Part01
                         if(region.ContainsKey(offsetPos)) boundery--;
                         
                     }
-                    GlobalLog.Log($"boundery: {boundery}");
+                    GlobalLog.LogLine($"boundery: {boundery}");
                     fence += boundery;
                 }
-                GlobalLog.Log($"FenceCounter: {fence}");
-                GlobalLog.Log($" Price: {Price} += {fence} * {region.Count};");
+                GlobalLog.LogLine($"FenceCounter: {fence}");
+                GlobalLog.LogLine($" Price: {Price} += {fence} * {region.Count};");
 
                 Price += fence * region.Count;
                 
@@ -63,7 +63,7 @@ public static class Part01
 
     private static void CheckForRegion((int y, int x) postion, char v)
     {
-        GlobalLog.Log($"CheckForRegion: Y:{postion.y} X:{postion.x} and Char:{v}");
+        GlobalLog.LogLine($"CheckForRegion: Y:{postion.y} X:{postion.x} and Char:{v}");
         if (field[postion.y][postion.x] == v)
         {
             if (region.TryAdd(postion, v))

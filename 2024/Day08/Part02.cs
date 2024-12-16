@@ -38,9 +38,9 @@ public static class Part02
             {
                 for (int j = i + 1; j < list.Count; j++)
                 {
-                    GlobalLog.Log($"##### New Calc I:{i} j: {j} #########");
-                    GlobalLog.Log($"tuple1 = list[i]: Y:{list[i].Y} X:{list[i].X}");
-                    GlobalLog.Log($"tuple2 = list[j]: Y:{list[j].Y} X:{list[j].X}");
+                    GlobalLog.LogLine($"##### New Calc I:{i} j: {j} #########");
+                    GlobalLog.LogLine($"tuple1 = list[i]: Y:{list[i].Y} X:{list[i].X}");
+                    GlobalLog.LogLine($"tuple2 = list[j]: Y:{list[j].Y} X:{list[j].X}");
                     var tuple1 = list[i];
                     var tuple2 = list[j];
                     dicAntinodes.Add(tuple1);
@@ -53,14 +53,14 @@ public static class Part02
                     int mult = 1;
                     while (tuple1Posible || tuple2Posible)
                     {
-                        GlobalLog.Log($"tuple1.Y: {tuple1.Y}");
-                        GlobalLog.Log($"tuple2.Y: {tuple2.Y}");
+                        GlobalLog.LogLine($"tuple1.Y: {tuple1.Y}");
+                        GlobalLog.LogLine($"tuple2.Y: {tuple2.Y}");
                         var antinode01 = (tuple1.Y - diffY * mult, tuple1.X - diffX * mult);
                         var antinode02 = (tuple2.Y + diffY * mult, tuple2.X + diffX * mult);
                         if ((antinode01.Item1 >= 0 && antinode01.Item2 >= 0)
                             && (antinode01.Item1 < inputHeightY && antinode01.Item2 < inputWidthX))
                         {
-                        GlobalLog.Log($"antinode01: Y:{antinode01.Item1},X:{antinode01.Item2} ");
+                        GlobalLog.LogLine($"antinode01: Y:{antinode01.Item1},X:{antinode01.Item2} ");
                             dicAntinodes.Add(antinode01);
                         }
                         else
@@ -71,7 +71,7 @@ public static class Part02
                         if ((antinode02.Item1 >= 0 && antinode02.Item2 >= 0)
                             && (antinode02.Item1 < inputHeightY && antinode02.Item2 < inputWidthX))
                         {
-                        GlobalLog.Log($"antinode02: Y:{antinode02.Item1},X:{antinode02.Item2} ");
+                        GlobalLog.LogLine($"antinode02: Y:{antinode02.Item1},X:{antinode02.Item2} ");
                             dicAntinodes.Add(antinode02);
                         }
                         else
@@ -86,6 +86,6 @@ public static class Part02
         }
             int antinodesCounter = dicAntinodes.Count;
 
-            GlobalLog.Log($"antinodesCounter: {antinodesCounter}");
+            GlobalLog.LogLine($"antinodesCounter: {antinodesCounter}");
     }
 }

@@ -11,7 +11,7 @@ public static class Part01
     public static int Result(string[] rawInput)
     {
         GetGuardPosition(rawInput, out Point guPos);
-        GlobalLog.Log($"{guPos}");
+        GlobalLog.LogLine($"{guPos}");
         Guard guard = new Guard(guPos);
         bool loop = true;
         bool dirClear = false;
@@ -24,7 +24,7 @@ public static class Part01
                 (xDir, yDir) = guard.CheckPathKord();
                 if (rawInput[yDir][xDir] == '#')
                 {
-                    GlobalLog.Log($"Blocker @: Y:{yDir} X:{xDir}");
+                    GlobalLog.LogLine($"Blocker @: Y:{yDir} X:{xDir}");
                     dirClear=false;
                 }
                     
@@ -33,7 +33,7 @@ public static class Part01
                     (xDir, yDir) = guard.CheckPathKord();
                     if (rawInput[yDir][xDir] == '#')
                     {
-                        GlobalLog.Log($"Blocker @: Y:{yDir} X:{xDir}");
+                        GlobalLog.LogLine($"Blocker @: Y:{yDir} X:{xDir}");
                         guard.TurnRight();
                     }
                     else 
@@ -45,8 +45,8 @@ public static class Part01
                 guard.MoveOneStep();
                 var pos = guard.GetPosition();
                 var dir = guard.GetPosition();
-                GlobalLog.Log($"GuardPosition : Y:{pos.Y} X:{pos.X}");
-                GlobalLog.Log($"GuardDirection : Y:{dir.Y} X:{dir.X}");
+                GlobalLog.LogLine($"GuardPosition : Y:{pos.Y} X:{pos.X}");
+                GlobalLog.LogLine($"GuardDirection : Y:{dir.Y} X:{dir.X}");
 
 
             }

@@ -22,7 +22,7 @@ public static class Part02
         {
             for (int x = 0; x < MapWidth; x++)
             {
-                GlobalLog.Log($"input[y][x] : Y:{y} X:{x}");
+                GlobalLog.LogLine($"input[y][x] : Y:{y} X:{x}");
                 if (CharToInt(input[y][x]) == 0)
                 {
                     PathChecker(CharToInt(input[y][x]), (y, x), input);
@@ -30,17 +30,17 @@ public static class Part02
             }
         }
 
-        GlobalLog.Log($"trailHeadCounter : {trailHeadCounter}");
+        GlobalLog.LogLine($"trailHeadCounter : {trailHeadCounter}");
         return trailHeadCounter;
     }
 
     private static void PathChecker(int trailNum, (int Y, int X) trailPos, ReadOnlySpan<string> input)
     {
-        GlobalLog.Log($"PathChecker: trailNum:{trailNum}, trailPos: Y:{trailPos.Y} X:{trailPos.X}");
+        GlobalLog.LogLine($"PathChecker: trailNum:{trailNum}, trailPos: Y:{trailPos.Y} X:{trailPos.X}");
         if (trailNum == 9)
         {
             trailHeadCounter++;
-            GlobalLog.Log($"trailHeadCounter : {trailHeadCounter}");
+            GlobalLog.LogLine($"trailHeadCounter : {trailHeadCounter}");
             return;
         }
         foreach (var trail in (ExtractNearbyTrails(trailNum, trailPos, input)))
@@ -119,7 +119,7 @@ public static class Part02
         {
             for (int x = 0; x < MapWidth; x++)
             {
-                GlobalLog.Log($"input[y][x] : Y:{y} X:{x}");
+                GlobalLog.LogLine($"input[y][x] : Y:{y} X:{x}");
                 if (CharToInt(input[y][x]) == 0)
                 {
                     PathChecker_Imp(CharToInt(input[y][x]), (y, x), input);
@@ -127,7 +127,7 @@ public static class Part02
             }
         }
 
-        GlobalLog.Log($"trailHeadCounter : {trailHeadCounter}");
+        GlobalLog.LogLine($"trailHeadCounter : {trailHeadCounter}");
         return trailHeadCounter;
     }
 

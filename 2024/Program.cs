@@ -1,28 +1,23 @@
 ﻿
 
+
 using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 
-string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day12/InputData/Part02Example.txt");
+string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day15/InputData/Part03Example.txt");
 
-//var inputLines = File.ReadAllText(path);
+
+var inputText= File.ReadAllText(path);
 var inputLines = File.ReadAllLines(path);
 
 
 BenchmarkRunner.Run<Benchmarks>();
 
 
-//long solution = Day12.Part01.Result(inputLines);
-long solution02 = Day12.Part02.Result(inputLines);
-//long solutionRec = Day11.Part01.Result_test(inputLines);
+//long solution01 = Day15.Part01.Result(inputText);
 
-//var solutionTest = Day11.Part01.Result_Rec(inputLines);
-//var solution01 = Day11.Part02.Result(inputLines);
+long solution = Day15.Part02.Result(inputText);
 
-//GlobalLog.Log($"{solution}");
-GlobalLog.Log($"{solution02}");
+//GlobalLog.LogLine($"{solution01}");
 
-
-//GlobalLog.Log($"{solution01}");
 
 

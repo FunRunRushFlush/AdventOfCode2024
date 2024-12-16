@@ -36,7 +36,7 @@ public static class Part02
         for (int i = lastFileIndex; i > 0; i -= 2)
         {
             var num = CharToInt(input[i]);
-            GlobalLog.Log($"num = {num}; lastFileIndex = {i}");
+            GlobalLog.LogLine($"num = {num}; lastFileIndex = {i}");
             for (int j = 1; j < discSpace.Length; j+=2)
             {
                 if (j> i) break;
@@ -54,7 +54,7 @@ public static class Part02
                     var temp = discSpaceSpaceLeft - num;
                     for (int k = discSpace[j].SpaceLeft; k > temp; k--)
                     {
-                        GlobalLog.Log($"discSpace[{j}].Data[^{(k)}] = {i / 2};");
+                        GlobalLog.LogLine($"discSpace[{j}].Data[^{(k)}] = {i / 2};");
                         discSpace[j].Data[^(k)] = i / 2;
                     }
                     discSpace[j].SpaceLeft -= num;
@@ -86,7 +86,7 @@ public static class Part02
                     continue;                
                 }
                 var num = CharToInt(input[i]);
-                GlobalLog.Log($"### num: {num} x fileIndex:{fileIndex} ### ");
+                GlobalLog.LogLine($"### num: {num} x fileIndex:{fileIndex} ### ");
                 for (int j = 0; j < num; j++)
                 {
                     if(checksumIndex==10)
@@ -94,7 +94,7 @@ public static class Part02
 
                     }
                     var addingChecksum = checksumIndex * fileIndex;
-                    GlobalLog.Log($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and fileIndex I:{fileIndex}");
+                    GlobalLog.LogLine($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and fileIndex I:{fileIndex}");
                     checksum += addingChecksum;
                     checksumIndex++;
                 }
@@ -103,7 +103,7 @@ public static class Part02
             else
             {
                 var dSpace = discSpace[i];
-                GlobalLog.Log($"### dSpace.Data.Length: {dSpace.Data.Length} ###");
+                GlobalLog.LogLine($"### dSpace.Data.Length: {dSpace.Data.Length} ###");
 
                 for (int j = 0; j < dSpace.Data.Length; j++)
                 {
@@ -113,7 +113,7 @@ public static class Part02
                     }
 
                     var addingChecksum = checksumIndex * dSpace.Data[j];
-                    GlobalLog.Log($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and dSpace.Data[j]:{dSpace.Data[j]}");
+                    GlobalLog.LogLine($"addingChecksum: {addingChecksum} for checksumIndex:{checksumIndex} and dSpace.Data[j]:{dSpace.Data[j]}");
                     checksum += addingChecksum;
                     checksumIndex++;
      
@@ -121,7 +121,7 @@ public static class Part02
             }
         }
 
-        GlobalLog.Log($"checksum: {checksum}");
+        GlobalLog.LogLine($"checksum: {checksum}");
         return checksum;
     }
     public struct DiscSpace

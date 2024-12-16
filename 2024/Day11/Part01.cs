@@ -1,7 +1,3 @@
-
-
-using Perfolizer.Mathematics.Randomization;
-
 namespace Day11;
 public static class Part01
 {
@@ -19,7 +15,7 @@ public static class Part01
 
         for (int x = 0; x < BlinkLimit; x++)
         {
-            GlobalLog.Log($"{string.Join(", ", stoneList)}");
+            GlobalLog.LogLine($"{string.Join(", ", stoneList)}");
             for (int i = 0; i < stoneList.Count; i++)
             {
                 string stone = stoneList[i];
@@ -58,7 +54,7 @@ public static class Part01
             StoneCounter += CheckStoneRule(element, 0);
         }
 
-        GlobalLog.Log($"StoneCounter: {StoneCounter} - Result_Rec");
+        GlobalLog.LogLine($"StoneCounter: {StoneCounter} - Result_Rec");
         return StoneCounter;
     }
 
