@@ -7,6 +7,15 @@ public static class Part02
     private static int WarehouseHeight;
     private static int WarehouseWidth;
 
+    private const char StoneRightSide = ']';
+    private const char StoneLeftSide = '[';
+    private const char Player = '@';
+    private const char Wall = '#';
+    private const char smallStone = 'O';
+    private const char freeSpace = '.';
+
+    private static Dictionary<(int Y,int X),char> tempRender = new Dictionary<(int Y,int X),char>();
+
     public static (int Y, int X) roboPos;
 
     public static long Result(string input)
@@ -14,22 +23,24 @@ public static class Part02
         ParseInput(input);
         int insCounter = 0;
         long GPS = 0;
+        DrawGrid(insCounter);
         foreach (char ins in Instructions)
         {
             insCounter++;
             var pos = SetOffsetCoord((Direction)ins, roboPos);
             GlobalLog.LogLine($"ins: {(Direction)ins}");
-            CheckForStone(pos.Y, pos.X, ins);
+            CheckForStone(pos.Y, pos.X, ins);   
+            tempRender.Clear();
 
-            DrawGrid(insCounter);
-
+            //DrawGrid(insCounter);
+            //Console.ReadLine();
         }
 
         for (int y = 0; y < WarehouseHeight; y++)
         {
             for (int x = 0; x < WarehouseWidth; x++)
             {
-                if (Warehouse[y, x] == 'O')
+                if (Warehouse[y, x] == StoneLeftSide)
                 {
                     GPS += y * 100 + x;
                 }
@@ -62,93 +73,175 @@ public static class Part02
         Console.WriteLine("-------------------------------------------");
         Console.WriteLine();
     }
-
-    private static bool CheckForStone(int y, int x, int dir)
+    private static void TryAddWithLog((int Y, int X)pos,char value)
     {
-        if (Warehouse[y, x] == '#')
+        GlobalLog.LogLine($"tempRender.Add((y:{pos.Y},x:{pos.X}), {value}");
+        tempRender.TryAdd(pos, value);
+    }
+
+    private static int CheckForStone(int y, int x, int dir)
+    {
+        GlobalLog.LogLine($"CheckForStone: y:{y} x:{x}");
+        var counter = 0;
+        var checkingTile = Warehouse[y, x];
+
+        var partDir = checkingTile == StoneLeftSide ? Direction.Right : Direction.Left;
+        var partOffSett = SetOffsetCoord((Direction)partDir, (y, x));
+        var partChar = Warehouse[partOffSett.Y, partOffSett.X];
+        TryAddWithLog((y, x), checkingTile);
+        TryAddWithLog(partOffSett, partChar);
+ 
+
+        if (checkingTile == Wall)
         {
             GlobalLog.LogLine($"Wall: y:{y} x:{x}");
-            return false;
+            return 0;
         }
-        else if (Warehouse[y, x] == '[' || Warehouse[y, x] == ']')
+        else if (checkingTile == StoneLeftSide || checkingTile == StoneRightSide)
         {
-            if(Warehouse[y, x] == '[' 
-                &&((Direction)dir == Direction.Up || (Direction)dir == Direction.Down))
-            {
-                var offsetPos01 = SetOffsetCoord((Direction)dir, (y, x));
-                var result01 = CheckForStone(offsetPos01.Y, offsetPos01.X, dir);
-                var offsetPos02 = SetOffsetCoord(Direction.Left, (y, x));
-                var result02 = CheckForStone(offsetPos02.Y, offsetPos02.X, dir);
-
-                return result01 && result02;
-
-            }
-            else if (Warehouse[y, x] == ']'
+            if (checkingTile == StoneLeftSide
                 && ((Direction)dir == Direction.Up || (Direction)dir == Direction.Down))
             {
-                //Wenn einer der beiden failt failen beide:
-                var offsetPos01 = SetOffsetCoord((Direction)dir, (y, x));
-                var result01 = CheckForStone(offsetPos01.Y, offsetPos01.X, dir);
-                var offsetPos02 = SetOffsetCoord(Direction.Right, (y, x));
-                var result02 = CheckForStone(offsetPos02.Y, offsetPos02.X, dir);
+                //tempRender.Add((y, x), checkingTile);
+                //tempRender.Add(partOffSett, partChar);
+                var offsetPos = SetOffsetCoord((Direction)dir, (y, x));
 
-                return result01 && result02;
+                counter += CheckForWideStone(offsetPos.Y, offsetPos.X, dir);
+                offsetPos = SetOffsetCoord(Direction.Right, (offsetPos.Y, offsetPos.X));
+                counter += CheckForWideStone(offsetPos.Y, offsetPos.X, dir);
+
+            }
+            else if (checkingTile == StoneRightSide
+                && ((Direction)dir == Direction.Up || (Direction)dir == Direction.Down))
+            {
+                //tempRender.Add((y, x), checkingTile);
+                //tempRender.Add(partOffSett, checkingTile);
+                var offsetPos = SetOffsetCoord((Direction)dir, (y, x));
+
+                counter += CheckForWideStone(offsetPos.Y, offsetPos.X, dir);
+                offsetPos = SetOffsetCoord(Direction.Left, (offsetPos.Y, offsetPos.X));
+                counter += CheckForWideStone(offsetPos.Y, offsetPos.X, dir);
             }
             else
             {
-                    var offsetPos = SetOffsetCoord((Direction)dir, (y, x));
-                    CheckForStone(offsetPos.Y, offsetPos.X, dir);                
+                var offsetPos = SetOffsetCoord((Direction)dir, (y, x));
+                CheckForStone(offsetPos.Y, offsetPos.X, dir);
             }
         }
-        else if (Warehouse[y, x] == '.')
+        else if (checkingTile == freeSpace)
         {
             var distance = Math.Abs(y - roboPos.Y) + Math.Abs(x - roboPos.X);
-            Warehouse[roboPos.Y, roboPos.X] = '.';
+            Warehouse[roboPos.Y, roboPos.X] = freeSpace;
             var offsetPos = SetOffsetCoord((Direction)dir, (roboPos.Y, roboPos.X));
             roboPos = offsetPos;
-            Warehouse[roboPos.Y, roboPos.X] = '@';
+            Warehouse[roboPos.Y, roboPos.X] = Player;
             if (distance > 1)
             {
                 var tempPos = roboPos;
-                for (int d = 1; d < distance; d+=1)
+                for (int d = 1; d < distance; d += 1)
                 {
                     offsetPos = SetOffsetCoord((Direction)dir, (tempPos.Y, tempPos.X));
                     tempPos = offsetPos;
-                    if((Direction) dir==Direction.Left && d%2==1)
+                    if ((Direction)dir == Direction.Left && d % 2 == 1)
                     {
-                        Warehouse[tempPos.Y, tempPos.X] = ']';
+                        Warehouse[tempPos.Y, tempPos.X] = StoneRightSide;
                         offsetPos = SetOffsetCoord((Direction)dir, (tempPos.Y, tempPos.X));
                         //tempPos = offsetPos;
-                        Warehouse[offsetPos.Y, offsetPos.X] = '[';
+                        Warehouse[offsetPos.Y, offsetPos.X] = StoneLeftSide;
 
                     }
-                    if ((Direction)dir == Direction.Up)
+                    else if ((Direction)dir == Direction.Right && d % 2 == 1)
                     {
-                        var temp02 = tempPos;
-                        Warehouse[tempPos.Y, tempPos.X] = ']';
-                        offsetPos = SetOffsetCoord((Direction)dir, (tempPos.Y, tempPos.X));
-                        //tempPos = offsetPos;
-                        Warehouse[tempPos.Y, tempPos.X] = ']';
-                        temp02 = tempPos;
-                        offsetPos = SetOffsetCoord(Direction.Left, (temp02.Y, temp02.X));
-                        Warehouse[tempPos.Y, tempPos.X] = '[';
+
+                            Warehouse[tempPos.Y, tempPos.X] = StoneLeftSide;
+                            offsetPos = SetOffsetCoord((Direction)dir, (tempPos.Y, tempPos.X));
+                            //tempPos = offsetPos;
+                            Warehouse[offsetPos.Y, offsetPos.X] = StoneRightSide;
+
+                        
                     }
 
-                    if ((Direction)dir == Direction.Up)
-                    {
-                        var temp02=tempPos;
-                        Warehouse[tempPos.Y, tempPos.X] = '[';
-                        offsetPos = SetOffsetCoord((Direction)dir, (tempPos.Y, tempPos.X));
-                        //tempPos = offsetPos;
-                        Warehouse[tempPos.Y, tempPos.X] = '[';
-                        temp02 = tempPos;
-                        offsetPos = SetOffsetCoord(Direction.Right, (temp02.Y, temp02.X));
-                        Warehouse[tempPos.Y, tempPos.X] = ']';
-                    }
                 }
             }
         }
-        return true;
+
+        if (counter > 1)
+        {
+            var distance = Math.Abs(y - roboPos.Y) + Math.Abs(x - roboPos.X);
+            Warehouse[roboPos.Y, roboPos.X] = freeSpace;
+            var offsetPos = SetOffsetCoord((Direction)dir, (roboPos.Y, roboPos.X));
+            RenderNewStoneLocation( dir);
+            roboPos = offsetPos;
+            Warehouse[roboPos.Y, roboPos.X] = Player;
+            
+        }
+        return counter;
+    }
+
+    private static void RenderNewStoneLocation(int dir)
+    {
+        foreach( var element in tempRender)
+        {
+            Warehouse[element.Key.Y,element.Key.X] = freeSpace;
+        }
+        foreach (var element in tempRender)
+        {
+            var offsetPos = SetOffsetCoord((Direction)dir, element.Key);
+                Warehouse[offsetPos.Y, offsetPos.X] = element.Value;
+        }
+    }
+
+    private static int CheckForWideStone(int wY, int wX, int dir)
+    {
+        GlobalLog.LogLine($"CheckForWideStone: y:{wY} x:{wX}");
+        var counter = 0;
+        var checkingTile = Warehouse[wY, wX];
+
+        var partDir = checkingTile == StoneLeftSide ? Direction.Right : Direction.Left;
+        var partOffSett = SetOffsetCoord((Direction)partDir, (wY, wX));
+        var partChar = Warehouse[partOffSett.Y, partOffSett.X];
+        
+                
+        if (checkingTile == Wall)
+        {
+            GlobalLog.LogLine($"Wall: y:{wY} x:{wX}");
+            return -1000;
+        }
+        else if (checkingTile == StoneLeftSide || checkingTile == StoneRightSide)
+        {
+                TryAddWithLog((wY, wX), checkingTile);
+                TryAddWithLog(partOffSett, partChar);
+            if (checkingTile == StoneLeftSide
+                && ((Direction)dir == Direction.Up || (Direction)dir == Direction.Down))
+            {
+                
+
+                var offsetPos = SetOffsetCoord((Direction)dir, (wY, wX));
+
+                counter += CheckForWideStone(offsetPos.Y, offsetPos.X, dir);
+                var temp = SetOffsetCoord(Direction.Right, (offsetPos.Y, offsetPos.X));
+                counter += CheckForWideStone(temp.Y, temp.X, dir);
+
+            }
+            else if (checkingTile == StoneRightSide
+                && ((Direction)dir == Direction.Up || (Direction)dir == Direction.Down))
+            {
+
+                var offsetPos = SetOffsetCoord((Direction)dir, (wY, wX));
+
+                counter += CheckForWideStone(offsetPos.Y, offsetPos.X, dir);
+                offsetPos = SetOffsetCoord(Direction.Left, (offsetPos.Y, offsetPos.X));
+                counter += CheckForWideStone(offsetPos.Y, offsetPos.X, dir);
+            }
+
+        }
+
+
+        else if (checkingTile == freeSpace )
+        {
+            return 1;
+        }
+        return counter;
     }
 
     private enum Direction
@@ -200,30 +293,30 @@ public static class Part02
         int height = rows.Length;
         int width = rows[0].Length;
 
-        Warehouse = new char[height, width*2];
+        Warehouse = new char[height, width * 2];
 
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
-                if (rows[y][x] == '@')
+                if (rows[y][x] == Player)
                 {
                     Warehouse[y, x * 2] = rows[y][x];
-                    roboPos = (y, x*2);
-                    Warehouse[y, x * 2 + 1] = '.';
+                    roboPos = (y, x * 2);
+                    Warehouse[y, x * 2 + 1] = freeSpace;
                 }
-                else if (rows[y][x] == 'O')
+                else if (rows[y][x] == smallStone)
                 {
-                    Warehouse[y, x * 2] = '[';
-                    Warehouse[y, x * 2 + 1] = ']';
+                    Warehouse[y, x * 2] = StoneLeftSide;
+                    Warehouse[y, x * 2 + 1] = StoneRightSide;
                 }
                 else
                 {
-                    Warehouse[y, x*2] = rows[y][x];
-                    Warehouse[y, x * 2+1] = rows[y][x];
+                    Warehouse[y, x * 2] = rows[y][x];
+                    Warehouse[y, x * 2 + 1] = rows[y][x];
                 }
 
-                if (Warehouse[y, x] == '@')
+                if (Warehouse[y, x] == Player)
                 {
                     roboPos = (y, x);
                 }

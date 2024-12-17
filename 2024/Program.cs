@@ -3,7 +3,7 @@
 
 using BenchmarkDotNet.Running;
 
-string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day15/InputData/Part03Example.txt");
+string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day16/InputData/Part01Example.txt");
 
 
 var inputText= File.ReadAllText(path);
@@ -15,7 +15,7 @@ BenchmarkRunner.Run<Benchmarks>();
 
 //long solution01 = Day15.Part01.Result(inputText);
 
-long solution = Day15.Part02.Result(inputText);
+long solution = Day16.Part01.Result(inputText);
 
 //GlobalLog.LogLine($"{solution01}");
 

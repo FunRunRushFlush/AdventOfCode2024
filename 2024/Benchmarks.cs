@@ -14,7 +14,7 @@ public class Benchmarks
     [GlobalSetup]
     public void Setup()
     {
-        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day14/InputData/Input.txt");
+        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day15/InputData/Input.txt");
         inputRaw = File.ReadAllText(path);
     
          input = File.ReadAllLines(path);
@@ -22,13 +22,13 @@ public class Benchmarks
     [Benchmark]
     public void Part01_Result()
     {
-        Day14.Part01.Result(input);
+        Day15.Part01.Result(inputRaw);
     }
 
     [Benchmark]
     public void Part02_Result()
     {
-        Day14.Part02.Result(input);
+        Day15.Part02.Result(inputRaw);
     }
 
 
