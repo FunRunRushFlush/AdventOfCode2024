@@ -15,7 +15,7 @@ BenchmarkRunner.Run<Benchmarks>();
 
 //long solution01 = Day15.Part01.Result(inputText);
 
-long solution = Day16.Part01.Result(inputText);
+long solution = Day16.Part01.Result(inputLines);
 
 //GlobalLog.LogLine($"{solution01}");
 
