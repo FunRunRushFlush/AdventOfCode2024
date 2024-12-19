@@ -25,11 +25,11 @@ public class Benchmarks
         Day16.Part01.Result(input);
     }
 
-    [Benchmark]
-    public void Result_ToArray()
-    {
-        Day16.Part01.Result_ToArray(input);
-    }
+    //[Benchmark]
+    //public void Result_ToArray()
+    //{
+    //    Day16.Part01.Result_ToArray(input);
+    //}
 
 
 
