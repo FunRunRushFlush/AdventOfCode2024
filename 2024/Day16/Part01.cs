@@ -1,3 +1,4 @@
+/*
 using System.Collections.Generic;
 
 namespace Day16;
@@ -83,11 +84,7 @@ public static class Part01
         GlobalLog.LogLine($"ReindeerMove = {path.Count}");
         GlobalLog.LogLine($"Reindeer Score: {minReinPath.GetScore()}");
 
-        foreach (var element in path)
-        {
-            element.ge
-            charMaze[element.Y][element.X] = 'o';
-        }
+
 
         for (int h = 0; h < charMaze.Length; h++)
         {
@@ -296,3 +293,4 @@ public static class Part01
         return (Y, X);
     }
 }
+*/

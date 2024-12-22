@@ -1,15 +1,18 @@
+using BenchmarkDotNet.Attributes;
+using System.Collections.Generic;
+using System.ComponentModel;
+
 namespace Day16;
-public static class Part02
+public static class Part01_Try01
 {
     private static string[] maze;
     private static int[,] PointMap;
 
     private static (int Y, int X) EndPosition;
     private static (int Y, int X) StartPosition;
-    private static int maxAllowdScore = int.MaxValue;
+    private static int maxAllowdScore = int.MaxValue; 
     private static List<Reindeer> reindeerList = new List<Reindeer>();
     private static List<Reindeer> newReindeers = new List<Reindeer>();
-    private static HashSet<(int Y, int X)> WalkedSolutions = new HashSet<(int Y, int X)>();
 
     public static long Result(ReadOnlySpan<string> input)
     {
@@ -17,13 +20,13 @@ public static class Part02
         StartPosition = (maze.Length - 2, 1);
         EndPosition = (1, maze.Length - 2);
         PointMap = new int[maze.Length, maze[0].Length];
-        newReindeers.Add(new Reindeer(StartPosition.Y, StartPosition.X, Direction.Right, 0));
+        newReindeers.Add(new Reindeer(StartPosition.Y, StartPosition.X,Direction.Right,0));
         while (true)
-        {
+        {  
             for (int i = 0; i < newReindeers.Count; i++)
             {
                 var reindeer = newReindeers[i];
-                if (reindeer.ImStuck)
+                if (reindeer.CheckForStuckState())
                 {
                     continue;
                 }
@@ -34,37 +37,21 @@ public static class Part02
 
             }
 
-            for (int i = newReindeers.Count - 1; i > -1; i--)
+            for (int i = newReindeers.Count-1; i >-1; i--)
             {
                 var reindeer = newReindeers[i];
-                if (reindeer.ImStuck)
+                if (reindeer.CheckForStuckState())
                 {
-                    if (reindeer.ImFinished)
-                    { 
-                        reindeerList.Add(reindeer);
-                    }
                     GlobalLog.LogLine($"Remove RTeindeer");
                     newReindeers.Remove(reindeer);
                 }
             }
 
-            if (newReindeers.Count == 0) break;
+                if (newReindeers.Count == 0) break;
         }
-
-        for (int i = reindeerList.Count; i > 0; i--)
-        {
-            if(reindeerList[^i].Score>maxAllowdScore) continue;
-
-            foreach(var step in reindeerList[^i].WalkedPath)
-            {
-                WalkedSolutions.Add(step);
-            }
-       
-        }
-
 
         DrawGrid();
-        GlobalLog.LogLine($"WalkedSolutions: {WalkedSolutions.Count +1}");
+
         return PointMap[EndPosition.Y, EndPosition.X];
     }
 
@@ -82,7 +69,7 @@ public static class Part02
 
 
 
-                Console.Write($"[{PointMap[h, w]}],");
+                Console.Write($"[{PointMap[h,w]}],");
             }
             Console.WriteLine();
         }
@@ -93,33 +80,27 @@ public static class Part02
 
     private class Reindeer
     {
-        public int Score { get; set; } = 0;
+        private int Score = 0;
         private (int Y, int X) Position;
         private Direction FacingDir;
-        public bool ImStuck { get; set; } = false;
-        public bool ImFinished { get; set; } = false;
-        public HashSet<(int Y, int X)> WalkedPath { get; set; }
+        private bool ImStuck = false;
 
 
-        public Reindeer(int Y, int X, Direction dir, int score, HashSet<(int Y, int X)>? walkedPath = null)
+        public Reindeer(int Y, int X, Direction dir, int score)
         {
             Score = score;
             Position = (Y, X);
             FacingDir = dir;
-            WalkedPath = walkedPath != null
-                   ? new HashSet<(int Y, int X)>(walkedPath) { (Y, X) }
-                   : new HashSet<(int Y, int X)> { (Y, X) };
             GlobalLog.LogLine($"New Reindeer: Y:{Y} X:{X} Score:{score}");
         }
 
-        public bool CheckForStuckState() => ImStuck;
-        public bool CheckForFinishedState() => ImFinished;
 
         public void TryToMove()
         {
             CheckForSplitting();
             TryToStep();
         }
+        public bool CheckForStuckState() => ImStuck;
         private void TryToStep()
         {
             var offSetPos = SetOffsetCoord(FacingDir, Position);
@@ -128,7 +109,6 @@ public static class Part02
             {
                 Position = offSetPos;
                 Score = tempScore;
-                WalkedPath.Add(Position);
             }
             else
             {
@@ -144,32 +124,31 @@ public static class Part02
                 if ((Direction)((i + 2) % 4) == FacingDir) continue;
 
                 var offSetPos = SetOffsetCoord((Direction)i, Position);
-                var tempScore = Score + 1000 +1; //Turn + one Step
+                var tempScore = Score + 1000 + 1; //Turn + one Step
                 if (CheckIfStepIsAllowed(offSetPos, tempScore))
                 {
-                    newReindeers.Add(CreateReindeer(offSetPos, (Direction)i, tempScore, WalkedPath));
+                    newReindeers.Add(CreateReindeer(offSetPos, (Direction)i, tempScore));
                 }
             }
         }
 
 
-        private Reindeer CreateReindeer((int Y, int X) pos, Direction dir, int score, HashSet<(int Y, int X)>? walkedPath = null)
+        private Reindeer CreateReindeer((int Y, int X) pos, Direction dir, int score)
         {
-            return new Reindeer(pos.Y, pos.X, dir, score,walkedPath);
+            return new Reindeer(pos.Y, pos.X, dir, score);
         }
 
         private bool CheckIfStepIsAllowed((int Y, int X) pos, int score)
         {
             if (maze[pos.Y][pos.X] == '#') return false;
 
-            if (score > maxAllowdScore) return false;
+            if(score> maxAllowdScore) return false;
             if (PointMap[pos.Y, pos.X] == 0 || PointMap[pos.Y, pos.X] >= score)
             {
                 PointMap[pos.Y, pos.X] = score;
                 if (maze[pos.Y][pos.X] == 'E')
                 {
                     maxAllowdScore = Math.Min(maxAllowdScore, score);
-                    ImFinished = true;
                     return false;
                 }
 

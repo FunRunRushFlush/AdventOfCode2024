@@ -3,7 +3,7 @@
 
 using BenchmarkDotNet.Running;
 
-string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day16/InputData/Custom.txt");
+string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day16/InputData/Input.txt");
 
 
 var inputText= File.ReadAllText(path);
@@ -15,7 +15,7 @@ var inputLines = File.ReadAllLines(path);
 
 //long solution01 = Day15.Part01.Result(inputText);
 
-long solution = Day16.Part01.Result(inputLines);
+long solution = Day16.Part02.Result(inputLines);
 
 Console.WriteLine($"solution : {solution}");
 

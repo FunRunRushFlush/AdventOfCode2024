@@ -19,11 +19,11 @@ public class Benchmarks
     
          input = File.ReadAllLines(path);
     }
-    [Benchmark]
-    public void Part01_Result()
-    {
-        Day16.Part01.Result(input);
-    }
+    //[Benchmark]
+    //public void Part01_Result()
+    //{
+    //    Day16.Part01.Result(input);
+    //}
 
     //[Benchmark]
     //public void Result_ToArray()
