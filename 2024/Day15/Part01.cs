@@ -129,7 +129,7 @@ public static class Part01
 
     private static void ParseInput(string input)
     {
-        //TODO: DAFUQ: Environment.NewLine + Environment.NewLine = eien leere zeile
+        //TODO: DAFUQ: Environment.NewLine + Environment.NewLine = eine leere zeile
         var inputSplit = input
             .Split(new[] { Environment.NewLine + Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
