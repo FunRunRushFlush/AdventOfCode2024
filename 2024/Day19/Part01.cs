@@ -1,147 +1,207 @@
-using Microsoft.CodeAnalysis;
 
-namespace Day18;
+using System.Collections.Generic;
+
+namespace Day19;
 public class Part01
 {
-    //private int[,] MemoryField = new int[7,7];
-    private int[,] MemoryField = new int[71,71];
+    private HashSet<string> Designs = new();
+    private HashSet<string> BlackList = new();
 
-    //private int MaxAllowedBytes = 12;
-    private int MaxAllowedBytes = 1024;
-    private int FieldHeight = 0;
-    private int FieldWidth = 0;
     public long Result(ReadOnlySpan<string> input)
     {
         InputParser(input);
-        FieldHeight= MemoryField.GetLength(0);
-        FieldWidth = MemoryField.GetLength(1);
-        DrawGrid(MemoryField);
 
-        MemoryField[0,0] = 1;
-        (int Y, int X) Pos = (0,0);
-        TryToEscape(Pos,1);
+         int possibleLogos = 0;
 
-        DrawGrid(MemoryField);
+        for (int i = 2; i < input.Length; i++)
+        {
+            var instrucLineOrig = input[i].AsSpan();
+            var instrucLine = input[i].AsSpan();
+            int counter = 0;
 
-        var solution = MemoryField[FieldHeight - 1, FieldWidth - 1] - 1; //-1, da steplogik start=1 
-        return solution;
+            while(true)
+            {
+                var res = CheckIfMatching(instrucLine);
+                if (!res.match)
+                {
+                    if (counter !=0)
+                    {
+                    GlobalLog.LogLine($"{input[i]}");
+                        SpecialEdgeCase(instrucLineOrig);
+                    }
+                    break;
+                }
+                instrucLine = instrucLine.Slice(res.length);
+
+                counter += res.length;
+                if (counter == input[i].Length)
+                {
+                    possibleLogos++;
+                    break;
+                }
+                if (counter > input[i].Length)
+                {
+                    GlobalLog.LogLine($"counter > input[{i}].Length");
+                }
+       
+            }
+            //GlobalLog.LogLine($"String: i:{i}={input[i]}");
+            //GlobalLog.LogLine($"possibleLogos: {possibleLogos}");
+
+        }
+        foreach (var item in Designs)
+        {
+            GlobalLog.LogLine(item);
+        }
+        return possibleLogos;
     }
 
-    private void TryToEscape((int Y, int X) pos, int step)
+    private bool SpecialEdgeCase(ReadOnlySpan<char> instrucLine)
     {
-        var nextStep = step +1;
-        for (int i = 0; i < 4; i++)
+        GlobalLog.LogLine($"SpecialEdgeCase");
+        GlobalLog.LogLine($"instrucLine; {instrucLine}");
+        if (instrucLine.IsEmpty || instrucLine.Length ==1)
+            return true;
+
+        for (int i = 1; i< instrucLine.Length; i++)
         {
-            var offSet = SetOffsetCoord((Direction)i, pos);
-            if (CheckForValidStepOption(offSet, nextStep))
+            if (Designs.Contains(instrucLine.ToString()))
             {
-       
-                MemoryField[offSet.Y, offSet.X] = nextStep;
-                TryToEscape(offSet,nextStep);
+            GlobalLog.LogLine($"forloop: {i}");
+                return true;
+                
+            }            
+            var rest = instrucLine.Slice(0, i);
+
+            var slice = instrucLine.Slice(i);
+            if (Designs.Contains(slice.ToString()))
+            {
+                GlobalLog.LogLine($"forloop: {i}");
+                SpecialEdgeCase(rest);
             }
         }
+
+        return false;
+
     }
-
-
-
-    private enum Direction
+    private bool SpecialEdgeCase_test(ReadOnlySpan<char> instrucLine)
     {
-        Up = 0,
-        Right = 1,
-        Down = 2,
-        Left = 3
-    }
-
-    private bool CheckForValidStepOption((int Y, int X) pos, int stepCount)
-    {
-        if (pos.X < 0) return false;
-        if (pos.Y < 0) return false;
-        if (pos.X >= MemoryField.GetLength(1)) return false;
-        if (pos.Y >= MemoryField.GetLength(0)) return false;
-        if(stepCount>= MemoryField[pos.Y,pos.X] && MemoryField[pos.Y, pos.X] != 0) return false;
-        if(MemoryField[FieldHeight-1, FieldWidth-1]>0 && MemoryField[FieldHeight - 1, FieldWidth - 1] < stepCount) return false;
-
-        return true;
-    }
-
-    private (int Y, int X) SetOffsetCoord(Direction direction, (int Y, int X) trailPos)
-    {
-        var dir = direction switch
+            var instrucLineOrig = instrucLine;
+            int counter = 0;
+        for (int i = 0; i < instrucLine.Length; i++)
         {
-            Direction.Up => (-1, 0),
-            Direction.Right => (0, 1),
-            Direction.Down => (1, 0),
-            Direction.Left => (0, -1),
-            _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Invalid direction: {direction}")
-        };
 
-        int Y = trailPos.Y + dir.Item1;
-        int X = trailPos.X + dir.Item2;
 
-        return (Y, X);
+            while (true)
+            {
+                var res = CheckIfMatching(instrucLine);
+                if (!res.match)
+                {
+                    if (counter != 0)
+                    {
+                        GlobalLog.LogLine($"{input[i]}");
+                        SpecialEdgeCase(instrucLineOrig);
+                    }
+                    break;
+                }
+                instrucLine = instrucLine.Slice(res.length);
+
+                counter += res.length;
+                if (counter == input[i].Length)
+                {
+                    possibleLogos++;
+                    break;
+                }
+                if (counter > input[i].Length)
+                {
+                    GlobalLog.LogLine($"counter > input[{i}].Length");
+                }
+
+            }
+
+        }
+
+    private (bool match, int length) CheckIfMatchingV2(ReadOnlySpan<char> instrucLine)
+    {
+        //GlobalLog.LogLine($"instrucLine {instrucLine}");
+        if (Designs.Contains(instrucLine.ToString()) && Blacklist.C)
+        {
+            //GlobalLog.LogLine($"Return instrucLine {instrucLine}");
+            return (true, instrucLine.Length);
+        }
+        else if (instrucLine.Length == 1) return (false, 0);
+
+        var subLine = instrucLine.Slice(0, instrucLine.Length - 1);
+        var res = CheckIfMatching(subLine);
+        if (res.match) return (true, res.length);
+
+        return (false, 0);
     }
+
+
+
+    private (bool match,int length) CheckIfMatching(ReadOnlySpan<char> instrucLine)
+    {
+        //GlobalLog.LogLine($"instrucLine {instrucLine}");
+        if (Designs.Contains(instrucLine.ToString()))
+        {
+            //GlobalLog.LogLine($"Return instrucLine {instrucLine}");
+            return (true, instrucLine.Length);
+        }
+        else if(instrucLine.Length == 1) return (false,0);
+
+        var subLine = instrucLine.Slice(0, instrucLine.Length-1);
+        var res = CheckIfMatching(subLine);
+        if (res.match) return (true, res.length);
+
+        return (false, 0);
+    }
+
+
+    //public long ResultOld(ReadOnlySpan<string> input)
+    //{
+    //    InputParserOld(input);
+
+
+    //    foreach (var item in Designs)
+    //    {
+    //        GlobalLog.LogLine(item);
+    //    }
+    //    return 0;
+    //}
 
     private void InputParser(ReadOnlySpan<string> input)
     {
-        var limit = MaxAllowedBytes > input.Length ? input.Length : MaxAllowedBytes;
-        for (int i = 0; i < limit; i++)
+        var line = input[0].AsSpan();
+        ReadOnlySpan<char> restSpan;
+        while (true)
         {
-            ReadOnlySpan<char> line = input[i].AsSpan();
             int commaIndex = line.IndexOf(',');
-            var xSpan = line.Slice(0, commaIndex);
-            var ySpan = line.Slice(commaIndex + 1);
+            if (commaIndex == -1) break;
 
-            int x = int.Parse(xSpan);
-            int y = int.Parse(ySpan);
+            var instructionSpan = line.Slice(0, commaIndex);
+            line = line.Slice(commaIndex + 2); //+2 wegen komma+space ', '
 
-            MemoryField[y, x] = -1;
+            Designs.Add(instructionSpan.ToString());
         }
-    }
-
-    [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private static void DrawGrid(int[,] array)
-    {
-        var arrayHeight = array.GetLength(0);
-        var arrayWidth = array.GetLength(1);
-
-        GlobalLog.LogLine($"DrawGrid");
-
-        for (int h = 0; h < arrayHeight; h++)
-        {
-            for (int w = 0; w < arrayWidth; w++)
-            {
-                string drawPoint = ".";
-                //if (array[h, w] > 0)
-                //{
-                    drawPoint = array[h, w].ToString();
-                //}
-
-                //TODO: $"[{array[h, w],3}]" syntax für besseren Print
-                Console.Write($"[{array[h, w],3}]");
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine("-------------------------------------------");
-        Console.WriteLine();
-    }
-
-    public long ResultOld(ReadOnlySpan<string> input)
-    {
-        InputParserOld(input);
-        DrawGrid(MemoryField);
-        return 0;
+        Designs.Add(line.ToString()); // mir fehklt sonst das letzte
     }
 
     private void InputParserOld(ReadOnlySpan<string> input)
     {
-        var limit = MaxAllowedBytes > input.Length ? input.Length : MaxAllowedBytes;
-        for (int i = 0; i < limit; i++)
+        var line = input[0];
+        ReadOnlySpan<char> restSpan;
+        while (true)
         {
-            //(int X,int Y)Pos = (input[i][0],input[i][2]);
-            var pos = input[i].Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(int.Parse).ToArray();
-            MemoryField[pos[1], pos[0]] = -1;
+            int commaIndex = line.IndexOf(',');
+            if (commaIndex == -1) break;
+
+            var instructionSpan = line.Substring(0, commaIndex);
+            line = line.Substring(commaIndex + 2); //+2 wegen komma+space ', '
+
+            Designs.Add(instructionSpan.ToString());
         }
     }
+
 
 }

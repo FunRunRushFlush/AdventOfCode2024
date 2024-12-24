@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Running;
-using Day18;
 
-string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day18/InputData/Input.txt");
+
+string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day19/InputData/CustomInput.txt");
 
 
 var inputText= File.ReadAllText(path);
@@ -12,17 +12,20 @@ BenchmarkRunner.Run<Benchmarks>();
 
 
 
-Part01 dayP01 = new();
-Day18.Part02 dayP02 = new();
+Day19.Part01 dayP01 = new();
+//Day19.Part01Try dayP01Try = new();
+//Day19.Part02 dayP02 = new();
 
 long solution = dayP01.Result(inputLines);
-long solution02 = dayP02.Result(inputLines);
-long solution03 = dayP02.ResultBackwards(inputLines);
+//long solutionTry = dayP01Try.Result(inputLines);
+//long solution02 = dayP02.Result(inputLines);
+
 
 
 Console.WriteLine($"solution : {solution}");
-Console.WriteLine($"solution : {solution02}");
-Console.WriteLine($"solution : {solution03}");
+//Console.WriteLine($"solution : {solutionTry}");
+//Console.WriteLine($"solution : {solution02}");
+
 
 
 
