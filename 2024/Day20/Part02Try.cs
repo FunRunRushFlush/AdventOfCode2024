@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Day20;
-public class Part02
+public class Part02Try
 {
     private (int Y, int X) RaceStartPos;
     private (int Y, int X) RaceEndPos;
@@ -22,6 +22,8 @@ public class Part02
 
     private Dictionary<int, int> TimeSaveDic = new();
     private (int Y, int X) TryCheatStartPos;
+
+    private int CheatCounter;
 
 
     public long Result(ReadOnlySpan<string> input)
@@ -62,95 +64,31 @@ public class Part02
 
         foreach (var timeSlot in RaceTimeDic)
         {
-            CheatPath.Clear();
-            foreach (var ele in UniqueCheats)
-            {
-                if (!TimeSaveDic.TryAdd(ele.Value, 1))
-                {
-                    TimeSaveDic[ele.Value]++;
-                }
- 
-            }
-            UniqueCheats.Clear();
-            GlobalLog.LogLine($"timeSlot: Y:{timeSlot.Key.Y} X:{timeSlot.Key.X}");
-            for (int d = 0; d < 4; d++)
-            {
-                //if (CarDirection == (Direction)((d + 2) % 4)) continue;
-                var offSet = SetOffsetCoord((Direction)d, timeSlot.Key);
 
-                if (input[offSet.Y][offSet.X] == '#')
-                {
-                    TryCheatStartPos = timeSlot.Key;
-                   if(!CheatPath.TryAdd(offSet, 1))
-                    {
-                        CheatPath[offSet] = 1;
-                    }
-                    CheatCrawler(offSet, 1, input);
-
-                }
-
-            }
-            DrawGridDic(input);
+            CheatStamp20x20(timeSlot);
         }
 
-
-        GlobalLog.LogLine("TimeSaveDic-List (sorted ascending by Time)");
-        foreach (var kvp in TimeSaveDic.OrderBy(x => x.Key))
-        {
-            GlobalLog.LogLine($"Time: {kvp.Key} Count: {kvp.Value}");
-        }
 
 
         DrawGrid(RaceTimeMap);
 
-        return UniqueCheats.Count;
+        return CheatCounter;
     }
 
-    private void CheatCrawler((int Y, int X) pos, int StepCounter, ReadOnlySpan<string> input)
+    private void CheatStamp20x20(KeyValuePair<(int Y, int X), int> timeSlot)
     {
-        if (StepCounter < 20)
+        foreach (var raceTime in RaceTimeDic)
         {
-            for (int d = 0; d < 4; d++)
+            var test = Math.Abs(timeSlot.Key.Y - raceTime.Key.Y) + Math.Abs(timeSlot.Key.X - raceTime.Key.X);
+            if (test > 0 && test <= 20 && raceTime.Value - ((timeSlot.Value + test) ) >= 100)
             {
-                //if (CarDirection == (Direction)((d + 2) % 4)) continue;
-                var offSet = SetOffsetCoord((Direction)d, pos);
-                if (!CheckForOutOfBounds(offSet, input)) continue;
-                if (input[offSet.Y][offSet.X] == '#')                {
-
-                        if (!CheatPath.ContainsKey(offSet))
-                        {
-                            CheatPath.TryAdd(offSet, StepCounter + 1);
-                            CheatCrawler(offSet, StepCounter + 1, input);
-                        }
-                        else if (CheatPath.ContainsKey(offSet) && CheatPath[offSet] > StepCounter)
-                        {
-                            CheatPath[offSet] = StepCounter + 1;
-                            CheatCrawler(offSet, StepCounter + 1, input);
-                        }
-                    
-                }
-                else if (RaceTimeDic.ContainsKey(offSet))//+1 wegen dem extrastep??
-                {
-                    var timeSave = (RaceTimeDic[offSet] - (RaceTimeDic[TryCheatStartPos] + StepCounter + 1));
-                    if (timeSave > 49)
-                    {
-
-                        if (!UniqueCheats.TryAdd((TryCheatStartPos, offSet), timeSave))
-                        {
-                            //GlobalLog.LogLine($"CheatCrawler: Y:{pos.Y} X:{pos.X}; StepCounter: {StepCounter}");
-                            //GlobalLog.LogLine($"timeSave: {timeSave}");
-                            UniqueCheats[(TryCheatStartPos, offSet)] = Math.Max(timeSave, UniqueCheats[(TryCheatStartPos, offSet)]);
-
-                        }
-                    }
-                }
-
+                CheatCounter++;
             }
         }
-         
-
     }
 
+   
+   
 
     private void ParseInput(ReadOnlySpan<string> input)
     {
