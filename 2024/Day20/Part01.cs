@@ -15,6 +15,10 @@ public class Part01
     private int Racetime;
     private int NumberOfCheats;
 
+    public void ParseOnly(ReadOnlySpan<string> input)
+    {
+        ParseInput(input);
+    }
 
     public long Result(ReadOnlySpan<string> input)
     {
@@ -84,7 +88,7 @@ public class Part01
 
 
     [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private static void DrawGrid(int[,] array)
+    private void DrawGrid(int[,] array)
     {
         var arrayHeight = array.GetLength(0);
         var arrayWidth = array.GetLength(1);
