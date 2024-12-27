@@ -1,5 +1,4 @@
-
-namespace Day24;
+namespace Day22;
 public class Part01
 {
     private Dictionary<string, int> Rule = new Dictionary<string, int>();

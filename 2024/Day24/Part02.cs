@@ -1,8 +1,5 @@
 
 
-using System.Collections;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
 namespace Day24;
 public class Part02
 {
