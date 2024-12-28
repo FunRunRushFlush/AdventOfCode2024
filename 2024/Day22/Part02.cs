@@ -1,177 +1,107 @@
 namespace Day22;
 public class Part02
 {
-    private Dictionary<string, int> Rule = new Dictionary<string, int>();
-    private Dictionary<string, int> ZAddRule = new Dictionary<string, int>();
-    private Dictionary<string, int> failedZ = new Dictionary<string, int>();
-    private List<GateLogic> Gates = new List<GateLogic>();
-    private List<GateLogic> GatesBackUp = new List<GateLogic>();
+    //TODO: Dic von array funktioniert nicht wie ich gedacht habe, Ref- vs valuetype !!!
+    //    int[] array1 = { 0, 0, 0, -1 };
+    //    int[] array2 = { 0, 0, 0, -1 };
 
+    //    Console.WriteLine(array1 == array2); // False (Referenzvergleich)
+    //  Console.WriteLine(array1.SequenceEqual(array2)); // True (Inhaltsvergleich)
 
-    public void ParseOnly(ReadOnlySpan<string> input)
+    private Dictionary<string, int> Sequence=new Dictionary<string,int>();
+    private int MaxSteps = 2000;
+
+    public void ParseOnly(ReadOnlySpan<int> input)
     {
-        ParseInput(input);
-
-
+        //ParseInput(input);
     }
-
     public long Result(ReadOnlySpan<string> input)
     {
-        ParseInput(input);
-
-        CalculateSupposedZBit();
-        bool loop = true;
-        while (loop)
+        long solution = 0;
+        //ParseInput(input);
+        foreach (var item in input)
         {
-
-            for (int i = Gates.Count - 1; i >= 0; i--)
+            HashSet<string> forbidenSequence = new();
+            Queue<int> sequence = new Queue<int>();
+            var temp = long.Parse(item);
+            int newOneDigit = 0;
+            int oneDigit = (int)temp%10;
+            
+            
+            for (var i = 0; i < MaxSteps; i++)
             {
-                var gate = Gates[i];
-                if (Rule.ContainsKey(gate.InputVar01) && Rule.ContainsKey(gate.InputVar02))
+
+                temp = CalculateSecretNum(temp);
+                newOneDigit =(int) temp % 10;
+                if (sequence.Count >= 4)
                 {
-                    CalculateGateLogic(gate);
+                    sequence.Enqueue(newOneDigit - oneDigit);
+                    sequence.Dequeue();
+
+                    var text = string.Join(',',sequence);
+                    if (forbidenSequence.Add(text))
+                    {
+                        if(!Sequence.TryAdd(text, newOneDigit))
+                        {
+                            Sequence[text] += newOneDigit; 
+                        }
+                    }
+
                 }
-            }
-            if (Gates.Count == 0) break;
-        }
-        int[] bitArray = new int[64];
-        for (int i = 0; i < bitArray.Length; i++)
-        {
-            string key = $"z{i:D2}";
-            if (!Rule.TryGetValue(key, out int output)) break;
-
-            bitArray[i] = output;
-        }
-        foreach(var ele in ZAddRule)
-        {
-            if (ele.Value != Rule[ele.Key])
-            {
-                failedZ.Add(ele.Key,ele.Value);
-            }
-        }
-
-        return ConvertBitArrayToInt_String(bitArray);
-    }
-
-    private void CalculateSupposedZBit()
-    {
-        for (int i = 0; i < Rule.Count; i++)
-        {
-            string xkey = $"x{i:D2}";
-            string ykey = $"y{i:D2}";
-            if (!Rule.TryGetValue(xkey, out int xOut)) break;
-            if (!Rule.TryGetValue(ykey, out int yOut)) break;
-
-            if (xOut != yOut)
-            {
-                ZAddRule.Add($"z{i:D2}", 1);
-            }
-            else
-            {
-                ZAddRule.Add($"z{i:D2}", 0);
-            }
-
-        }
-    }
-
-    private long ConvertBitArrayToInt_String(int[] bits)
-    {
-        string bitString = string.Join("", bits.Reverse());
-        // bits.Reverse(), damit bits[0] das am wenigsten signifikante Bit ist
-        return Convert.ToInt64(bitString, 2);
-    }
-    private void CalculateGateLogic(GateLogic gate)
-    {
-        var solution = 0;
-        if (gate.Operator == Operator.And)
-        {
-            if (Rule[gate.InputVar01] + Rule[gate.InputVar02] == 2) solution = 1;
-
-        }
-        if (gate.Operator == Operator.Xor)
-        {
-            if (Rule[gate.InputVar01] != Rule[gate.InputVar02]) solution = 1;
-        }
-        if (gate.Operator == Operator.Or)
-        {
-            if (Rule[gate.InputVar01] == 1 || Rule[gate.InputVar02] == 1) solution = 1;
-        }
-
-        Rule.Add(gate.OutputVar01, solution);
-        Gates.Remove(gate);
-        GatesBackUp.Add(gate);
-    }
-
-    private void ParseInput(ReadOnlySpan<string> input)
-    {
-        bool rules = true;
-        for (int i = 0; i < input.Length; i++)
-        {
-            if (rules)
-            {
-                if (string.IsNullOrEmpty(input[i]))
+                else
                 {
-                    rules = false;
-                    continue;
+                    sequence.Enqueue(newOneDigit - oneDigit);
                 }
-                RuleExtractor(input[i]);
+                //GlobalLog.LogLine($"{temp%10}");
+
+                oneDigit = newOneDigit;
+                
             }
-            else
-            {
-                ExtractGateLogic(input[i]);
-            }
+
+            
+            
         }
-    }
-
-    private void ExtractGateLogic(string line)
-    {
-        var inp = line.Split(' ');
-        var op = GetOperator(inp[1]);
-        Gates.Add(new GateLogic(inp[0], op, inp[2], inp[4]));
-    }
-
-    private Operator GetOperator(string operatorString)
-    {
-        return operatorString switch
+        var banana = 0;
+        foreach (var item in Sequence)
         {
-            "AND" => Operator.And,
-            "XOR" => Operator.Xor,
-            "OR" => Operator.Or,
-            _ => throw new NotImplementedException()
-        };
-    }
-    private void RuleExtractor(string line)
-    {
-        var test = line.IndexOf(':');
-        Rule.Add(line.Substring(0, test), int.Parse(line.Substring(test + 1)));
-    }
-
-
-    private struct GateLogic
-    {
-        public string InputVar01;
-        public Operator Operator;
-        public string InputVar02;
-        public string OutputVar01;
-        public int? Value01;
-
-
-        public GateLogic(string inputVar01, Operator oper, string inputVar02, string outputVar01, int? value01 = null)
-        {
-            InputVar01 = inputVar01;
-            Operator = oper;
-            InputVar02 = inputVar02;
-            OutputVar01 = outputVar01;
-            Value01 = value01;
+            banana = Math.Max(banana, item.Value);
         }
+        
+        return banana;
     }
 
-
-    private enum Operator
+    private long CalculateSecretNum(long secretNum)
     {
-        And,
-        Or,
-        Xor
+        secretNum = Mult(secretNum, 64);
+        secretNum = Div(secretNum, 32);
+        secretNum = Mult(secretNum, 2048);
+        return secretNum;
     }
+
+    private long Mix(long secretNum, long value)
+    {
+        return (secretNum ^ value);
+    }
+    private long Prune(long secretNum, long modulo = 16777216)
+    {
+        return (secretNum % modulo);
+    }
+    private long Div(long secretNum, int div)
+    {
+        long value = secretNum / div;
+        secretNum = Mix(secretNum, value);
+        secretNum = Prune(secretNum);
+        return secretNum;
+    }
+
+    private long Mult(long secretNum, int mult)
+    {
+        long value = secretNum * mult;
+        secretNum = Mix(secretNum, value);
+        secretNum = Prune(secretNum);
+        return secretNum;
+    }
+
+
 }
 
