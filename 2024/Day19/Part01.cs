@@ -11,54 +11,70 @@ public class Part01
 
         for (int i = 2; i < input.Length; i++)
         {
-           var line = input[i].AsSpan();
-            int index = 0;
+            GlobalLog.LogLine($"Line; {i}");
+            var line = input[i].AsSpan();
+           int index = 0;
+            List<int> nodeStart = new List<int>();
             
-            for (int j = 1; j <= input[i].Length; j++)
+            for(int j = line.Length; j>0;j--)
             {
-                if (Designs.Contains(line.Slice(index, j-index).ToString()))
+                var subString = line.Slice(0,j);
+                if (Designs.Contains(subString.ToString()))
                 {
-                    index=j;
-                }
-                else if(index == input[i].Length)
-
-                if(index== input[i].Length)
-                {
-                    possibleLogos++;
-                    break;
+                    var newline = line.Slice(j);
+                    if (CheckForExistingDesign(newline))
+                    {
+                        possibleLogos++;
+                        break;
+                    };
                 }
             }
-
-
-            //GlobalLog.LogLine($"String: i:{i}={input[i]}");
-            //GlobalLog.LogLine($"possibleLogos: {possibleLogos}");
-
+            
         }
 
-
-        foreach (var item in Designs)
-        {
-            GlobalLog.LogLine(item);
-        }
         return possibleLogos;
     }
 
-    private (bool match,int length) CheckIfMatching(ReadOnlySpan<char> instrucLine)
-    {
-        //GlobalLog.LogLine($"instrucLine {instrucLine}");
-        if (Designs.Contains(instrucLine.ToString()))
+    //private bool CheckForExistingDesign(ReadOnlySpan<char> subString)
+    //{
+    //    GlobalLog.LogLine($"CheckForExistingDesign; {subString}");
+    //    bool result = false;
+    //    if ( Designs.Contains(subString.ToString()))
+    //    {
+    //        return true;
+    //    }
+    //    for (int j = subString.Length; j > 0; j--)
+    //    {
+    //        GlobalLog.LogLine($" subString.Length; {j}");
+    //        var subSubString = subString.Slice(0, j);
+    //        if (Designs.Contains(subSubString.ToString()))
+    //        {
+    //            result = CheckForExistingDesign(subString.Slice(j));
+    //        }
+    //    }
+    //    return result;
+    //}
+    private bool CheckForExistingDesign(ReadOnlySpan<char> subString)
+    {        
+        if (Designs.Contains(subString.ToString()))
         {
-            //GlobalLog.LogLine($"Return instrucLine {instrucLine}");
-            return (true, instrucLine.Length);
+            return true;
         }
-        else if(instrucLine.Length == 1) return (false,0);
-
-        var subLine = instrucLine.Slice(0, instrucLine.Length-1);
-        var res = CheckIfMatching(subLine);
-        if (res.match) return (true, res.length);
-
-        return (false, 0);
+    
+        for (int j = subString.Length; j > 0; j--)
+        {
+            var subSubString = subString.Slice(0, j);
+            if (Designs.Contains(subSubString.ToString()))
+            {                
+                if (CheckForExistingDesign(subString.Slice(j)))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
+
 
     private void InputParser(ReadOnlySpan<string> input)
     {
@@ -77,21 +93,7 @@ public class Part01
         Designs.Add(line.ToString()); // mir fehlt sonst das letzte
     }
 
-    private void InputParserOld(ReadOnlySpan<string> input)
-    {
-        var line = input[0];
-        ReadOnlySpan<char> restSpan;
-        while (true)
-        {
-            int commaIndex = line.IndexOf(',');
-            if (commaIndex == -1) break;
 
-            var instructionSpan = line.Substring(0, commaIndex);
-            line = line.Substring(commaIndex + 2); //+2 wegen komma+space ', '
-
-            Designs.Add(instructionSpan.ToString());
-        }
-    }
 
 
 }
