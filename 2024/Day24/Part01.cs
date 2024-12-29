@@ -9,8 +9,6 @@ public class Part01
     public void ParseOnly(ReadOnlySpan<string> input)
     {
         ParseInput(input);
-
-
     }
 
     public long Result(ReadOnlySpan<string> input)

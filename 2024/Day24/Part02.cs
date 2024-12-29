@@ -13,8 +13,6 @@ public class Part02
     public void ParseOnly(ReadOnlySpan<string> input)
     {
         ParseInput(input);
-
-
     }
 
     public long Result(ReadOnlySpan<string> input)
@@ -25,7 +23,6 @@ public class Part02
         bool loop = true;
         while (loop)
         {
-
             for (int i = Gates.Count - 1; i >= 0; i--)
             {
                 var gate = Gates[i];
@@ -36,14 +33,14 @@ public class Part02
             }
             if (Gates.Count == 0) break;
         }
-        int[] bitArray = new int[64];
-        for (int i = 0; i < bitArray.Length; i++)
+        //CalculateGateList(GatesBackUp);
+        foreach(var gate in GatesBackUp)
         {
-            string key = $"z{i:D2}";
-            if (!Rule.TryGetValue(key, out int output)) break;
 
-            bitArray[i] = output;
         }
+
+        var test = GatesBackUp.Where(x => x.OutputVar01.StartsWith('z')).ToList();
+
         foreach(var ele in ZAddRule)
         {
             if (ele.Value != Rule[ele.Key])
@@ -52,7 +49,23 @@ public class Part02
             }
         }
 
+        int[] bitArray = new int[64];
+        for (int i = 0; i < bitArray.Length; i++)
+        {
+            string key = $"z{i:D2}";
+            if (!Rule.TryGetValue(key, out int output)) break;
+
+            bitArray[i] = output;
+        }
         return ConvertBitArrayToInt_String(bitArray);
+    }
+
+    private void CalculateGateList(List<GateLogic> gatesBackUp)
+    {
+        foreach (var gate in gatesBackUp)
+        {
+
+        }
     }
 
     private void CalculateSupposedZBit()
@@ -88,7 +101,6 @@ public class Part02
         if (gate.Operator == Operator.And)
         {
             if (Rule[gate.InputVar01] + Rule[gate.InputVar02] == 2) solution = 1;
-
         }
         if (gate.Operator == Operator.Xor)
         {
@@ -101,6 +113,7 @@ public class Part02
 
         Rule.Add(gate.OutputVar01, solution);
         Gates.Remove(gate);
+        gate.Value01 = solution;
         GatesBackUp.Add(gate);
     }
 
