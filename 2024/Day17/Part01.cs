@@ -36,7 +36,7 @@ public class Part01
             GlobalLog.Log($"{i}, ");
             solution += $"{i}";
         }
-        GlobalLog.LogLine($"");
+        GlobalLog.LogLine($"solution: {solution}");
 
         return long.Parse(solution);
     }

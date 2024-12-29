@@ -3,57 +3,28 @@ namespace Day19;
 public class Part01
 {
     private HashSet<string> Designs = new();
+    private Dictionary<string, long> memo = new();
 
     public long Result(ReadOnlySpan<string> input)
     {
         InputParser(input);
-        int possibleLogos = 0;
+        long possibleLogos = 0;
 
         for (int i = 2; i < input.Length; i++)
         {
             GlobalLog.LogLine($"Line; {i}");
             var line = input[i].AsSpan();
+            possibleLogos += CountCombinations(input[i]);
            int index = 0;
             List<int> nodeStart = new List<int>();
             
-            for(int j = line.Length; j>0;j--)
-            {
-                var subString = line.Slice(0,j);
-                if (Designs.Contains(subString.ToString()))
-                {
-                    var newline = line.Slice(j);
-                    if (CheckForExistingDesign(newline))
-                    {
-                        possibleLogos++;
-                        break;
-                    };
-                }
-            }
             
         }
 
         return possibleLogos;
     }
 
-    //private bool CheckForExistingDesign(ReadOnlySpan<char> subString)
-    //{
-    //    GlobalLog.LogLine($"CheckForExistingDesign; {subString}");
-    //    bool result = false;
-    //    if ( Designs.Contains(subString.ToString()))
-    //    {
-    //        return true;
-    //    }
-    //    for (int j = subString.Length; j > 0; j--)
-    //    {
-    //        GlobalLog.LogLine($" subString.Length; {j}");
-    //        var subSubString = subString.Slice(0, j);
-    //        if (Designs.Contains(subSubString.ToString()))
-    //        {
-    //            result = CheckForExistingDesign(subString.Slice(j));
-    //        }
-    //    }
-    //    return result;
-    //}
+
     private bool CheckForExistingDesign(ReadOnlySpan<char> subString)
     {        
         if (Designs.Contains(subString.ToString()))
@@ -73,6 +44,36 @@ public class Part01
             }
         }
         return false;
+    }
+
+    //TODO: Cache Implementierung üben/verstehen gleiche wie in Day11 
+    public long CountCombinations(string s)
+    {
+
+        if (memo.TryGetValue(s, out long savedCount))
+            return savedCount;
+
+        long totalWays = 0;
+
+        
+        if (Designs.Contains(s))
+        {
+            totalWays++;
+        }
+
+       
+        for (int i = 1; i < s.Length; i++)
+        {
+            string left = s[..i];
+            if (Designs.Contains(left))
+            {
+                string right = s[i..];
+                totalWays += CountCombinations(right);
+            }
+        }
+
+        memo[s] = totalWays;
+        return totalWays;
     }
 
 

@@ -7,26 +7,41 @@ public class Part02
     private long bReg;
     private long cReg;
     private long[] ProgramCode;
-
-    private List<long> OutList = new();
+    private HashSet<string> ProgramCodeHash = new HashSet<string>();
+    private long n=1_003_000_000_000_000;
+                    //72_338_647_597
+    private List<int> OutList = new();
     private long Pointer = 0;
+
+
+
 
     public long Result(ReadOnlySpan<string> input)
     {
         ParseInstructions(input);
-        long aTemp = 0;
+        //TODO: muss ich wiederholen!!!
+        string bits = "01110000010101000101101";
+        ulong fixedBits = Convert.ToUInt64(bits, 2); // 23 feste Bits, die ich schon gebrutforced habe
+        int fixedBitLength = bits.Length;      
+        int remainingBits = 64 - fixedBitLength;
+        ulong maxIterations = 1UL << remainingBits; // 2^(remainingBits)
+
+
+        ProgramCodeHash.Add(string.Join(",", ProgramCode));
+        ulong aTemp = fixedBits;
         var bTemp = bReg;
         var cTemp = cReg;
-        bool notFound = true;
+
         bool innerLoop = true;
-        int counter = 0;
+
+        ulong index = 0;
         GlobalLog.LogLine($"aReg: {aReg}");
         GlobalLog.LogLine($"bReg: {bReg}");
         GlobalLog.LogLine($"cReg: {cReg}");
         GlobalLog.LogLine($"ProgramCode: {ProgramCode.Length}");
-        while (notFound)
+        while (true)
         { 
-            aReg = aTemp;
+            aReg = (long)aTemp;
             bReg = bTemp;
             cReg = cTemp;
             while (innerLoop)
@@ -34,61 +49,64 @@ public class Part02
                 if (Pointer >= ProgramCode.Length)
                 {
                     innerLoop = false;
+                    break;
                 }
-                if (OutList.Count > 0)
+
+                if(OutList.Count > 0)
                 {
-                    
+                    var ind = 0;
                     for (int i = 0; i < OutList.Count; i++)
                     {
                         if (OutList[i] != ProgramCode[i])
-                        {                           
-                            innerLoop = false;
+                        {
+                            if (ind > 13)
+                            {
+                                GlobalLog.LogLine($"-----------I; {i} --------------");
+
+                                GlobalLog.LogLine($"First Match: {aTemp}");
+                                GlobalLog.LogLine($"In Bits: {Convert.ToString((long)aTemp, 2)}"); 
+                                GlobalLog.LogLine($".Mod8: {aTemp%8}");
+                                GlobalLog.LogLine($".div8: {aTemp /8}");
+                                GlobalLog.LogLine($".div8.Mod8: {(aTemp / 8)%8}");
+
+                            }
+                            innerLoop= false;
                             break;
                         }
-                        
-                    }
-                }
-                if (!innerLoop) break;
 
+                        ind = i;
+                    }
+                    if (!innerLoop) break;
+                }
+                if(!innerLoop) break;
                 OperationPicker(ProgramCode[Pointer], ProgramCode[Pointer + 1]);
                 Pointer += 2;
             }
 
-            for (int i = 0; i < OutList.Count; i++)
+            if (ProgramCodeHash.Contains(string.Join(',', OutList)))
             {
-                if (OutList[i] == ProgramCode[i])
-                {
-                    counter++;
-                }
+                break;
             }
-            if (counter == ProgramCode.Length) break;
-
-            counter = 0;
+            OutList.Clear();
+            
             innerLoop = true;
             Pointer = 0;
-            aTemp +=1;
-            OutList.Clear();
-            //GlobalLog.LogLine($"aReg: {aReg}");
 
-            //GlobalLog.LogLine($"bReg: {bReg}");
-            //GlobalLog.LogLine($"cReg: {cReg}");
-            //GlobalLog.LogLine($"ProgramCode: {ProgramCode.Length}");
+            index += 1;
+            //TODO: Muss ich umbedingt wiederholen!!!
+            aTemp = (index << fixedBitLength) | fixedBits;
+            //Console.WriteLine(Convert.ToString((long)aTemp, 2).PadLeft(64, '0'));
+
+            //GlobalLog.LogLine($"aReg: {aReg}");
         }
-        GlobalLog.LogLine($"aReg: {aTemp}");
 
         GlobalLog.LogLine($"bReg: {bReg}");
         GlobalLog.LogLine($"cReg: {cReg}");
         GlobalLog.LogLine($"ProgramCode: {ProgramCode.Length}");
 
-        string solution = string.Empty;
-        foreach (long i in OutList)
-        {
-            GlobalLog.Log($"{i}, ");
-            solution += $"{i}";
-        }
-        GlobalLog.LogLine($"");
 
-        return long.Parse("1");
+
+        return (long)aTemp;
     }
 
     private long ComboOperandPicker(long progValue)
@@ -186,7 +204,8 @@ public class Part02
 
     private void OutOperation(long combo)
     {
-        OutList.Add((long)(combo % 8));
+        OutList.Add((int)(combo % 8));
+
     }
     private void BdvOperation(long combo)
     {

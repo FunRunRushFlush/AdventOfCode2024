@@ -11,13 +11,13 @@ public class Benchmarks
     string inputRaw = string.Empty;
     string[] input;
     string[] rules;
-    private Day22.Part01 _part01;
-    private Day22.Part02 _part02;
+    private Day17.Part01 _part01;
+    private Day17.Part02 _part02;
 
     [GlobalSetup]
     public void Setup()
     {
-        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day22/InputData/Input.txt");
+        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day17/InputData/Input.txt");
         inputRaw = File.ReadAllText(path);
     
          input = File.ReadAllLines(path);
@@ -28,8 +28,8 @@ public class Benchmarks
     public void SetupIteration()
     {
         // Vor jedem Iterationslauf eine neue Instanz anlegen
-        _part01 = new Day22.Part01();
-        _part02 = new Day22.Part02();
+        _part01 = new Day17.Part01();
+        _part02 = new Day17.Part02();
     }
 
     //[Benchmark]
