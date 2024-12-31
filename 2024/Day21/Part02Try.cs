@@ -1,25 +1,18 @@
 
-
-using System;
-using System.Linq;
-
 namespace Day21;
-public class Part01
+public class Part02Try
 {
-    public void ParseOnly(ReadOnlySpan<string> input)
-    {
-        ParseInput(input);
-    }
 
     public long Result(ReadOnlySpan<string> input)
     {
         int sim = 0;
-            int minSolution =int.MaxValue;
-        while (sim<1_000) 
+        int minSolution = int.MaxValue;
+        Dictionary<string,string> minInputString = new();
+        while (sim < 1_000)
         {
-        string inputString="";
-        int solution = 0;
-        ParseInput(input);
+            string inputString = "";
+            int solution = 0;
+
             foreach (var line in input)
             {
                 //GlobalLog.LogLine($" ------------ {line} --------------");
@@ -36,7 +29,7 @@ public class Part01
                 foreach (char code in line)
                 {
                     var inputList = door.ReadNextInput(code);
-                    
+
                     foreach (var robot in robots)
                     {
                         inputList = robot.ReadNextInput(inputList);
@@ -48,29 +41,32 @@ public class Part01
                 }
                 solution += inputString.Length * int.Parse(line.Substring(0, line.Length - 1));
 
-                //GlobalLog.LogLine($"{inputString}");
-                //GlobalLog.LogLine($"{inputString.Length}");
-                //GlobalLog.LogLine($"solution: {solution}");
+                if (!minInputString.TryAdd(line,inputString))
+                {
+                    if (minInputString[line].Length > inputString.Length)
+                    {
+                        minInputString[line] = inputString;
+                    }
+                }      
                 inputString = string.Empty;
             }
 
-            if(Math.Min(minSolution, solution) < minSolution)
+            if (Math.Min(minSolution, solution) < minSolution)
             {
                 GlobalLog.LogLine($"{sim}");
-                minSolution = Math.Min( minSolution, solution);
+                minSolution = Math.Min(minSolution, solution);
                 GlobalLog.LogLine($"{minSolution}");
+
+                foreach(var ele in minInputString)
+                {
+                    GlobalLog.LogLine($"{ele.Key}: ");
+                    GlobalLog.LogLine($"    {ele.Value}");
+                }
             }
             sim++;
-            GlobalLog.LogLine($"----------------Next Sim---------------");
             //if (sim%10 ==0) GlobalLog.LogLine($"solution: {sim}");
         }
         return minSolution;
-    }
-
-    private void ParseInput(ReadOnlySpan<string> input)
-    {
-
-
     }
 
     private class RobotController
@@ -100,12 +96,12 @@ public class Part01
                 var lrList = GetLeftRightInput(xDiff);
                 var udList = GetUpDownInput(yDiff);
 
-                if (Position.Y + yDiff == 0 && yDiff!=0 && Position.X == 0)
+                if (Position.Y + yDiff == 0 && yDiff != 0 && Position.X == 0)
                 {
                     dirInputs.AddRange(lrList);
                     dirInputs.AddRange(udList);
                 }
-                else if (Position.X + xDiff == 0 && xDiff != 0 && Position.Y==0)
+                else if (Position.X + xDiff == 0 && xDiff != 0 && Position.Y == 0)
                 {
                     dirInputs.AddRange(udList);
                     dirInputs.AddRange(lrList);
@@ -114,7 +110,7 @@ public class Part01
                 {
                     Random test = new Random();
                     var yeah = test.NextDouble();
-                    GlobalLog.LogLine($"rng: {yeah}");
+                    //GlobalLog.LogLine($"rng: {yeah}");
                     if (yeah >= 0.5)
                     {
                         dirInputs.AddRange(lrList);
@@ -214,21 +210,21 @@ public class Part01
             var lrList = GetLeftRightInput(xDiff);
             var udList = GetUpDownInput(yDiff);
 
-            if(Position.Y +yDiff ==3 && yDiff!=0 && Position.X == 0)
+            if (Position.Y + yDiff == 3 && yDiff != 0 && Position.X == 0)
             {
                 dirInputs.AddRange(lrList);
                 dirInputs.AddRange(udList);
             }
-            else if(Position.X + xDiff == 0 && xDiff != 0 && Position.Y==3)
+            else if (Position.X + xDiff == 0 && xDiff != 0 && Position.Y == 3)
             {
                 dirInputs.AddRange(udList);
                 dirInputs.AddRange(lrList);
             }
-            else 
+            else
             {
                 Random test = new Random();
                 var yeah = test.NextDouble();
-                GlobalLog.LogLine($"rng: {yeah}");
+                //GlobalLog.LogLine($"rng: {yeah}");
                 if (yeah >= 0.5)
                 {
                     dirInputs.AddRange(lrList);
@@ -242,7 +238,7 @@ public class Part01
 
             }
             dirInputs.Add('A');
-            
+
 
             CheckIfPathIsAllowed(dirInputs);
 
@@ -254,7 +250,7 @@ public class Part01
 
         private void CheckIfPathIsAllowed(List<char> dirInputs)
         {
-            var test = dirInputs.Where(x => x=='<');
+            var test = dirInputs.Where(x => x == '<');
         }
 
         private List<char> GetUpDownInput(int yDiff)
