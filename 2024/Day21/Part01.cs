@@ -1,76 +1,44 @@
-
-
-using System;
-using System.Linq;
-
 namespace Day21;
 public class Part01
 {
-    public void ParseOnly(ReadOnlySpan<string> input)
-    {
-        ParseInput(input);
-    }
-
     public long Result(ReadOnlySpan<string> input)
     {
-        int sim = 0;
-            int minSolution =int.MaxValue;
-        while (sim<1_000) 
-        {
-        string inputString="";
+        string inputString = "";
         int solution = 0;
-        ParseInput(input);
-            foreach (var line in input)
+        foreach (var line in input)
+        {
+            GlobalLog.LogLine($" ------------ {line} --------------");
+            DoorController door = new DoorController();
+            List<RobotController> robots = new List<RobotController>();
+
+            for (int i = 0; i < 2; i++)
             {
-                //GlobalLog.LogLine($" ------------ {line} --------------");
-                DoorController door = new DoorController();
-                List<RobotController> robots = new List<RobotController>();
-
-                
-                for (int i = 0; i < 2; i++)
-                {
-                    robots.Add(new RobotController());
-                }
-
-
-                foreach (char code in line)
-                {
-                    var inputList = door.ReadNextInput(code);
-                    
-                    foreach (var robot in robots)
-                    {
-                        inputList = robot.ReadNextInput(inputList);
-                        //GlobalLog.LogLine($"robot : {inputList.Count} ");
-                        //GlobalLog.LogLine($"robot : {string.Join("", inputList)} ");
-                    }
-
-                    inputString += string.Join("", inputList);
-                }
-                solution += inputString.Length * int.Parse(line.Substring(0, line.Length - 1));
-
-                //GlobalLog.LogLine($"{inputString}");
-                //GlobalLog.LogLine($"{inputString.Length}");
-                //GlobalLog.LogLine($"solution: {solution}");
-                inputString = string.Empty;
+                robots.Add(new RobotController());
             }
 
-            if(Math.Min(minSolution, solution) < minSolution)
+            foreach (char code in line)
             {
-                GlobalLog.LogLine($"{sim}");
-                minSolution = Math.Min( minSolution, solution);
-                GlobalLog.LogLine($"{minSolution}");
+                GlobalLog.LogLine($"door: {code}");
+                var inputList = door.ReadNextInput(code);
+
+                foreach (var robot in robots)
+                {
+                    inputList = robot.ReadNextInput(inputList);
+                    GlobalLog.LogLine($"robot : {inputList.Count} ");
+                    GlobalLog.LogLine($"robot : {string.Join("", inputList)} ");
+                }
+
+                inputString += string.Join("", inputList);
             }
-            sim++;
-            GlobalLog.LogLine($"----------------Next Sim---------------");
-            //if (sim%10 ==0) GlobalLog.LogLine($"solution: {sim}");
+            solution += inputString.Length * int.Parse(line.Substring(0, line.Length - 1));
+
+            GlobalLog.LogLine($"{inputString}");
+            GlobalLog.LogLine($"{inputString.Length}");
+            GlobalLog.LogLine($"solution: {solution}");
+            inputString = string.Empty;
         }
-        return minSolution;
-    }
 
-    private void ParseInput(ReadOnlySpan<string> input)
-    {
-
-
+        return solution;
     }
 
     private class RobotController
@@ -85,7 +53,6 @@ public class Part01
         public RobotController()
         {
             Position = ControllerDic['A']; //A
-
         }
 
         public List<char> ReadNextInput(List<char> inputs)
@@ -100,44 +67,27 @@ public class Part01
                 var lrList = GetLeftRightInput(xDiff);
                 var udList = GetUpDownInput(yDiff);
 
-                if (Position.Y + yDiff == 0 && yDiff!=0 && Position.X == 0)
+                if (Position.Y + yDiff == 0 && yDiff != 0 && Position.X == 0)
                 {
                     dirInputs.AddRange(lrList);
                     dirInputs.AddRange(udList);
                 }
-                else if (Position.X + xDiff == 0 && xDiff != 0 && Position.Y==0)
+                else if (Position.X + xDiff == 0 && xDiff != 0 && Position.Y == 0)
                 {
                     dirInputs.AddRange(udList);
                     dirInputs.AddRange(lrList);
                 }
                 else
                 {
-                    Random test = new Random();
-                    var yeah = test.NextDouble();
-                    GlobalLog.LogLine($"rng: {yeah}");
-                    if (yeah >= 0.5)
-                    {
-                        dirInputs.AddRange(lrList);
-                        dirInputs.AddRange(udList);
-                    }
-                    else
-                    {
-                        dirInputs.AddRange(udList);
-                        dirInputs.AddRange(lrList);
-                    }
-
+                    dirInputs.AddRange(lrList);
+                    dirInputs.AddRange(udList);
                 }
 
                 dirInputs.Add('A');
-
                 Position = targetPos;
-
             }
 
-
-
             return dirInputs;
-
         }
 
 
@@ -151,12 +101,10 @@ public class Part01
                 if (yDiff < 0)
                 {
                     dirInputs.Add('^');
-
                 }
                 if (yDiff > 0)
                 {
                     dirInputs.Add('v');
-
                 }
             }
             return dirInputs;
@@ -171,12 +119,10 @@ public class Part01
                 if (xDiff > 0)
                 {
                     dirInputs.Add('>');
-
                 }
                 if (xDiff < 0)
                 {
                     dirInputs.Add('<');
-
                 }
             }
             return dirInputs;
@@ -186,8 +132,6 @@ public class Part01
     private class DoorController
     {
         private (int Y, int X) Position;
-        //private int ySteps;
-        //private int xSteps;
 
         private Dictionary<char, (int Y, int X)> ControllerDic = new()
             {
@@ -199,8 +143,6 @@ public class Part01
         public DoorController()
         {
             Position = ControllerDic['A']; //A
-            //ySteps = 0;
-            //xSteps = 0;
         }
 
         public List<char> ReadNextInput(char input)
@@ -214,47 +156,32 @@ public class Part01
             var lrList = GetLeftRightInput(xDiff);
             var udList = GetUpDownInput(yDiff);
 
-            if(Position.Y +yDiff ==3 && yDiff!=0 && Position.X == 0)
+            if (Position.Y + yDiff == 3 && yDiff != 0 && Position.X == 0)
             {
                 dirInputs.AddRange(lrList);
                 dirInputs.AddRange(udList);
             }
-            else if(Position.X + xDiff == 0 && xDiff != 0 && Position.Y==3)
+            else if (Position.X + xDiff == 0 && xDiff != 0 && Position.Y == 3)
             {
                 dirInputs.AddRange(udList);
                 dirInputs.AddRange(lrList);
             }
-            else 
+            else if (yDiff > 0 && xDiff > 0)
             {
-                Random test = new Random();
-                var yeah = test.NextDouble();
-                GlobalLog.LogLine($"rng: {yeah}");
-                if (yeah >= 0.5)
-                {
-                    dirInputs.AddRange(lrList);
-                    dirInputs.AddRange(udList);
-                }
-                else
-                {
-                    dirInputs.AddRange(udList);
-                    dirInputs.AddRange(lrList);
-                }
-
+                dirInputs.AddRange(udList);
+                dirInputs.AddRange(lrList);
+            }
+            else
+            {
+                dirInputs.AddRange(lrList);
+                dirInputs.AddRange(udList);
             }
             dirInputs.Add('A');
-            
-
-            CheckIfPathIsAllowed(dirInputs);
 
             Position = targetPos;
 
             return dirInputs;
 
-        }
-
-        private void CheckIfPathIsAllowed(List<char> dirInputs)
-        {
-            var test = dirInputs.Where(x => x=='<');
         }
 
         private List<char> GetUpDownInput(int yDiff)
@@ -287,12 +214,10 @@ public class Part01
                 if (xDiff > 0)
                 {
                     dirInputs.Add('>');
-
                 }
                 if (xDiff < 0)
                 {
                     dirInputs.Add('<');
-
                 }
             }
             return dirInputs;
@@ -301,4 +226,3 @@ public class Part01
 
 
 }
-

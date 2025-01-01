@@ -1,11 +1,13 @@
 
 
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 namespace Day21;
-public class Part02
+public class Part01Try
 {
     private int NumOfControllerRobots = 25;
 
-    private static Dictionary<(string, int), long> Cache;
+    private static Dictionary<(string, int), long> Cache = new();
     public long Result(ReadOnlySpan<string> input)
     {
         string inputString = "";
@@ -21,18 +23,22 @@ public class Part02
             foreach (char code in line)
             {
                 GlobalLog.LogLine($"door: {code}");
-                var inputList = door.ReadNextInput(code);
-
-                totalNumOfInputs += GetNumberOfRoboInputs(inputList, 0);
-                //foreach (var robot in robots)
+                int sim = 0;
+                long minNumOfInputs = long.MaxValue;
+                //while (sim < 1_00)
                 //{
-                //    inputList = robot.ReadNextInput(inputList);
-                //    GlobalLog.LogLine($"robot : {inputList.Count} ");
-                //    GlobalLog.LogLine($"robot : {string.Join("", inputList)} ");
-                //}
+                    var inputList = door.ReadNextInput(code);
 
-            GlobalLog.LogLine($"    {totalNumOfInputs}");
-                //inputString += string.Join("", inputList);
+                    var numOfInputs = GetNumberOfRoboInputs(inputList, 0);
+
+                    minNumOfInputs = numOfInputs<minNumOfInputs?numOfInputs:minNumOfInputs;
+                //    sim++;
+                //}
+                totalNumOfInputs += numOfInputs;
+
+                GlobalLog.LogLine($"    {minNumOfInputs}");
+                GlobalLog.LogLine($"    {totalNumOfInputs}");
+
             }
             solution += totalNumOfInputs * int.Parse(line.Substring(0, line.Length - 1));
             GlobalLog.LogLine($"totalNumOfInputs: {totalNumOfInputs}");
@@ -40,16 +46,20 @@ public class Part02
             totalNumOfInputs = 0;
         }
 
+        //26705_8991850960 too hogh
+        //263617786809000 <---- RICHTIG!!!
+        GlobalLog.LogLine($"Final solution: {solution}");
         return solution;
     }
 
     private long GetNumberOfRoboInputs(List<char> inputList, int roboChain)
     {
+        GlobalLog.LogLine($"GetNumberOfRoboInputs: {inputList.Count}");
         if (roboChain == NumOfControllerRobots)
         {
             return inputList.Count;
         }
-        if (Cache.TryGetValue((inputList.ToString(), roboChain), out long cachedResult))
+        if (Cache.TryGetValue((string.Join(',', inputList), roboChain), out long cachedResult))
         {
             return cachedResult;
         }
@@ -60,26 +70,30 @@ public class Part02
 
         foreach (var chunk in chunks)
         {
-            result += GetNumberOfRoboInputs(chunk, roboChain+1);
+            result += GetNumberOfRoboInputs(chunk, roboChain + 1);
         }
-        Cache[(inputList.ToString(), roboChain)] = result;
+        Cache[(string.Join(',', inputList), roboChain)] = result;
         return result;
 
     }
 
     private List<List<char>> ParseInputListIntoChunks(List<char> inputList)
     {
+
+        RobotController robot = new RobotController();
+        inputList = robot.ReadNextInput(inputList);
+
         List<List<char>> result = new List<List<char>>();
         List<char> currentChunk = new List<char>();
 
         foreach (char c in inputList)
         {
             currentChunk.Add(c);
-             
+
             if (c == 'A')
             {
                 result.Add(new List<char>(currentChunk));
-                currentChunk.Clear(); 
+                currentChunk.Clear();
             }
         }
         if (currentChunk.Count > 0)
@@ -118,25 +132,102 @@ public class Part02
 
                 if (Position.Y + yDiff == 0 && yDiff != 0 && Position.X == 0)
                 {
+                    GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
+
                     dirInputs.AddRange(lrList);
                     dirInputs.AddRange(udList);
                 }
                 else if (Position.X + xDiff == 0 && xDiff != 0 && Position.Y == 0)
                 {
+                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
                     dirInputs.AddRange(udList);
                     dirInputs.AddRange(lrList);
                 }
-                else
+                else if (yDiff == 1 && xDiff == 1)
                 {
+                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    dirInputs.AddRange(udList);
+                    dirInputs.AddRange(lrList);
+                }
+                else if (yDiff == -1 && xDiff == -1)
+                {
+                    GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
+
                     dirInputs.AddRange(lrList);
                     dirInputs.AddRange(udList);
                 }
+                else if (yDiff == 0 && xDiff == -1)
+                {
+                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    dirInputs.AddRange(udList);
+                    dirInputs.AddRange(lrList);
+                }
+                else if (Math.Abs(yDiff) == 1 && xDiff == 0)
+                {
+                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    dirInputs.AddRange(udList);
+                    dirInputs.AddRange(lrList);
+                }
+                else if (Math.Abs(yDiff) == 0 && xDiff == 0)
+                {
+                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    dirInputs.AddRange(udList);
+                    dirInputs.AddRange(lrList);
+                }
+                else if (Math.Abs(yDiff) == 0 && xDiff == 1)
+                {
+                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    dirInputs.AddRange(udList);
+                    dirInputs.AddRange(lrList);
+                }
+                else if (yDiff == -1 && xDiff == 1)
+                {
+                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    dirInputs.AddRange(udList);
+                    dirInputs.AddRange(lrList);
+                }
+                else if (yDiff == 1 && xDiff == -1)
+                {
+                    GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    dirInputs.AddRange(lrList);
+                    dirInputs.AddRange(udList);
+                }
+                else if (yDiff == -3 && xDiff == -1)
+                {
+                    GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
+
+                    dirInputs.AddRange(lrList);
+                    dirInputs.AddRange(udList);
+                }
+                //else
+                //{
+                //    Random test = new Random();
+                //    bool lrFirst = test.Next(2) == 0;
+                //    _rngDecisionsThisSim.Add((yDiff, xDiff, lrFirst));
+                //    if (lrFirst)
+                //    {
+                //        GlobalLog.LogLine($"RNG Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                //        dirInputs.AddRange(lrList);
+                //        dirInputs.AddRange(udList);
+                //    }
+                //    else
+                //    {
+                //        GlobalLog.LogLine($"RNG Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                //        dirInputs.AddRange(udList);
+                //        dirInputs.AddRange(lrList);
+                //    }
+                //}
 
                 dirInputs.Add('A');
+
                 Position = targetPos;
+
             }
 
+
+
             return dirInputs;
+
         }
 
 
@@ -168,10 +259,12 @@ public class Part02
                 if (xDiff > 0)
                 {
                     dirInputs.Add('>');
+
                 }
                 if (xDiff < 0)
                 {
                     dirInputs.Add('<');
+
                 }
             }
             return dirInputs;
@@ -181,6 +274,8 @@ public class Part02
     private class DoorController
     {
         private (int Y, int X) Position;
+        //private int ySteps;
+        //private int xSteps;
 
         private Dictionary<char, (int Y, int X)> ControllerDic = new()
             {
@@ -192,6 +287,8 @@ public class Part02
         public DoorController()
         {
             Position = ControllerDic['A']; //A
+            //ySteps = 0;
+            //xSteps = 0;
         }
 
         public List<char> ReadNextInput(char input)
@@ -215,22 +312,58 @@ public class Part02
                 dirInputs.AddRange(udList);
                 dirInputs.AddRange(lrList);
             }
-            else if (yDiff > 0 && xDiff > 0)
+            else if (yDiff == 1 && xDiff == 1)
             {
                 dirInputs.AddRange(udList);
                 dirInputs.AddRange(lrList);
+            }
+            else if (yDiff == -1 && xDiff == -1)
+            {
+                dirInputs.AddRange(lrList);
+                dirInputs.AddRange(udList);
+            }
+            else if (yDiff == -2 && xDiff == 1)
+            {
+                dirInputs.AddRange(udList);
+                dirInputs.AddRange(lrList);
+            }
+            else if (yDiff == -3 && xDiff == -1)
+            {
+                dirInputs.AddRange(lrList);
+                dirInputs.AddRange(udList);
             }
             else
             {
-                dirInputs.AddRange(lrList);
-                dirInputs.AddRange(udList);
+                Random test = new Random();
+                bool lrFirst = test.Next(2) == 0;
+                if (lrFirst)
+                {
+                    GlobalLog.LogLine($"Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    dirInputs.AddRange(lrList);
+                    dirInputs.AddRange(udList);
+                }
+                else
+                {
+                    GlobalLog.LogLine($"Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    dirInputs.AddRange(udList);
+                    dirInputs.AddRange(lrList);
+                }
+
             }
             dirInputs.Add('A');
+
+
+            CheckIfPathIsAllowed(dirInputs);
 
             Position = targetPos;
 
             return dirInputs;
 
+        }
+
+        private void CheckIfPathIsAllowed(List<char> dirInputs)
+        {
+            var test = dirInputs.Where(x => x == '<');
         }
 
         private List<char> GetUpDownInput(int yDiff)
@@ -261,10 +394,12 @@ public class Part02
                 if (xDiff > 0)
                 {
                     dirInputs.Add('>');
+
                 }
                 if (xDiff < 0)
                 {
                     dirInputs.Add('<');
+
                 }
             }
             return dirInputs;
