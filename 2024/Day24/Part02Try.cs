@@ -5,7 +5,11 @@ public class Part02Try
     private Dictionary<string, int> Rule = new Dictionary<string, int>();
     private Dictionary<string, int> RuleBackUp = new Dictionary<string, int>();
     private Dictionary<string, int> OriginalRule = new Dictionary<string, int>();
-    private HashSet<string> UniqueSortedPairs = new HashSet<string>();
+    private HashSet<string> BlackList = new HashSet<string>();
+    private HashSet<string> WhiteList = new HashSet<string>();
+
+
+    HashSet<string> AlreadyPicked = new();
 
     private List<GateLogic> Gates = new List<GateLogic>();
     private List<GateLogic> BackUp = new List<GateLogic>();
@@ -25,6 +29,8 @@ public class Part02Try
     public long Result(ReadOnlySpan<string> input)
     {
         ParseInput(input);
+        SettingBlackList();
+        AllowedValues();
 
         for (int i = 0; i < Rule.Count; i++)
         {
@@ -35,8 +41,8 @@ public class Part02Try
 
             if (Rule[ykey] + Rule[xkey] + MusterLoesung[i] >= 2)
             {
-                MusterLoesung[i+1] = 1;
-                if(Rule[ykey] + Rule[xkey] + MusterLoesung[i] == 2)
+                MusterLoesung[i + 1] = 1;
+                if (Rule[ykey] + Rule[xkey] + MusterLoesung[i] == 2)
                 {
                     MusterLoesung[i] = 0;
                 }
@@ -61,14 +67,14 @@ public class Part02Try
         {
             Gates = new List<GateLogic>(BackUp);
             Rule = new Dictionary<string, int>(RuleBackUp);
-            
+
             if (sim > 0)
             {
                 SwapedGates.Clear();
                 SwapedGatesList.Clear();
                 Gates = SwapGates(Gates);
             }
-            
+
             while (true)
             {
                 bool etwasBerechnet = false;
@@ -85,13 +91,13 @@ public class Part02Try
 
                 if (!etwasBerechnet)
                 {
-                    
+
                     break;
                 }
 
                 if (Gates.Count == 0)
                 {
-                    
+
                     break;
                 }
             }
@@ -99,11 +105,12 @@ public class Part02Try
             for (int i = 0; i < MusterLoesung.Length; i++)
             {
                 string key = $"z{i:D2}";
-                if (!Rule.TryGetValue(key, out int output)) break;
+                if (!Rule.TryGetValue(key, out int output))
+                    //break;
 
                 if (MusterLoesung[i] != output)
                 {
-                    //if(i>bestNumOfMatches) 
+                    if (i > bestNumOfMatches)
                         GlobalLog.LogLine($"{key} --> {MusterLoesung[i]} != {output}");
                     //break;
                 }
@@ -117,9 +124,9 @@ public class Part02Try
 
                 bestNumOfMatches = numOfMatches;
                 GlobalLog.LogLine("Swapped Gates: ");
-                for (int i = 0;i < SwapedGatesList.Count;i++)
+                for (int i = 0; i < SwapedGatesList.Count; i++)
                 {
-                    GlobalLog.LogLine($"    {SwapedGatesList[i]}");          
+                    GlobalLog.LogLine($"    {SwapedGatesList[i]}");
                 }
 
             }
@@ -128,7 +135,15 @@ public class Part02Try
             {
                 OriginalRule = new Dictionary<string, int>(Rule);
             }
-
+            if (sim % 100000 == 0)
+            {
+                GlobalLog.LogLine($"-------Sim {sim}-------------: ");
+                GlobalLog.LogLine("Swapped Gates: ");
+                for (int i = 0; i < SwapedGatesList.Count; i++)
+                {
+                    GlobalLog.LogLine($"    {SwapedGatesList[i]}");
+                }
+            }
             sim++;
         }
         //return ConvertBitArrayToInt_String(bitArray);
@@ -136,35 +151,54 @@ public class Part02Try
 
     }
 
-  
-    
+
+
 
     private List<GateLogic> SwapGates(List<GateLogic> gates)
     {
         var swappedGates = new List<GateLogic>();
         HashSet<string> localSwapedGates = new HashSet<string>();
         List<string> localSwapedGatesList = new List<string>();
-        int limit = gates.Count;
+
+        var enTest = WhiteList.ToArray();
+        var limit = enTest.Length;
 
 
         Random random = new Random();
 
-
-
         while (true)
         {
-            if (localSwapedGates.Count >= 8) break;
-
+            if (localSwapedGates.Count >= 4)
+            {
+                if (AlreadyPicked.Add(string.Join("", localSwapedGatesList)))
+                {
+                    break;
+                }
+                else
+                {
+                    localSwapedGates.Clear();
+                    localSwapedGatesList.Clear();
+                }
+            }
+            
             var rng01 = random.Next(limit);
             var rng02 = random.Next(limit);
-            string temp01 = gates[rng01].OutputVar01;
-            string temp02 = gates[rng02].OutputVar01;
+            string val1 = enTest[rng01];
+            string val2 = enTest[rng02];
+            if (rng01 == rng02) continue;
+            string temp01 = gates.FirstOrDefault(x => x.OutputVar01 == val1)?.OutputVar01;
+            string temp02 = gates.FirstOrDefault(x => x.OutputVar01 == val2)?.OutputVar01;
+            if (temp01 == null || temp02 == null) continue;
+
             if (localSwapedGates.Contains(temp01)
                 || localSwapedGates.Contains(temp02)) continue;
 
+            if (BlackList.Contains(temp01)
+            || BlackList.Contains(temp02)) continue;
 
-            gates[rng01].ChangeOutputVar01(temp02);
-            gates[rng02].ChangeOutputVar01(temp01);
+
+            gates.FirstOrDefault(x => x.OutputVar01 == val1)?.ChangeOutputVar01(temp02);
+            gates.FirstOrDefault(x => x.OutputVar01 == val2)?.ChangeOutputVar01(temp01);
 
 
             var (first, second) = temp01.CompareTo(temp02) <= 0
@@ -289,6 +323,425 @@ public class Part02Try
         And,
         Or,
         Xor
+    }
+
+    private void SettingBlackList()
+    {
+        string input = """
+            fht
+            dmk
+            ntf
+            nrs
+            qdt
+            pbb
+            mkc
+            bcm
+            cjs
+            dbv
+            qlh
+            qqv
+            bvb
+            jtk
+            nqr
+            bwb
+            jgf
+            pvt
+            bdc
+            smt
+            chv
+            mqt
+            cjt
+            sfm
+            fmd
+            jmq
+            mms
+            qsf
+            cvm
+            sbj
+            knp
+            swm
+            wjb
+            cgv
+            hjc
+            kjv
+            dfj
+            jkn
+            whc
+            hct
+            hmc
+            tsh
+            wbt
+            mfr
+            dwn
+            kng
+            jqh
+            fcd
+            bnt
+            kwb
+            nmm
+            fjv
+            fgr
+            gmh
+            gbd
+            cqb
+            ckd
+            hch
+            dmm
+            msb
+            bhs
+            cvg
+            gts
+            vmr
+            mwp
+            ptj
+            srh
+            fvk
+            rjj
+            kkg
+            nwg
+            qdp
+            tfn
+            qgq
+            jgt
+            rtt
+            csj
+            jgk
+            rvk
+            nsb
+            vfv
+            qpp
+            ptw
+            cpb
+            pjk
+            qpm
+            gvt
+            bbv
+            rbf
+            pww
+            rkw
+            rqf
+            kdt
+            cbd
+            mrj
+            tmh
+            bjr
+            bch
+            cjf
+            jsp
+            pnh
+            fjm
+            ftc
+            bkq
+            fhk
+            ghp
+            mtn
+            gnj
+            bcv
+            wdw
+            hrf
+            wtk
+            thb
+            nbk
+            knk
+            hrh
+            chp
+            cbh
+            bgc
+            qqd
+            hfb
+            wtb
+            qmd
+            wqn
+            tmm
+            wwt
+            rjp
+            bkk
+            hvf
+            qtd
+            z00
+            z01
+            z02
+            z03
+            z04
+            z05
+            z06
+            z07
+            z08
+            z09
+            z10
+            z11
+            z12
+            z13
+            z14
+            z15
+            z16
+            z17
+            z18
+            z19
+            z20
+            z21
+            z22
+            z23
+            z24
+            z25
+            z26
+            z27
+            z28
+            z29
+            z30
+            z31
+            z32
+            z33
+            z34
+            z35
+            """;
+
+        var test = input.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        foreach (string inp in test)
+        {
+            BlackList.Add(inp);
+        }
+    }
+
+    private void AllowedValues()
+    {
+
+        string whiteList = """
+        gts
+        z00
+        rrt
+        tmh
+        sfm
+        wvm
+        smt
+        mvf
+        nmh
+        msb
+        kqm
+        wqn
+        gvt
+        rqf
+        ndr
+        qqj
+        jtk
+        wgw
+        vmr
+        tfn
+        hjc
+        qmn
+        kjv
+        pbb
+        ptw
+        wdq
+        swm
+        wtb
+        sbj
+        cgj
+        cqb
+        hch
+        hnr
+        fjv
+        fcd
+        hdk
+        mpv
+        nvr
+        mfr
+        bbb
+        rjp
+        nbk
+        gqg
+        hvf
+        wrj
+        kkg
+        stn
+        ghp
+        dvj
+        hrh
+        fhk
+        dbv
+        pww
+        hct
+        rds
+        thb
+        bwb
+        ftc
+        qkp
+        qsw
+        njc
+        vfv
+        nqp
+        qtd
+        jsp
+        pvt
+        nmm
+        cpg
+        qkh
+        tsh
+        fgr
+        ptj
+        jmq
+        cbh
+        qdp
+        mms
+        qdt
+        bvb
+        cbd
+        qqd
+        gnj
+        dmk
+        fvk
+        jkn
+        fns
+        bch
+        rvk
+        mqt
+        kng
+        fht
+        ntf
+        z01
+        nrs
+        z02
+        mkc
+        bcm
+        z03
+        qqv
+        nqr
+        z04
+        jgf
+        bdc
+        z05
+        chv
+        cjt
+        fmd
+        z06
+        qsf
+        cvm
+        z07
+        knp
+        z08
+        wjb
+        cgv
+        z09
+        dfj
+        whc
+        z10
+        hmc
+        wbt
+        z11
+        dwn
+        jqh
+        bnt
+        kwb
+        gmh
+        z12
+        z14
+        gbd
+        ckd
+        z13
+        dmm
+        bhs
+        z15
+        cvg
+        mwp
+        srh
+        z16
+        z17
+        rjj
+        nwg
+        jpt
+        qgq
+        z19
+        z18
+        jgt
+        cjs
+        z20
+        nsb
+        jgk
+        z21
+        qpp
+        pjk
+        z22
+        cpb
+        qpm
+        z23
+        rbf
+        ssw
+        rkw
+        kdt
+        mrj
+        bjr
+        z24
+        z25
+        z26
+        cjf
+        pnh
+        fjm
+        bkq
+        z27
+        z28
+        mtn
+        bcv
+        hrf
+        z29
+        wtk
+        z30
+        knk
+        chp
+        bgc
+        z31
+        hfb
+        z32
+        qmd
+        tmm
+        wwt
+        bkk
+        gqf
+        z33
+        z34
+        njp
+        kqf
+        z35
+        ggh
+        svm
+        z36
+        nsf
+        z37
+        jrg
+        ngk
+        qrh
+        z38
+        wtp
+        kgw
+        z39
+        bjg
+        djv
+        qvh
+        z41
+        z40
+        mmm
+        rmc
+        vwp
+        pqg
+        z42
+        fcb
+        z43
+        jbp
+        z44
+        dhs
+        z45
+        """;
+
+
+        var test = whiteList.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        foreach (string inp in test)
+        {
+            if (!BlackList.Contains(inp))
+            {
+                WhiteList.Add(inp);
+
+            }
+        }
+
     }
 }
 

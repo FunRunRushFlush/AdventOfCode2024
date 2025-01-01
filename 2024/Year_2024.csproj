@@ -222,6 +222,9 @@
 	  <None Update="Day23\InputData\Part01Example_7.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="Day24\InputData\Blacklist.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Day24\InputData\InputCustom.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

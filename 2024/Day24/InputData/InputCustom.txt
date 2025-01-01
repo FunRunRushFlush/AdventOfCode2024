@@ -179,7 +179,7 @@ bdc AND pvt -> chv
 wrj AND njp -> kqf
 jtk XOR nqr -> z04
 gqf OR qtd -> njp
-njc AND ngk -> z38
+njc AND ngk -> qrh
 x39 AND y39 -> rds
 x10 AND y10 -> hct
 hch AND dmm -> bhs
@@ -242,7 +242,7 @@ hvf XOR bkk -> z34
 x15 XOR y15 -> hch
 y14 AND x14 -> cqb
 fmd OR jmq -> qsf
-ngk XOR njc -> qrh
+ngk XOR njc -> z38
 x41 XOR y41 -> cgj
 x07 AND y07 -> sbj
 nmm AND kwb -> gbd
