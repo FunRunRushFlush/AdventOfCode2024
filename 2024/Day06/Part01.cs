@@ -6,11 +6,11 @@ using System.Drawing;
 
 namespace Day06;
 
-public static class Part01
+public class Part01 : IPart
 {
-    public static int Result(string[] rawInput)
+    public string Result(Input rawInput)
     {
-        GetGuardPosition(rawInput, out Point guPos);
+        GetGuardPosition(rawInput.Lines, out Point guPos);
         GlobalLog.LogLine($"{guPos}");
         Guard guard = new Guard(guPos);
         bool loop = true;
@@ -22,7 +22,7 @@ public static class Part01
             try
             {
                 (xDir, yDir) = guard.CheckPathKord();
-                if (rawInput[yDir][xDir] == '#')
+                if (rawInput.Lines[yDir][xDir] == '#')
                 {
                     GlobalLog.LogLine($"Blocker @: Y:{yDir} X:{xDir}");
                     dirClear=false;
@@ -31,7 +31,7 @@ public static class Part01
                 while (!dirClear)
                 {
                     (xDir, yDir) = guard.CheckPathKord();
-                    if (rawInput[yDir][xDir] == '#')
+                    if (rawInput.Lines[yDir][xDir] == '#')
                     {
                         GlobalLog.LogLine($"Blocker @: Y:{yDir} X:{xDir}");
                         guard.TurnRight();
@@ -57,10 +57,10 @@ public static class Part01
 
         }
 
-        return guard.GetUniqueCoordinat();
+        return guard.GetUniqueCoordinat().ToString();
     }
 
-    public static void GetGuardPosition(ReadOnlySpan<string> rawInput, out Point position)
+    public void GetGuardPosition(ReadOnlySpan<string> rawInput, out Point position)
     {
         Point positionTemp = new Point(0, 0);
         for (int i = 0; i < rawInput.Length; i++)

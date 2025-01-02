@@ -2,9 +2,9 @@
 namespace Day01;
 public class Part01 : IPart
 {
-    public string Result(string input)
+    public string Result(Input input)
     {
-        int[] numbers = input
+        int[] numbers = input.Text
             .Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(int.Parse)
             .ToArray();

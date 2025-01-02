@@ -5,11 +5,11 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 
 namespace Day06;
-public static class Part02
+public class Part02 : IPart
 {
-    public static int Result(string[] rawInput)
+    public string Result(Input rawInput)
     {
-        GetGuardPosition(rawInput, out Point guPos);
+        GetGuardPosition(rawInput.Lines, out Point guPos);
         Console.WriteLine(guPos);
 
         bool loop = true;
@@ -18,13 +18,13 @@ public static class Part02
         int yDir = 0;
 
         int numberOfLoops = 0;
-        for (int i = 0; i < rawInput.Length; i++)
+        for (int i = 0; i < rawInput.Lines.Length; i++)
         {
-            for (int j = 0; j < rawInput[0].Length; j++)
+            for (int j = 0; j < rawInput.Lines[0].Length; j++)
             {
             GuardPart02 guard = new GuardPart02(guPos);
                 loop = true;
-                if (rawInput[i][j] == '#' || (guPos.Y, guPos.X)== (i, j))
+                if (rawInput.Lines[i][j] == '#' || (guPos.Y, guPos.X)== (i, j))
                 { 
                     continue; 
                 }
@@ -36,7 +36,7 @@ public static class Part02
                     try
                     {
                         (xDir, yDir) = guard.CheckPathKord();
-                        if (rawInput[yDir][xDir] == '#' || (yDir, xDir) == (i, j))
+                        if (rawInput.Lines[yDir][xDir] == '#' || (yDir, xDir) == (i, j))
                         {
                             GlobalLog.LogLine($"Blocker @: Y:{yDir} X:{xDir}");
                             dirClear = false;
@@ -45,7 +45,7 @@ public static class Part02
                         while (!dirClear)
                         {
                             (xDir, yDir) = guard.CheckPathKord();
-                            if (rawInput[yDir][xDir] == '#' || (yDir,xDir) ==(i,j) )
+                            if (rawInput.Lines[yDir][xDir] == '#' || (yDir,xDir) ==(i,j) )
                             {
                                 GlobalLog.LogLine($"Blocker @: Y:{yDir} X:{xDir}");
                                 guard.TurnRight();
@@ -76,10 +76,10 @@ public static class Part02
             }
 
         }
-        return numberOfLoops;
+        return numberOfLoops.ToString();
     }
 
-    public static int Result_Improved01(string[] rawInput)
+    public int Result_Improved01(string[] rawInput)
     {
         GetGuardPosition(rawInput, out Point guPos);
         Console.WriteLine(guPos);
@@ -151,7 +151,7 @@ public static class Part02
         return numberOfLoops;
     }
 
-    public static void GetGuardPosition(Span<string> rawInput, out Point position)
+    public void GetGuardPosition(Span<string> rawInput, out Point position)
     {
         Point positionTemp = new Point(0, 0);
         for (int i = 0; i < rawInput.Length; i++)

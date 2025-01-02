@@ -8,9 +8,9 @@ using CommunityToolkit.HighPerformance;
 [RankColumn]
 public class Benchmarks
 {
-    string inputRaw = string.Empty;
-    string[] input;
-    string[] rules;
+
+    private Input _input;
+
     private Day01.Part01 _part01;
     private Day01.Part02 _part02;
 
@@ -18,10 +18,10 @@ public class Benchmarks
     public void Setup()
     {
         string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day01/InputData/Input.txt");
-        inputRaw = File.ReadAllText(path);
-    
-         input = File.ReadAllLines(path);
-
+        _input = new(
+         File.ReadAllBytes(path),
+         File.ReadAllText(path),
+         File.ReadAllLines(path));
     }
 
     [IterationSetup]
@@ -36,12 +36,12 @@ public class Benchmarks
     [Benchmark]
     public void Part01_Result()
     {
-        _part01.Result(inputRaw);
+        _part01.Result(_input);
     }
     [Benchmark]
     public void Part02_Result()
     {
-        _part02.Result(inputRaw);
+        _part02.Result(_input);
     }
 
 

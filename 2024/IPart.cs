@@ -1,4 +1,4 @@
 ﻿public interface IPart
 {
-    string Result(string input);
+    string Result(Input input);
 }

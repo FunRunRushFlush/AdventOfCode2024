@@ -1,15 +1,13 @@
 ﻿
 using CommunityToolkit.HighPerformance;
 
-
-
 namespace Day05;
 
-public static class Part01
+public class Part01 : IPart
 {
-    public static int Result(string[] rawInput)
+    public string Result(Input rawInput)
     {
-        InputParser(rawInput, out ReadOnlySpan2D<bool> rules2D,
+        InputParser(rawInput.Lines, out ReadOnlySpan2D<bool> rules2D,
        out ReadOnlySpan<int[]> parsedInput);
         int midCounter = 0;
         for (int i = 0; i < parsedInput.Length; i++)
@@ -41,10 +39,10 @@ public static class Part01
         }
 
         //Console.WriteLine("midCounter: {0}", midCounter);
-        return midCounter;
+        return midCounter.ToString();
     }
 
-    public static int Result_Improved01(ReadOnlySpan<string> rawInput)
+    public int Result_Improved01(ReadOnlySpan<string> rawInput)
     {
         InputParser(rawInput, out ReadOnlySpan2D<bool> rules2D,
        out ReadOnlySpan<int[]> parsedInput);
@@ -81,7 +79,7 @@ public static class Part01
         return midCounter;
     }
 
-    public static void InputParser(
+    public void InputParser(
        ReadOnlySpan<string> rawInput,
        out ReadOnlySpan2D<bool> rules2D,
        out ReadOnlySpan<int[]> parsedInput)
@@ -105,7 +103,7 @@ public static class Part01
         }
         parsedInput = parsedInpu;
     }
-    public static void InputParserNoOut(
+    public void InputParserNoOut(
    ReadOnlySpan<string> rawInput)
     {
         int separatorIndex = Array.IndexOf(rawInput.ToArray(), string.Empty);

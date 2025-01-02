@@ -6,14 +6,14 @@ namespace Day03;
 public class Part02 : IPart
 {
 
-    public string Result(string input)
+    public string Result(Input input)
     {
         // https://learn.microsoft.com/de-de/dotnet/api/system.text.regularexpressions.regex.match?view=net-8.0
         string doPattern = @"do\(\)";
   
         Regex doReg = new Regex(doPattern);
 
-        var test = doReg.Split(input);
+        var test = doReg.Split(input.Text);
 
         int counter = 0;
         for( int i=0; i<test.Length; i++)

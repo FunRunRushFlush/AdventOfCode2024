@@ -2,14 +2,14 @@
 using System;
 
 
-string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day24/InputData/InputCustom.txt");
+//string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day24/InputData/InputCustom.txt");
 
 
-var inputText= File.ReadAllText(path);
-var inputLines = File.ReadAllLines(path);
+//var inputText= File.ReadAllText(path);
+//var inputLines = File.ReadAllLines(path);
 
 BenchmarkRunner.Run<DayBenchmark>();
-BenchmarkRunner.Run<Benchmarks>();
+//BenchmarkRunner.Run<Benchmarks>();
 
 
 //Day24.Part01 dayP01 = new();

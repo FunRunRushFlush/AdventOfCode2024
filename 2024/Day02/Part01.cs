@@ -3,9 +3,9 @@ namespace Day02;
 
 public class Part01 : IPart
 {
-    public string Result(string input)
+    public string Result(Input input)
     {
-        string[] lines = input
+        string[] lines = input.Text
         .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
         .ToArray();
 

@@ -4,11 +4,11 @@ using Microsoft.Diagnostics.Runtime.Utilities;
 using System.Text.RegularExpressions;
 
 namespace Day05;
-public static class Part02
+public class Part02 : IPart
 {
-    public static int Result(string[] rawInput)
+    public string Result(Input input)
     {
-        InputParser(rawInput, out ReadOnlySpan2D<bool> rules2D,
+        InputParser(input.Lines, out ReadOnlySpan2D<bool> rules2D,
        out ReadOnlySpan<int[]> parsedInput);
         int midCounter = 0;
         for (int i = 0; i < parsedInput.Length; i++)
@@ -69,10 +69,10 @@ public static class Part02
 
 
         //Console.WriteLine("midCounter: {0}", midCounter);
-        return midCounter;
+        return midCounter.ToString();
     }
 
-    public static void InputParser(
+    public void InputParser(
        string[] rawInput,
        out ReadOnlySpan2D<bool> rules2D,
        out ReadOnlySpan<int[]> parsedInput)

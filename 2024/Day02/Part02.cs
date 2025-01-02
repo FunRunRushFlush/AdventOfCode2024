@@ -2,10 +2,9 @@
 namespace Day02;
 public class Part02 : IPart
 {
-    public string Result(string input)
+    public string Result(Input input)
     {
-        //Stopwatch sw = Stopwatch.StartNew();
-        string[] lines = input
+        string[] lines = input.Text
         .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
         .ToArray();
 

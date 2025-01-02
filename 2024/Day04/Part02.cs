@@ -5,11 +5,11 @@ using CommunityToolkit.HighPerformance;
 namespace Day04;
 public class Part02 : IPart
 {
-    public string Result(string inputi)
+    public string Result(Input input)
     {
-        var input = inputi.Split(Environment.NewLine);
-        int rows = input.Length;
-        int cols = input[0].Length;
+
+        int rows = input.Lines.Length;
+        int cols = input.Lines[0].Length;
         XmasState state = XmasState.None;
         XmasBackwardsState stateBackwards = XmasBackwardsState.None;
 
@@ -23,7 +23,7 @@ public class Part02 : IPart
         {
             for (int j = 0; j < cols; j++)
             {
-                input2D[i, j] = input[i][j];
+                input2D[i, j] = input.Lines[i][j];
             }
         }
 

@@ -6,13 +6,13 @@ namespace Day03;
 
 public class Part01 : IPart
 {
-    public string Result(string input)
+    public string Result(Input input)
     {
         // https://learn.microsoft.com/de-de/dotnet/api/system.text.regularexpressions.regex.match?view=net-8.0
         string pattern = @"mul\(\d{1,3},\d{1,3}\)";
         Regex reg = new Regex(pattern);
         int result = 0;
-        foreach(Match match in reg.Matches(input))
+        foreach(Match match in reg.Matches(input.Text))
         {
             var value = match.Value.Split(new[] { '(', ')', ',', }, StringSplitOptions.RemoveEmptyEntries);
 

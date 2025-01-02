@@ -7,10 +7,11 @@ using System.IO;
 [RankColumn]
 public class DayBenchmark
 {
-    [Params("Day01", "Day02", "Day03")] // Liste der Tage, die getestet werden
+    //[Params("Day01", "Day02", "Day03", "Day04", "Day05", "Day06", "Day07", "Day08", "Day09", "Day10")]
+    [Params("Day01", "Day02", "Day03", "Day04", "Day05", "Day06")]
     public string Day { get; set; }
 
-    private string inputRaw;
+    private Input _input;
     private string[] inputLines;
     private IPart part01Instance;
     private IPart part02Instance;
@@ -19,8 +20,10 @@ public class DayBenchmark
     public void Setup()
     {
         string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{Day}/InputData/Input.txt");
-        inputRaw = File.ReadAllText(path);
-        inputLines = File.ReadAllLines(path);
+        _input = new(
+            File.ReadAllBytes(path),
+            File.ReadAllText(path),
+            File.ReadAllLines(path));
 
         part01Instance = CreateInstance($"{Day}.Part01");
         part02Instance = CreateInstance($"{Day}.Part02");
@@ -31,22 +34,22 @@ public class DayBenchmark
         var type = Type.GetType(typeName);
         if (type == null)
         {
-            throw new ArgumentException($"Typ {typeName} nicht gefunden.");
+            throw new ArgumentException($"Typ {typeName} not found");
         }
 
         return (IPart)Activator.CreateInstance(type);
     }
 
     [Benchmark]
-    public void Part01_Result_String()
+    public void Part01()
     {
-        part01Instance.Result(inputRaw);
+        part01Instance.Result(_input);
     }
 
     [Benchmark]
-    public void Part02_Result_String()
+    public void Part02()
     {
-        part02Instance.Result(inputRaw);
+        part02Instance.Result(_input);
     }
 
 }
