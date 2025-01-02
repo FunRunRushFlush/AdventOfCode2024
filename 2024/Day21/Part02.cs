@@ -1,8 +1,6 @@
-
 namespace Day21;
 public class Part02
 {
-   
     public void ParseOnly(ReadOnlySpan<string> input)
     {
         ParseInput(input);
@@ -16,8 +14,6 @@ public class Part02
 
     private void ParseInput(ReadOnlySpan<string> input)
     {
-
         
     }
-
 }

@@ -1,5 +1,3 @@
-
-
 namespace Day21;
 public class Part01
 {
@@ -17,9 +15,5 @@ public class Part01
     private void ParseInput(ReadOnlySpan<string> input)
     {
 
-
     }
-
-
-
 }

@@ -1,16 +1,12 @@
-using System.Diagnostics;
-
-public static class Part02
+namespace Day01;
+public class Part02 : IPart
 {
-    public static void Result(string input)
+    public string Result(string input)
     {
-
-        Stopwatch sw = Stopwatch.StartNew();
         int[] numbers = input
             .Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(int.Parse)
             .ToArray();
-
 
         int[] number01 = new int[numbers.Length / 2];
         int[] number02 = new int[numbers.Length / 2];
@@ -33,8 +29,6 @@ public static class Part02
             similarityScore += localSimilarityScore;
         }
 
-        sw.Stop();
-
-        Console.WriteLine($"similarityScore {similarityScore}, Time {sw.ElapsedMilliseconds}");
+        return $"{similarityScore}";
     }
 }

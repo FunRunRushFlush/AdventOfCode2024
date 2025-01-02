@@ -3,9 +3,10 @@ using Microsoft.Diagnostics.Runtime.Utilities;
 using System.Text.RegularExpressions;
 
 namespace Day03;
-public static class Part02
+public class Part02 : IPart
 {
-    public static int Result(string input)
+
+    public string Result(string input)
     {
         // https://learn.microsoft.com/de-de/dotnet/api/system.text.regularexpressions.regex.match?view=net-8.0
         string doPattern = @"do\(\)";
@@ -21,11 +22,11 @@ public static class Part02
             counter +=CalculateMul(line);
 
         }
- 
-        return counter;
+
+        return $"{counter}";
     }
 
-    private static int CalculateMul(string stringInput)
+    private int CalculateMul(string stringInput)
     {
         string pattern = @"mul\(\d{1,3},\d{1,3}\)";
         Regex reg = new Regex(pattern);
@@ -52,7 +53,7 @@ public static class Part02
 
     //    return safeReports;
     //}
-    private static ReadOnlySpan<int> CreateSlicedSpan(ReadOnlySpan<int> span, int skipIndex)
+    private ReadOnlySpan<int> CreateSlicedSpan(ReadOnlySpan<int> span, int skipIndex)
     {
         if (skipIndex == 0)
             return span.Slice(1); 
@@ -63,7 +64,7 @@ public static class Part02
    
         return CombineSlices(span.Slice(0, skipIndex), span.Slice(skipIndex + 1));
     }
-    private static int[] CombineSlices(ReadOnlySpan<int> part1, ReadOnlySpan<int> part2)
+    private int[] CombineSlices(ReadOnlySpan<int> part1, ReadOnlySpan<int> part2)
     {
         int[] result = new int[part1.Length + part2.Length];
         part1.CopyTo(result);
