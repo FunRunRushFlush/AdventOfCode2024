@@ -1,50 +1,20 @@
 namespace Day11;
-public static class Part01
+public class Part01 :IPart
 {
 
-    private static int BlinkLimit;
-    private static long StoneCounter;
-    private static Dictionary<(long, int), long> Cache;
+    private int BlinkLimit;
+    private long StoneCounter;
+    private Dictionary<(long, int), long> Cache;
     //1 2024 1 0 9 9 2021976
-    public static long Result(string input)
-    {
-        BlinkLimit = 25;
-        List<string> stoneList = input
-            .Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
-            .ToList();
 
-        for (int x = 0; x < BlinkLimit; x++)
-        {
-            GlobalLog.LogLine($"{string.Join(", ", stoneList)}");
-            for (int i = 0; i < stoneList.Count; i++)
-            {
-                string stone = stoneList[i];
-                if (stone == "0") stoneList[i] = "1";
-                else if (stone.Length % 2 == 0)
-                {
-                    stoneList.Insert(i, stone.Substring(0, stone.Length / 2));
-                    stoneList[i + 1] = int.Parse(stone.Substring(stone.Length / 2, stone.Length / 2)).ToString();
-                    i++;
-                }
-                else
-                {
-                    stoneList[i] = (long.Parse(stone) * 2024).ToString();
-                }
-            }
-        }
 
-        return stoneList.Count;
-    }
-
-  
-
-    public static long Result_Improved(string input)
+    public string Result(Input input)
     {
         StoneCounter = 0;
         BlinkLimit = 25;
         Cache = new Dictionary<(long, int), long>();
 
-        List<long> stoneList = input
+        List<long> stoneList = input.Text
             .Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(long.Parse)
             .ToList();
@@ -55,10 +25,10 @@ public static class Part01
         }
 
         GlobalLog.LogLine($"StoneCounter: {StoneCounter} - Result_Rec");
-        return StoneCounter;
+        return StoneCounter.ToString();
     }
-
-    private static long CheckStoneRule(long stoneNum, int blinkNum)
+    //TODO: Caching+Recursive besser verstehen
+    private long CheckStoneRule(long stoneNum, int blinkNum)
     {
         if (blinkNum == BlinkLimit)
         {

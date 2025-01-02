@@ -2,7 +2,7 @@
 using System;
 
 
-string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day02/InputData/Input.txt");
+string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day14/InputData/Input.txt");
 
 Input input = new(
       File.ReadAllBytes(path),
@@ -10,13 +10,13 @@ Input input = new(
       File.ReadAllLines(path));
 
 
-BenchmarkRunner.Run<DayBenchmark>();
-//BenchmarkRunner.Run<Benchmarks>();
+//BenchmarkRunner.Run<DayBenchmark>();
+BenchmarkRunner.Run<Benchmarks>();
 
 
-Day02.Part01 dayP01 = new();
+Day14.Part01 dayP01 = new();
 //Day20.Part02 dayP02 = new();
-Day02.Part02 dayP02 = new();
+Day14.Part02 dayP02 = new();
 
 var solution = dayP01.Result(input);
 var solutionTry = dayP02.Result(input);

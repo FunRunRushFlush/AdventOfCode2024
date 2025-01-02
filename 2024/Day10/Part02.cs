@@ -1,20 +1,20 @@
 namespace Day10;
 
 
-public static class Part02
+public class Part02:IPart
 {
-    private static int trailHeadCounter = 0;
-    private static int MapHeight = 0;
-    private static int MapWidth = 0;
+    private int trailHeadCounter = 0;
+    private int MapHeight = 0;
+    private int MapWidth = 0;
 
 
-    //static HashSet<(int Y, int X, int StartY, int StartX)> uniqueHead = new HashSet<(int Y, int X, int StartY, int StartX)>();
+    // HashSet<(int Y, int X, int StartY, int StartX)> uniqueHead = new HashSet<(int Y, int X, int StartY, int StartX)>();
 
 
-    public static long Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
-        MapHeight = input.Length;
-        MapWidth = input[0].Length;
+        MapHeight = input.Lines.Length;
+        MapWidth = input.Lines[0].Length;
 
 
 
@@ -23,18 +23,18 @@ public static class Part02
             for (int x = 0; x < MapWidth; x++)
             {
                 GlobalLog.LogLine($"input[y][x] : Y:{y} X:{x}");
-                if (CharToInt(input[y][x]) == 0)
+                if (CharToInt(input.Lines[y][x]) == 0)
                 {
-                    PathChecker(CharToInt(input[y][x]), (y, x), input);
+                    PathChecker(CharToInt(input.Lines[y][x]), (y, x), input.Lines);
                 }
             }
         }
 
         GlobalLog.LogLine($"trailHeadCounter : {trailHeadCounter}");
-        return trailHeadCounter;
+        return trailHeadCounter.ToString();
     }
 
-    private static void PathChecker(int trailNum, (int Y, int X) trailPos, ReadOnlySpan<string> input)
+    private void PathChecker(int trailNum, (int Y, int X) trailPos, ReadOnlySpan<string> input)
     {
         GlobalLog.LogLine($"PathChecker: trailNum:{trailNum}, trailPos: Y:{trailPos.Y} X:{trailPos.X}");
         if (trailNum == 9)
@@ -51,7 +51,7 @@ public static class Part02
 
     }
 
-    private static TrailPath[] ExtractNearbyTrails(int trailNum, (int Y, int X) trailPos, ReadOnlySpan<string> input)
+    private TrailPath[] ExtractNearbyTrails(int trailNum, (int Y, int X) trailPos, ReadOnlySpan<string> input)
     {
         TrailPath[] trailPath = new TrailPath[4];
         for (int i = 0; i < 4; i++)
@@ -90,7 +90,7 @@ public static class Part02
     }
 
 
-    private static (int Y, int X) SetOffsetCoord(Direction direction, (int Y, int X) trailPos)
+    private (int Y, int X) SetOffsetCoord(Direction direction, (int Y, int X) trailPos)
     {
         var dir = direction switch
         {
@@ -106,11 +106,11 @@ public static class Part02
 
         return (Y, X);
     }
-    private static int CharToInt(char c)
+    private int CharToInt(char c)
     {
         return (int)(c - '0');
     }
-    public static long Result_Improved01(ReadOnlySpan<string> input)
+    public long Result_Improved01(ReadOnlySpan<string> input)
     {
         MapHeight = input.Length;
         MapWidth = input[0].Length;
@@ -131,7 +131,7 @@ public static class Part02
         return trailHeadCounter;
     }
 
-    private static void PathChecker_Imp(int startTrailNum, (int Y, int X) startTrailPos, ReadOnlySpan<string> input)
+    private void PathChecker_Imp(int startTrailNum, (int Y, int X) startTrailPos, ReadOnlySpan<string> input)
     {
         var stack = new Stack<TrailPath>();
         stack.Push(new TrailPath(startTrailNum, startTrailPos));
@@ -162,7 +162,7 @@ public static class Part02
             }
         }
     }
-    private static int ExtractNearbyTrails_Imp(int trailNum, (int Y, int X) trailPos, ReadOnlySpan<string> input, Span<TrailPath> trailPaths)
+    private int ExtractNearbyTrails_Imp(int trailNum, (int Y, int X) trailPos, ReadOnlySpan<string> input, Span<TrailPath> trailPaths)
     {
         int count = 0;
         for (int i = 0; i < 4; i++)

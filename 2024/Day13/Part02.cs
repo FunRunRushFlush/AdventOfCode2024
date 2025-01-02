@@ -1,17 +1,17 @@
 namespace Day13;
 
-public static class Part02
+public class Part02 : IPart
 {
 
-    private static List<ClawInstruction> _instructions;
+    private List<ClawInstruction> _instructions;
 
 
-    public static long Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
         long A_ButtonCounter = 0;
         long B_ButtonCounter = 0;
 
-        _instructions = ParseInputToClawInstructions(input);
+        _instructions = ParseInputToClawInstructions(input.SpanLines);
         GlobalLog.LogLine($"instructionsNumbers: {_instructions.Count}");
         foreach (var instruction in _instructions)
         {
@@ -28,13 +28,13 @@ public static class Part02
         GlobalLog.LogLine($"B_ButtonCounter: {B_ButtonCounter}");
         var token = (A_ButtonCounter * 3) + B_ButtonCounter;
         GlobalLog.LogLine($"token: {token}");
-        return token;
+        return token.ToString();
     }
 
 
 
 
-    private static (long APresses, long BPresses) CalculateButtonPresses(ClawInstruction ins)
+    private (long APresses, long BPresses) CalculateButtonPresses(ClawInstruction ins)
     {
         decimal Z_y = ins.Price.Y; decimal Z_x = ins.Price.X;
         decimal A_y = ins.A.Y; decimal A_x = ins.A.X;
@@ -48,7 +48,7 @@ public static class Part02
         decimal a = (Z_y - b * B_y) / A_y;
 
 
-        const decimal epsilon =(decimal)0.0001;
+        const decimal epsilon = (decimal)0.0001;
 
 
         if (Math.Abs(a - Math.Round(a)) > epsilon || Math.Abs(b - Math.Round(b)) > epsilon)
@@ -61,9 +61,9 @@ public static class Part02
 
         return ((long)(a), (long)b);
     }
- 
 
-    private static List<ClawInstruction> ParseInputToClawInstructions(ReadOnlySpan<string> input)
+
+    private List<ClawInstruction> ParseInputToClawInstructions(ReadOnlySpan<string> input)
     {
         var instructions = new List<ClawInstruction>();
 
@@ -81,7 +81,7 @@ public static class Part02
         return instructions;
     }
 
-    private static (int Y, int X) ParseFixedCoordinates(string input)
+    private (int Y, int X) ParseFixedCoordinates(string input)
     {
 
         var cleanInput = input.Substring(12);
@@ -91,7 +91,7 @@ public static class Part02
         return (int.Parse(parts[^1]), int.Parse(parts[0]));
     }
 
-    private static (long Y, long X) ParseFixedPrize(string input)
+    private (long Y, long X) ParseFixedPrize(string input)
     {
         long CostNum = 10000000000000;
 

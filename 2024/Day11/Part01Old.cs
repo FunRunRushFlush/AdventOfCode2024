@@ -1,17 +1,50 @@
 namespace Day11;
-
-public class Part02 : IPart
+public class Part01Old :IPart
 {
+
     private int BlinkLimit;
     private long StoneCounter;
     private Dictionary<(long, int), long> Cache;
+    //1 2024 1 0 9 9 2021976
     public string Result(Input input)
     {
+        BlinkLimit = 25;
+        List<string> stoneList = input.Text
+            .Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+            .ToList();
+
+        for (int x = 0; x < BlinkLimit; x++)
+        {
+            GlobalLog.LogLine($"{string.Join(", ", stoneList)}");
+            for (int i = 0; i < stoneList.Count; i++)
+            {
+                string stone = stoneList[i];
+                if (stone == "0") stoneList[i] = "1";
+                else if (stone.Length % 2 == 0)
+                {
+                    stoneList.Insert(i, stone.Substring(0, stone.Length / 2));
+                    stoneList[i + 1] = int.Parse(stone.Substring(stone.Length / 2, stone.Length / 2)).ToString();
+                    i++;
+                }
+                else
+                {
+                    stoneList[i] = (long.Parse(stone) * 2024).ToString();
+                }
+            }
+        }
+
+        return stoneList.Count.ToString();
+    }
+
+
+
+    public long Result_Improved(string input)
+    {
         StoneCounter = 0;
-        BlinkLimit = 75;
+        BlinkLimit = 25;
         Cache = new Dictionary<(long, int), long>();
 
-        List<long> stoneList = input.Text
+        List<long> stoneList = input
             .Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(long.Parse)
             .ToList();
@@ -22,7 +55,7 @@ public class Part02 : IPart
         }
 
         GlobalLog.LogLine($"StoneCounter: {StoneCounter} - Result_Rec");
-        return StoneCounter.ToString();
+        return StoneCounter;
     }
 
     private long CheckStoneRule(long stoneNum, int blinkNum)
@@ -58,3 +91,4 @@ public class Part02 : IPart
         return result;
     }
 }
+

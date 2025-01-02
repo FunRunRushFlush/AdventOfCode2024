@@ -1,19 +1,19 @@
 
 namespace Day09;
-public static class Part01
+public class Part01:IPart
 {
-    public static long Result(ReadOnlySpan<char> input)
+    public string Result(Input input)
     {
         var lastFileIndex = 0;
-        if ((input.Length - 1) % 2 == 0)
+        if ((input.Text.Length - 1) % 2 == 0)
         {
-            lastFileIndex = input.Length - 1;
+            lastFileIndex = input.Text.Length - 1;
         }
-        else if ((input.Length - 2) % 2 == 0)
+        else if ((input.Text.Length - 2) % 2 == 0)
         {
-            lastFileIndex = input.Length - 2;
+            lastFileIndex = input.Text.Length - 2;
         }
-        var lastFileNum = CharToInt(input[lastFileIndex]);
+        var lastFileNum = CharToInt(input.Text[lastFileIndex]);
         var fileIndex = 0;
         var checksumIndex = 0;
         long checksum = 0;
@@ -21,7 +21,7 @@ public static class Part01
         {
             if(i%2==0)
             {
-                var num = CharToInt(input[i]);
+                var num = CharToInt(input.Text[i]);
                 GlobalLog.LogLine($"### num: {num} x fileIndex:{fileIndex} ### ");
                 for (int j = 0; j < num; j++)
                 {
@@ -34,7 +34,7 @@ public static class Part01
             }
             else
             {
-                var spaceNum = CharToInt(input[i]);
+                var spaceNum = CharToInt(input.Text[i]);
                 GlobalLog.LogLine($"### spaceNum: {spaceNum} x lastFileIndex/2:{lastFileIndex/2} ###");
 
                 for (int j = 0; j < spaceNum; j++)
@@ -43,7 +43,7 @@ public static class Part01
                     {
                         lastFileIndex -= 2;
                         if (lastFileIndex < i) break;
-                        lastFileNum = CharToInt(input[lastFileIndex]);
+                        lastFileNum = CharToInt(input.Text[lastFileIndex]);
                     }
                         if (lastFileIndex < i) break;
                     var addingChecksum = checksumIndex * lastFileIndex/2;
@@ -68,10 +68,10 @@ public static class Part01
             }
         }
         GlobalLog.LogLine($"checksum: {checksum}");
-        return checksum;
+        return checksum.ToString();
     }
 
-    private static int CharToInt(char c)
+    private int CharToInt(char c)
     {
         return (int)(c - '0');
     }

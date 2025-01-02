@@ -7,8 +7,8 @@ using System.IO;
 [RankColumn]
 public class DayBenchmark
 {
-    //[Params("Day01", "Day02", "Day03", "Day04", "Day05", "Day06", "Day07", "Day08", "Day09", "Day10")]
-    [Params("Day01", "Day02", "Day03", "Day04", "Day05", "Day06")]
+    //[Params("Day01", "Day02", "Day03", "Day04", "Day05", "Day06")]
+    [Params("Day01", "Day02", "Day03", "Day04", "Day05", "Day06", "Day07", "Day08", "Day09", "Day10", "Day11", "Day12", "Day13", "Day14")]
     public string Day { get; set; }
 
     private Input _input;
@@ -25,8 +25,6 @@ public class DayBenchmark
             File.ReadAllText(path),
             File.ReadAllLines(path));
 
-        part01Instance = CreateInstance($"{Day}.Part01");
-        part02Instance = CreateInstance($"{Day}.Part02");
     }
 
     private IPart CreateInstance(string typeName)
@@ -38,6 +36,14 @@ public class DayBenchmark
         }
 
         return (IPart)Activator.CreateInstance(type);
+    }
+
+    [IterationSetup]
+    public void SetupIteration()
+    {
+        // Vor jedem Iterationslauf eine neue Instanz anlegen bekomme sonst Bugs
+        part01Instance = CreateInstance($"{Day}.Part01");
+        part02Instance = CreateInstance($"{Day}.Part02");
     }
 
     [Benchmark]

@@ -1,156 +1,113 @@
 
 
 using System;
+using System.Numerics;
 
 namespace Day14;
-public static class Part01
+public class Part01 : IPart
 {
-    private static List<Robot> roboInfoList = new();
-    private static int bathWidth = 101;
-    private static int bathHeight = 103;
+    private List<Robot> roboInfoList = new();
+    private int bathWidth = 101;
+    private int bathHeight = 103;
 
-    private static int SecondLimit = 100;
-        private static int[,] bathroom = new int[bathHeight, bathWidth];
+    private int SecondLimit = 100;
+    private int[,] bathroom;
+        long Q1 = 0;
+        long Q2 = 0;
+        long Q3 = 0;
+        long Q4 = 0;
 
-    public static long Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
-        long q1 = 0;
-        long q2 = 0;
-        long q3 = 0;
-        long q4 = 0;
+        bathroom = new int[bathHeight, bathWidth];
+        ParseInput(input.SpanLines);
 
-        ParseInput(input);
-
-        for (int s = 0; s<= SecondLimit; s++)
+        foreach (var robo in roboInfoList)
         {
-            Array.Clear(bathroom, 0, bathroom.Length);        
-            for(int r=0;r<roboInfoList.Count;r++)
+            CalculatePosition(robo, SecondLimit);
+            QuarterCalc(robo);
+        }
+
+        return (Q1*Q2*Q3*Q4).ToString();
+    }
+
+    private void QuarterCalc(Robot robo)
+    {
+        if (robo.Position.X < bathWidth / 2)
+        {
+            if (robo.Position.Y < bathHeight / 2)
             {
-                var roboPos = CalculateRoboPosition(roboInfoList[r], s);
-                   bathroom[roboPos.roboY, roboPos.roboX] += 1;
-                if(s== SecondLimit)
-                {
-                    if(roboPos.roboY<bathHeight/2) 
-                    {
-                        if( roboPos.roboX < bathWidth / 2)  q1++;
-                        else if(roboPos.roboX > bathWidth / 2)  q2++;
-                    }
-                    else if(roboPos.roboY > bathHeight / 2)
-                    {
-                        if (roboPos.roboX < bathWidth / 2)  q4++;
-                        else if (roboPos.roboX > bathWidth / 2) q3++;
-                    }
-                }
+                Q1++;
             }
-
-             DrawBathGrid(s);
-        }
-
-
-
-        return q1*q2*q3*q4;
-    }
-
-
-
-    [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private static void DrawBathGrid(int s =0)
-    {
-        GlobalLog.LogLine($"###################################################");
-        GlobalLog.LogLine($"### Seconds = {s}###");
-        GlobalLog.LogLine($"###################################################");
-        for (int h = 0; h < bathHeight; h++)
-        {
-            for (int w = 0; w < bathWidth; w++)
+            else
             {
-                string drawPoint = ".";
-                if (bathroom[h, w] > 0)
-                {
-                    drawPoint = bathroom[h, w].ToString();
-                }
-                if (bathWidth / 2 == w)
-                {
-                    drawPoint = "|";
-                }
-                if (bathHeight / 2 == h)
-                {
-                    drawPoint = "-";
-                }
-
-                Console.Write($"{drawPoint}");
+                Q2++;
             }
-            Console.WriteLine();
+        }
+        else
+        {
+            if (robo.Position.Y < bathHeight / 2)
+            {
+                Q3++;
+            }
+            else
+            {
+                Q4++;
+            }
+        }
+
+    }
+
+    private void CalculatePosition(Robot robo, int seconds)
+    {
+        var vec = robo.Position* robo.Velocity* seconds;
+        robo.Position = CalcTeleportation(vec);
+        robo.Seconds += seconds;
+    }
+
+    private Vector2 CalcTeleportation(Vector2 vec)
+    {
+        Vector2 res = new Vector2();
+        if (vec.X < 0)
+        {
+            res.X = bathWidth + (vec.X % bathWidth);
+        }
+        if (vec.X >= bathWidth)
+        {
+            res.X = (vec.X % bathWidth);
+        }
+        if (vec.Y < 0)
+        {
+            res.Y = bathHeight + (vec.Y % bathHeight);
+        }
+        if (vec.X >= bathWidth)
+        {
+            res.Y = (vec.Y % bathHeight);
+        }
+        return res;
+    }
+
+    private void ParseInput(ReadOnlySpan<string> spanLines)
+    {
+        foreach (string line in spanLines)
+        {
+            int[] data = line.Split(new[] {' ', ',', 'p','v','='}, StringSplitOptions.RemoveEmptyEntries)
+                                .Select(int.Parse).ToArray();
+            roboInfoList.Add(new Robot(new Vector2(data[0], data[1]), new Vector2(data[2], data[3])));
         }
     }
 
-    private static (int roboX,int roboY) CalculateRoboPosition(Robot robo, int s)
+    private class Robot
     {
+        public Vector2 Position;
+        public Vector2 Velocity;
+        public int Seconds;
 
-        var roboX = robo.Pos.X + robo.Vel.X * s;
-        var roboY = robo.Pos.Y + robo.Vel.Y * s;
-
-        while (roboX >= bathWidth) roboX -= bathWidth;
-        while (roboX < 0) roboX += bathWidth;
-
-        while (roboY >= bathHeight) roboY -= bathHeight;
-        while (roboY < 0) roboY += bathHeight;
-
-        return ( roboX, roboY );
-    }
-
-    private static void ParseInput(ReadOnlySpan<string> input)
-    {
-        foreach (var line in input)
+        public Robot(Vector2 position, Vector2 velocity, int seconds=0)
         {
-            
-            int pStart = line.IndexOf("p=") + 2; 
-            int vStart = line.IndexOf("v=") + 2; 
-
-           
-            var pPart = line.AsSpan(pStart, line.IndexOf(' ', pStart) - pStart); 
-            var vPart = line.AsSpan(vStart);
-
-
-            int commaP = pPart.IndexOf(',');
-            int pX = int.Parse(pPart[..commaP]);
-            int pY = int.Parse(pPart[(commaP + 1)..]);
-
-            
-            int commaV = vPart.IndexOf(',');
-            int vX = int.Parse(vPart[..commaV]);
-            int vY = int.Parse(vPart[(commaV + 1)..]);
-
-            roboInfoList.Add(new Robot(new Position(pX, pY), new Position(vX, vY)));
-        }
-    }
-
-
-    private struct Position
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
-
-        public Position(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
-    }
-
-    private struct Robot
-    {
-        public Position StartPos { get; set; }
-        public Position Vel { get; set; }
-        public Position Pos { get; set; }
-        public int Time { get; set; }
-
-        public Robot(Position startPos, Position vel)
-        {
-            StartPos = startPos;
-            Vel = vel;
-            Pos = startPos;
-            Time = 0;
+            Position = position;
+            Velocity = velocity;
+            Seconds = seconds;
         }
     }
 }
-

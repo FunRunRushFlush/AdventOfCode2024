@@ -1,9 +1,9 @@
-namespace Day14;
 
-/// <summary>
-/// Nachdem man weis nach was man sucht kann man es optimieren
-/// </summary>
-public class Part02 : IPart
+
+
+
+namespace Day14;
+public class Part02Old : IPart
 {
     private List<Robot> roboInfoList = new();
     private int bathWidth = 101;

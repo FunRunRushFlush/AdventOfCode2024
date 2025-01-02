@@ -1,33 +1,63 @@
-﻿#define LOGGING_ENABLED
+﻿
+using CommunityToolkit.HighPerformance;
 
 namespace Day07;
-public static class Part02
+public class Part02 : IPart
 {
-    public static int Result(string[] rawInput)
+    
+    public string Result(Input rawInput)
     {
-        ParseInput(rawInput);
-        return 0;
+        long resCounter = 0;
+        foreach (var line in rawInput.Lines)
+        {
+            long[] calc = line.Split(new[] { ' ', ':' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(long.Parse).ToArray();
+
+            if (CanBeCalculated(calc[0], calc[1..]) > 0)
+                resCounter += calc[0];
+        }
+
+        return resCounter.ToString();
     }
 
-    private static void ParseInput(string[] rawInput)
+    //Rückwärts
+    private long CanBeCalculated(long targetNum, long[] nums)
     {
-        long counter = 0;
+        long solution = 0;
 
-        foreach (string line in rawInput)
+        if (nums.Length == 2)
         {
-            var res = line.Split(new[] { ' ', ':' }, StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray();
+            if (targetNum / nums[1] == nums[0] && targetNum % nums[1] == 0)
+                return 1;
+            if (targetNum - nums[1] == nums[0])
+                return 1;
+            if (nums[0].ToString()+ nums[1].ToString() == targetNum.ToString())
+                return 1;
 
-
-            BinaryTreePart02 tree = new BinaryTreePart02();
-            tree.SetOperationValue(res);
-            tree.Insert(res[1], out long result);
-            counter += result;
-
-            //Console.WriteLine("In-Order Traversierung:");
-            //tree.PrintInOrder();
+            return 0;
         }
-        //Console.WriteLine($"FinalCounter : {counter}");
-        //GlobalLog.Log($"FinalCounter : {counter}");
 
+        if (nums.Length > 2)
+        {
+
+            if (targetNum % nums[^1] == 0)
+            {
+                solution += CanBeCalculated(targetNum / nums[^1], nums[..(nums.Length - 1)]);
+            }
+            if (targetNum - nums[^1] >= 0)
+            {
+                solution += CanBeCalculated(targetNum - nums[^1], nums[..(nums.Length - 1)]);
+            }
+            string strTargetNum = targetNum.ToString();
+            string suffix = nums[^1].ToString();
+            //TODO: EndWith() kannte ich nicht
+            if (strTargetNum.EndsWith(suffix)&& suffix.Length !=strTargetNum.Length)
+            {
+                var newTargetNum = long.Parse(strTargetNum.Substring(0, strTargetNum.Length - suffix.Length));
+                solution += CanBeCalculated(newTargetNum, nums[..(nums.Length - 1)]);
+            }
+        }
+
+        return solution;
     }
 }

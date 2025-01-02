@@ -3,22 +3,22 @@ using System.Diagnostics;
 namespace Day08;
 
 
-public static class Part02
+public class Part02:IPart
 {
-    public static void Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
-        var inputHeightY = input.Length;
-        var inputWidthX = input[0].Length;
+        var inputHeightY = input.Lines.Length;
+        var inputWidthX = input.Lines[0].Length;
 
         var dicAntenna = new Dictionary<char, List<(int Y, int X)>>();
         HashSet<(int x, int y)> dicAntinodes = new HashSet<(int, int)>();
 
 
-        for (int y = 0; y < input.Length; y++)
+        for (int y = 0; y < input.Lines.Length; y++)
         {
-            for (int x = 0; x < input[0].Length; x++)
+            for (int x = 0; x < input.Lines[0].Length; x++)
             {
-                char charCheck = input[y][x];
+                char charCheck = input.Lines[y][x];
                 if (charCheck == '.' || charCheck == '#') continue;
 
                 if (!dicAntenna.ContainsKey(charCheck))
@@ -60,7 +60,7 @@ public static class Part02
                         if ((antinode01.Item1 >= 0 && antinode01.Item2 >= 0)
                             && (antinode01.Item1 < inputHeightY && antinode01.Item2 < inputWidthX))
                         {
-                        GlobalLog.LogLine($"antinode01: Y:{antinode01.Item1},X:{antinode01.Item2} ");
+                            GlobalLog.LogLine($"antinode01: Y:{antinode01.Item1},X:{antinode01.Item2} ");
                             dicAntinodes.Add(antinode01);
                         }
                         else
@@ -71,7 +71,7 @@ public static class Part02
                         if ((antinode02.Item1 >= 0 && antinode02.Item2 >= 0)
                             && (antinode02.Item1 < inputHeightY && antinode02.Item2 < inputWidthX))
                         {
-                        GlobalLog.LogLine($"antinode02: Y:{antinode02.Item1},X:{antinode02.Item2} ");
+                            GlobalLog.LogLine($"antinode02: Y:{antinode02.Item1},X:{antinode02.Item2} ");
                             dicAntinodes.Add(antinode02);
                         }
                         else
@@ -84,8 +84,8 @@ public static class Part02
 
             }
         }
-            int antinodesCounter = dicAntinodes.Count;
+        int antinodesCounter = dicAntinodes.Count;
 
-            GlobalLog.LogLine($"antinodesCounter: {antinodesCounter}");
+        return antinodesCounter.ToString();
     }
 }

@@ -1,38 +1,82 @@
-﻿#define LOGGING_ENABLED
-
-using System.Data;
-
+﻿
 
 
 namespace Day07;
 
-public static class Part01
+public class Part01:IPart
 {
-    public static int Result(string[] rawInput)
+    public string Result(Input rawInput)
     {
-         ParseInput(rawInput);
-        return 0;
-    }
-
-    private static void ParseInput(string[] rawInput)
-    {
-        long counter = 0;
-
-        foreach (string line in rawInput)
+        long resCounter = 0;
+        foreach (var line in rawInput.Lines)
         {
-            var res = line.Split(new[] { ' ', ':' }, StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray();
+            long[] calc = line.Split(new[] { ' ', ':' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(long.Parse).ToArray();
 
-
-            BinaryTree tree = new BinaryTree();
-            tree.SetOperationValue(res);
-            tree.Insert(res[0], out long result);
-            counter += result;
-
-            //Console.WriteLine("In-Order Traversierung:");
-            //tree.PrintInOrder();
+            if (CanBeCalculated(calc[0], calc[1..]) > 0)
+                resCounter += calc[0];
         }
-        //Console.WriteLine($"FinalCounter : {counter}");
-        //GlobalLog.Log($"FinalCounter : {counter}");
-       
+
+        return resCounter.ToString();
     }
+
+    //Rückwärts
+    private long CanBeCalculated(long targetNum, long[] nums)
+    {
+        long solution = 0;
+
+        if (nums.Length == 2)
+        {
+            if (targetNum / nums[1] == nums[0] && targetNum % nums[1] == 0)
+                return 1;
+            if (targetNum - nums[1] == nums[0])
+                return 1;
+
+            return 0;
+        }
+
+        if (nums.Length > 2)
+        {
+
+            if (targetNum % nums[^1] == 0)
+            {
+                solution += CanBeCalculated(targetNum / nums[^1], nums[..(nums.Length - 1)]);
+            }
+            if (targetNum - nums[^1] >= 0)
+            {
+                solution += CanBeCalculated(targetNum - nums[^1], nums[..(nums.Length - 1)]);
+            }
+
+
+        }
+
+        return solution;
+    }
+
+    //Vorwärts
+    //private long CanBeCalculated(long targetNum, long[] nums)
+    //{
+    //    long solution = 0;
+    //    if (nums[0] > targetNum) return 0;
+
+    //    if (nums.Length == 1)
+    //    {
+    //        if (nums[0] == targetNum) return 1;
+    //        return 0;
+    //    }
+
+    //    if (nums.Length >= 2)
+    //    {
+    //        var add = nums[1..].ToArray();
+    //        var mult = nums[1..].ToArray();
+
+    //        add[0] += nums[0];
+    //        solution += CanBeCalculated(targetNum, add);
+
+    //        mult[0] *= nums[0];
+    //        solution += CanBeCalculated(targetNum, mult);
+    //    }
+
+    //    return solution;
+    //}
 }

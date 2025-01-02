@@ -1,172 +1,198 @@
 ﻿
-using CommunityToolkit.HighPerformance;
-using Microsoft.Diagnostics.Runtime.Utilities;
-using System.Drawing;
-using System.Text.RegularExpressions;
+using System.Numerics;
+
 
 namespace Day06;
+
 public class Part02 : IPart
 {
+    //y <--> x vertauscht
+    private HashSet<Vector2> WallMap = new HashSet<Vector2>();
+    private Dictionary<Vector2, Dir> UniqueSteps = new Dictionary<Vector2, Dir>();
+    private Dir PlayerDir = Dir.Up;
+    private Vector2 PlayerPosition;
+    private Vector2 WallDetection = new Vector2(-1, 0);
+    private int MapHeight;
+    private int MapWidth;
+
+    private Vector2 LoopPlayerStartPos;
+    private Dir LoopPlayerStartDir;
+    private Vector2 LoopStartWallDetection;
+    private Dictionary<Vector2, Dir> LoopUniqueSteps = new Dictionary<Vector2, Dir>(); 
+
+
+
+    private const char Wall = '#';
+    private const char Player = '^';
     public string Result(Input rawInput)
     {
-        GetGuardPosition(rawInput.Lines, out Point guPos);
-        Console.WriteLine(guPos);
+        ParseStartingInput(rawInput.Lines);
+        UniqueSteps.Add(PlayerPosition, PlayerDir);
 
-        bool loop = true;
-        bool dirClear = false;
-        int xDir = 0;
-        int yDir = 0;
 
-        int numberOfLoops = 0;
-        for (int i = 0; i < rawInput.Lines.Length; i++)
+        LoopPlayerStartPos = PlayerPosition;
+        LoopPlayerStartDir = PlayerDir;
+        LoopStartWallDetection = WallDetection;
+
+
+        MapHeight = rawInput.Lines.Length;
+        MapWidth = rawInput.Lines[0].Length;
+
+        
+
+        while (true)
         {
-            for (int j = 0; j < rawInput.Lines[0].Length; j++)
+            if (CheckOutOfBounds()) break;
+            //GlobalLog.Log($"X: {PlayerPosition.Y} Y:{PlayerPosition.X} ");
+
+            if (!CheckForWall())
             {
-            GuardPart02 guard = new GuardPart02(guPos);
-                loop = true;
-                if (rawInput.Lines[i][j] == '#' || (guPos.Y, guPos.X)== (i, j))
-                { 
-                    continue; 
-                }
-
-                GlobalLog.LogLine($"#_@: Y:{i} X:{j}");
-
-                while (loop)
-                {
-                    try
-                    {
-                        (xDir, yDir) = guard.CheckPathKord();
-                        if (rawInput.Lines[yDir][xDir] == '#' || (yDir, xDir) == (i, j))
-                        {
-                            GlobalLog.LogLine($"Blocker @: Y:{yDir} X:{xDir}");
-                            dirClear = false;
-                        }
-
-                        while (!dirClear)
-                        {
-                            (xDir, yDir) = guard.CheckPathKord();
-                            if (rawInput.Lines[yDir][xDir] == '#' || (yDir,xDir) ==(i,j) )
-                            {
-                                GlobalLog.LogLine($"Blocker @: Y:{yDir} X:{xDir}");
-                                guard.TurnRight();
-                            }
-                            else
-                            {
-                                dirClear = true;
-                            }
-                        }
-
-                        guard.MoveOneStep();
-                        var pos = guard.GetPosition();
-
-                        if (guard.GetLoopCounter() > 0)
-                        {
-                            numberOfLoops ++;
-                            loop = false;
-                        }
-
-                        GlobalLog.LogLine($"GuardPosition : Y:{pos.Y} X:{pos.X}");
-                    }
-                    catch (IndexOutOfRangeException ex)
-                    {
-                        loop = false;
-                    }
-                }
-
+                PlayerPosition += WallDetection;
+                UniqueSteps.TryAdd(PlayerPosition,PlayerDir);
+                //GlobalLog.Log($"X: {PlayerPosition.Y} Y:{PlayerPosition.X} ");
             }
+        }
+        //DrawGrid(rawInput.Lines);
+        bool foundTheLoop= false;
+        int uniqueLoopSteps=0;
+        foreach(var ele in UniqueSteps)
+        {
+            //if(foundTheLoop) break;
+
+            LoopUniqueSteps.Clear();
+
+            WallMap.Add(ele.Key);
+            PlayerPosition = ele.Key;
+            PlayerDir= ele.Value;
+            WallDetection = WallDetectionVec();
+            PlayerPosition -= WallDetection;
+            LoopUniqueSteps.Add(PlayerPosition, PlayerDir);
+
+            while (true)
+            {
+                if (CheckOutOfBounds()) break;
+                //GlobalLog.Log($"X: {PlayerPosition.Y} Y:{PlayerPosition.X} ");
+
+                if (!CheckForWall())
+                {
+                    PlayerPosition += WallDetection;
+                    if(!LoopUniqueSteps.TryAdd(PlayerPosition, PlayerDir) && LoopUniqueSteps[PlayerPosition]==PlayerDir)
+                    {
+                        foundTheLoop = true;
+                        uniqueLoopSteps++;
+                        break;
+                    }
+                    //GlobalLog.Log($"X: {PlayerPosition.Y} Y:{PlayerPosition.X} ");
+                }
+            }
+            WallMap.Remove(ele.Key);
 
         }
-        return numberOfLoops.ToString();
+        return uniqueLoopSteps.ToString();
+
     }
 
-    public int Result_Improved01(string[] rawInput)
+    [System.Diagnostics.Conditional("LOGGING_ENABLED")]
+    private void DrawGrid(string[] array)
     {
-        GetGuardPosition(rawInput, out Point guPos);
-        Console.WriteLine(guPos);
+        var arrayHeight = array.Length;
+        var arrayWidth = array[0].Length;
 
-        bool loop = true;
-        bool dirClear = false;
-        int xDir = 0;
-        int yDir = 0;
+        GlobalLog.LogLine($"DrawGrid");
 
-        int numberOfLoops = 0;
-        for (int i = 0; i < rawInput.Length; i++)
+        for (int h = 0; h < arrayHeight; h++)
         {
-            for (int j = 0; j < rawInput[0].Length; j++)
+            for (int w = 0; w < arrayWidth; w++)
             {
-                GuardPart02 guard = new GuardPart02(guPos);
-                loop = true;
-                if (rawInput[i][j] == '#' || (guPos.Y, guPos.X) == (i, j))
+                string drawPoint = ".";
+                //if (array[h, w] > 0)
+                //{
+                drawPoint = array[h][w].ToString();
+                //}
+
+                if (UniqueSteps.ContainsKey(new Vector2(h, w)))
                 {
-                    continue;
+                    drawPoint = "X";
                 }
-
-                //GlobalLog.Log($"#_@: Y:{i} X:{j}");
-
-                while (loop)
+                if (h == PlayerPosition.X && w == PlayerPosition.Y)
                 {
-                    try
-                    {
-                        (xDir, yDir) = guard.CheckPathKord();
-                        if (rawInput[yDir][xDir] == '#' || (yDir, xDir) == (i, j))
-                        {
-                            //GlobalLog.Log($"Blocker @: Y:{yDir} X:{xDir}");
-                            dirClear = false;
-                        }
-
-                        while (!dirClear)
-                        {
-                            (xDir, yDir) = guard.CheckPathKord();
-                            if (rawInput[yDir][xDir] == '#' || (yDir, xDir) == (i, j))
-                            {
-                                //GlobalLog.Log($"Blocker @: Y:{yDir} X:{xDir}");
-                                guard.TurnRight();
-                            }
-                            else
-                            {
-                                dirClear = true;
-                            }
-                        }
-
-                        guard.MoveOneStep();
-                        var pos = guard.GetPosition();
-
-                        if (guard.GetLoopCounter() > 0)
-                        {
-                            numberOfLoops++;
-                            loop = false;
-                        }
-
-                        //GlobalLog.Log($"GuardPosition : Y:{pos.Y} X:{pos.X}");
-                    }
-                    catch (IndexOutOfRangeException ex)
-                    {
-                        loop = false;
-                    }
+                    drawPoint = "@";
                 }
-
+                Console.Write($"{drawPoint}");
             }
-
+            Console.WriteLine();
         }
-        return numberOfLoops;
+        Console.WriteLine("-------------------------------------------");
+        Console.WriteLine();
     }
 
-    public void GetGuardPosition(Span<string> rawInput, out Point position)
+    private bool CheckOutOfBounds()
     {
-        Point positionTemp = new Point(0, 0);
-        for (int i = 0; i < rawInput.Length; i++)
-        {
-            for (int j = 0; j < rawInput[0].Length; j++)
-            {
-                if (rawInput[i][j] == '^')
-                {
-                    positionTemp.Y = i;
-                    positionTemp.X = j;
-                }
+        var nextStepPos = PlayerPosition + WallDetection;
 
-            }
-        }
-        position = positionTemp;
+        if (nextStepPos.Y >= MapWidth || nextStepPos.Y < 0)
+            return true;
+        if (nextStepPos.X >= MapHeight || nextStepPos.X < 0)
+            return true;
+
+        return false;
     }
 
+    private bool CheckForWall()
+    {
+        if (WallMap.Contains(PlayerPosition + WallDetection))
+        {
+            PlayerDir = (Dir)(((int)PlayerDir + 1) % 4);
+            WallDetection = WallDetectionVec();
+            return true;
+        }
+        return false;
+    }
+
+    private Vector2 WallDetectionVec()
+    {
+        return PlayerDir switch
+        {
+            Dir.Up => new Vector2(-1, 0),
+            Dir.Down => new Vector2(1, 0),
+            Dir.Right => new Vector2(0, 1),
+            Dir.Left => new Vector2(0, -1),
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    private void ParseStartingInput(string[] lines)
+    {
+
+        bool playerFound = false;
+        for (int y = 0; y < lines.Length; y++)
+        {
+            var line = lines[y];
+            if (!playerFound)
+            {
+                int xPos = line.IndexOf(Player);
+                if (xPos > -1)
+                {
+                    PlayerPosition = new Vector2(y, xPos);
+                    playerFound = true;
+                }
+            }
+
+            int x = line.IndexOf(Wall);
+            while (x != -1)
+            {
+                WallMap.Add(new Vector2(y, x));
+                x = line.IndexOf(Wall, x + 1);
+            }
+        }
+    }
+
+
+    enum Dir
+    {
+        Up = 0,
+        Right = 1,
+        Down = 2,
+        Left = 3,
+    }
 }

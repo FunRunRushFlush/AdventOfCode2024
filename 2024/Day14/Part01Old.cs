@@ -1,21 +1,16 @@
-namespace Day14;
 
-/// <summary>
-/// Nachdem man weis nach was man sucht kann man es optimieren
-/// </summary>
-public class Part02 : IPart
+
+using System;
+
+namespace Day14;
+public class Part01Old : IPart
 {
     private List<Robot> roboInfoList = new();
     private int bathWidth = 101;
     private int bathHeight = 103;
 
-    private int SecondLimit = 10000;
+    private int SecondLimit = 100;
     private int[,] bathroom;
-
-    private HashSet<(int y, int x)> cluster = new();
-
-    private int BiggestCluster = 0;
-    private int BiggestClusterTime = 0;
 
     public string Result(Input input)
     {
@@ -47,100 +42,16 @@ public class Part02 : IPart
                     }
                 }
             }
-            LookForRoboCluster(s);
-            //int currentClusterSize = cluster.Count;
-            //if (currentClusterSize > BiggestCluster)
-            //{
-            //    BiggestCluster = currentClusterSize;
-            //    BiggestClusterTime = s; 
-            //}
 
-            if (s == 225) DrawBathGrid(s);
+            DrawBathGrid(s);
         }
 
-
-        GlobalLog.LogLine($"BiggestCluster; {BiggestCluster}; BiggestClusterTime: {BiggestClusterTime} ");
         return (q1 * q2 * q3 * q4).ToString();
-    }
-
-    private void LookForRoboCluster(int s)
-    {
-        for (int y = 0; y < bathHeight; y++)
-        {
-            for (int x = 0; x < bathWidth; x++)
-            {
-                if (cluster.Contains((y, x))) continue;
-
-                CheckForNeighbors(y, x);
-                int currentClusterSize = cluster.Count;
-                if (currentClusterSize > BiggestCluster)
-                {
-                    BiggestCluster = currentClusterSize;
-                    BiggestClusterTime = s;
-                }
-                cluster.Clear();
-            }
-        }
-    }
-
-
-    private void CheckForNeighbors(int y, int x)
-    {
-
-        if (bathroom[y, x] > 0)
-        {
-            if (cluster.Add((y, x)))
-            {
-                for (int dir = 0; dir < 4; dir++)
-                {
-                    var offsetPos = SetOffsetCoord((Direction)dir, (y, x));
-                    if (!CheckBounderys(offsetPos)) continue;
-                    CheckForNeighbors(offsetPos.Y, offsetPos.X);
-                }
-
-            }
-
-
-        }
-    }
-
-    private enum Direction
-    {
-        Up = 0,
-        Right = 1,
-        Down = 2,
-        Left = 3
-    }
-    private bool CheckBounderys((int Y, int X) pos)
-    {
-        if (pos.X < 0) return false;
-        if (pos.Y < 0) return false;
-        if (pos.X >= bathWidth) return false;
-        if (pos.Y >= bathHeight) return false;
-
-        return true;
-    }
-
-    private (int Y, int X) SetOffsetCoord(Direction direction, (int Y, int X) trailPos)
-    {
-        var dir = direction switch
-        {
-            Direction.Up => (-1, 0),
-            Direction.Right => (0, 1),
-            Direction.Down => (1, 0),
-            Direction.Left => (0, -1),
-            _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Invalid direction: {direction}")
-        };
-
-        int Y = trailPos.Y + dir.Item1;
-        int X = trailPos.X + dir.Item2;
-
-        return (Y, X);
     }
 
 
     [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private void DrawBathGrid(int s)
+    private void DrawBathGrid(int s = 0)
     {
         GlobalLog.LogLine($"###################################################");
         GlobalLog.LogLine($"### Seconds = {s}###");

@@ -45,14 +45,7 @@ public class Part02 : IPart
         return result;
 
     }
-    //public static int Result_Improved(string input)
-    //{
 
-        
-
-
-    //    return safeReports;
-    //}
     private ReadOnlySpan<int> CreateSlicedSpan(ReadOnlySpan<int> span, int skipIndex)
     {
         if (skipIndex == 0)
