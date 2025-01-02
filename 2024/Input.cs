@@ -1,4 +1,4 @@
-﻿//Thanks to: https://github.com/viceroypenguin/adventofcode
+﻿//Thanks to: https://github.com/viceroypenguin
 public record Input(byte[] Bytes, string Text, string[] Lines)
 {
     public ReadOnlySpan<string> SpanLines => Lines;
