@@ -1,9 +1,9 @@
 ﻿
 namespace Day02;
 
-public static class Part01
+public class Part01 : IPart
 {
-    public static int Result(string input)
+    public string Result(string input)
     {
         string[] lines = input
         .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
@@ -24,12 +24,12 @@ public static class Part01
                 safeReports++;
             }
         }
-        Console.WriteLine($"safeReports {safeReports}");
-        return safeReports;
+        GlobalLog.LogLine($"safeReports {safeReports}");
+        return $"{safeReports}";
     }
 
 
-    public static int Result_Improved(string input)
+    public int Result_Improved(string input)
     {
         var data = InputParser(input);
 
@@ -41,11 +41,11 @@ public static class Part01
                 safeReports++;
             }
         }
-        Console.WriteLine($"safeReports {safeReports}");
+        GlobalLog.LogLine($"safeReports {safeReports}");
         return safeReports;
     }
 
-    public static int[][] InputParser(string input)
+    public int[][] InputParser(string input)
     {
         List<int[]> data = new List<int[]>();
 
@@ -67,7 +67,7 @@ public static class Part01
     // Simpler IntParser der perfomanter ist als Int.Parse()
     // WARNUNG: Aufkosten von Robustheit(kein edgecases etc...)
     // https://youtu.be/EWmufbVF2A4?feature=shared&t=880 
-    private static int IntParser(ReadOnlySpan<Char> span)
+    private int IntParser(ReadOnlySpan<Char> span)
     {
         int temp = 0;
         for (int i = 0; i < span.Length; i++)
@@ -80,7 +80,7 @@ public static class Part01
     }
 
 
-    private static bool CheckIfSafe(int[] intArray)
+    private bool CheckIfSafe(int[] intArray)
     {
         if(intArray.Length == 0) return false;
 

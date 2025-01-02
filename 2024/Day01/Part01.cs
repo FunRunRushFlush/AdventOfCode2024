@@ -1,15 +1,13 @@
-using System.Diagnostics;
+
 namespace Day01;
-public static class Part01
+public class Part01 : IPart
 {
-    public static void Result(string input)
+    public string Result(string input)
     {
-        Stopwatch sw = Stopwatch.StartNew();
         int[] numbers = input
             .Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(int.Parse)
             .ToArray();
-
 
         int[] number01 = new int[numbers.Length / 2];
         int[] number02 = new int[numbers.Length / 2];
@@ -17,7 +15,6 @@ public static class Part01
         int ind = 0;
         for (int i = 0; i < numbers.Length; i += 2)
         {
-
             number01[ind] = numbers[i];
             number02[ind] = numbers[i + 1];
             ind++;
@@ -32,7 +29,6 @@ public static class Part01
             distance += localDistance;
         }
 
-        sw.Stop();
-        Console.WriteLine($"Distance {distance}, Time {sw.ElapsedMilliseconds}");
+        return $"{distance}";
     }
 }

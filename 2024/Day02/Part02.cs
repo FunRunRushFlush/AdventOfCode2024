@@ -1,8 +1,8 @@
 ﻿
 namespace Day02;
-public static class Part02
+public class Part02 : IPart
 {
-    public static int Result(string input)
+    public string Result(string input)
     {
         //Stopwatch sw = Stopwatch.StartNew();
         string[] lines = input
@@ -32,13 +32,10 @@ public static class Part02
             }           
 
         }
-
-        //sw.Stop();
-        Console.WriteLine($"safeReports {safeReports}");
-        return safeReports;
+        return $"{safeReports}";
     }
 
-    public static int Result_Improved(string input)
+    public int Result_Improved(string input)
     {
         var data = InputParser(input);
         int safeReports = 0;
@@ -58,7 +55,7 @@ public static class Part02
         Console.WriteLine($"safeReports {safeReports}");
         return safeReports;
     }
-    private static ReadOnlySpan<int> CreateSlicedSpan(ReadOnlySpan<int> span, int skipIndex)
+    private ReadOnlySpan<int> CreateSlicedSpan(ReadOnlySpan<int> span, int skipIndex)
     {
         if (skipIndex == 0)
             return span.Slice(1); 
@@ -69,14 +66,14 @@ public static class Part02
    
         return CombineSlices(span.Slice(0, skipIndex), span.Slice(skipIndex + 1));
     }
-    private static int[] CombineSlices(ReadOnlySpan<int> part1, ReadOnlySpan<int> part2)
+    private int[] CombineSlices(ReadOnlySpan<int> part1, ReadOnlySpan<int> part2)
     {
         int[] result = new int[part1.Length + part2.Length];
         part1.CopyTo(result);
         part2.CopyTo(result.AsSpan(part1.Length));
         return result;
     }
-    public static int[][] InputParser(string input)
+    public int[][] InputParser(string input)
     {
         List<int[]> data = new List<int[]>();
 
@@ -97,7 +94,7 @@ public static class Part02
     // Simpler IntParser der perfomanter ist als Int.Parse()
     // WARNUNG: Aufkosten von Robustheit(kein edgecases etc...)
     // https://youtu.be/EWmufbVF2A4?feature=shared&t=880 
-    private static int IntParser(ReadOnlySpan<Char> span)
+    private int IntParser(ReadOnlySpan<Char> span)
     {
         int temp = 0;
         for (int i = 0; i < span.Length; i++)
@@ -110,7 +107,7 @@ public static class Part02
     }
 
 
-    private static bool CheckIfSafe(int[] intArray)
+    private bool CheckIfSafe(int[] intArray)
     {
         
         if (intArray.Length == 0) return false;
@@ -138,7 +135,7 @@ public static class Part02
         }
         return true;
     }
-    private static bool CheckIfSafeSpan(ReadOnlySpan<int> intSpan)
+    private bool CheckIfSafeSpan(ReadOnlySpan<int> intSpan)
     {
 
         if (intSpan.Length == 0) return false;

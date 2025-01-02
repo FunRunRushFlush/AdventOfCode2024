@@ -1,16 +1,15 @@
 ﻿
 using CommunityToolkit.HighPerformance;
-using Microsoft.Diagnostics.Runtime.Utilities;
-using System;
-using System.Text;
-using System.Text.RegularExpressions;
+
 
 namespace Day04;
 
-public static class Part01
+public class Part01 : IPart
 {
-    public static int Result(ReadOnlySpan<string> input)
+
+    public string Result(string inputi)
     {
+        var input = inputi.Split(Environment.NewLine);
         int rows = input.Length;
         int cols = input[0].Length;
         XmasState state = XmasState.None;
@@ -212,10 +211,10 @@ public static class Part01
         PrintCheckedState(inputLog2D);
 
 
-                return xmasCounter;
+                return $"{xmasCounter}";
     }
 
-    private static void PrintCheckedState(Span2D<int> span)
+    private void PrintCheckedState(Span2D<int> span)
     {
         //int rows = span.Height;
         //int cols = span.Width;
@@ -234,7 +233,7 @@ public static class Part01
         //}
         //Console.Write("#######################");
     }
-    static void SetConsoleColor(int value)
+    void SetConsoleColor(int value)
     {
         // Mapping von Zahlen auf Farben
         switch (value)
@@ -249,11 +248,11 @@ public static class Part01
         }
     }
 
-    private static void CheckForXmasHorizontal()
+    private void CheckForXmasHorizontal()
     {
         throw new NotImplementedException();
     }
-    private static XmasState UpdateXmasState(XmasState currentState, char currentChar)
+    private XmasState UpdateXmasState(XmasState currentState, char currentChar)
     {
         var nextState = currentState switch
         {
@@ -269,7 +268,7 @@ public static class Part01
         return nextState;
     }
 
-    private static XmasBackwardsState UpdateXmasBackwardsState(XmasBackwardsState currentState, char currentChar)
+    private XmasBackwardsState UpdateXmasBackwardsState(XmasBackwardsState currentState, char currentChar)
     {
         return currentState switch
         {

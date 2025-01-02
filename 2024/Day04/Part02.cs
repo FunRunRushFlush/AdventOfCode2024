@@ -1,13 +1,13 @@
 ﻿
 using CommunityToolkit.HighPerformance;
-using Microsoft.Diagnostics.Runtime.Utilities;
-using System.Text.RegularExpressions;
+
 
 namespace Day04;
-public static class Part02
+public class Part02 : IPart
 {
-    public static int Result(ReadOnlySpan<string> input)
+    public string Result(string inputi)
     {
+        var input = inputi.Split(Environment.NewLine);
         int rows = input.Length;
         int cols = input[0].Length;
         XmasState state = XmasState.None;
@@ -173,10 +173,10 @@ public static class Part02
         PrintCheckedState(inputLog2D, input2D);
 
 
-        return CountXCheckedState(inputLog2D); 
+        return $"{ CountXCheckedState(inputLog2D)}"; 
     }
 
-    private static void PrintCheckedState(Span2D<int> span,Span2D<char> input)
+    private void PrintCheckedState(Span2D<int> span,Span2D<char> input)
     {
         //int rows = span.Height;
         //int cols = span.Width;
@@ -198,7 +198,7 @@ public static class Part02
         //Console.Write("#######################");
 
     }
-    private static int CountXCheckedState(Span2D<int> span)
+    private int CountXCheckedState(Span2D<int> span)
     {
         var xCounter = 0;
         int rows = span.Height;
@@ -217,7 +217,7 @@ public static class Part02
         }
         return xCounter;
     }
-    static void SetConsoleColor(int value)
+     void SetConsoleColor(int value)
     {
         // Mapping von Zahlen auf Farben
         switch (value)
@@ -233,7 +233,7 @@ public static class Part02
     }
 
 
-    private static XmasState UpdateXmasState(XmasState currentState, char currentChar)
+    private XmasState UpdateXmasState(XmasState currentState, char currentChar)
     {
         var nextState = currentState switch
         {
@@ -247,7 +247,7 @@ public static class Part02
         return nextState;
     }
 
-    private static XmasBackwardsState UpdateXmasBackwardsState(XmasBackwardsState currentState, char currentChar)
+    private XmasBackwardsState UpdateXmasBackwardsState(XmasBackwardsState currentState, char currentChar)
     {
         return currentState switch
         {

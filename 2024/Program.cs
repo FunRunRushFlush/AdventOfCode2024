@@ -8,25 +8,23 @@ string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day24/InputDa
 var inputText= File.ReadAllText(path);
 var inputLines = File.ReadAllLines(path);
 
-
-//BenchmarkRunner.Run<Benchmarks>();
+BenchmarkRunner.Run<DayBenchmark>();
+BenchmarkRunner.Run<Benchmarks>();
 
 
 //Day24.Part01 dayP01 = new();
-Day24.Part02Try dayP02Try = new();
+////Day20.Part02 dayP02 = new();
 //Day24.Part02 dayP02 = new();
-//Day24.Part02Try dayP02 = new();
 
 //long solution = dayP01.Result(inputLines);
-//Console.WriteLine($"solution : {solution}");
-
-var solutionTry = dayP02Try.Result(inputLines);
+////var solutionTry = dayP02.Result(inputLines);
 //long solution02 = dayP02.Result(inputLines);
 
 
 
+//Console.WriteLine($"solution : {solution}");
 //Console.WriteLine($"solution : {solution02}");
-Console.WriteLine($"solutionTry : {solutionTry}");
+//Console.WriteLine($"solution : {solutionTry}");
 
 
 

@@ -1,13 +1,12 @@
 ﻿
-using Microsoft.Diagnostics.Runtime.Utilities;
-using System.Text;
+
 using System.Text.RegularExpressions;
 
 namespace Day03;
 
-public static class Part01
+public class Part01 : IPart
 {
-    public static int Result(string input)
+    public string Result(string input)
     {
         // https://learn.microsoft.com/de-de/dotnet/api/system.text.regularexpressions.regex.match?view=net-8.0
         string pattern = @"mul\(\d{1,3},\d{1,3}\)";
@@ -25,11 +24,11 @@ public static class Part01
 
         }
         //Console.WriteLine(result);
-        return result;
+        return $"{ result}";
     }
 
 
-    public static int Result_Improved(ReadOnlySpan<char> input)
+    public int Result_Improved(ReadOnlySpan<char> input)
     {
         bool[] mul = new bool[4];
         char[] num1 = new char[3];
@@ -117,13 +116,13 @@ public static class Part01
         return result;
     }
 
-private static bool CheckIfCharIsNum(char input) => ((input - '0') >= 0 && (input - '0') <= 9)? true : false;
+private bool CheckIfCharIsNum(char input) => ((input - '0') >= 0 && (input - '0') <= 9)? true : false;
 
 
     // Simpler IntParser der perfomanter ist als Int.Parse()
     // WARNUNG: Aufkosten von Robustheit(kein edgecases etc...)
     // https://youtu.be/EWmufbVF2A4?feature=shared&t=880 
-    private static int IntParser(ReadOnlySpan<char> span)
+    private int IntParser(ReadOnlySpan<char> span)
     {
         int temp = 0;
         for (int i = 0; i < span.Length; i++)
@@ -136,7 +135,7 @@ private static bool CheckIfCharIsNum(char input) => ((input - '0') >= 0 && (inpu
     }
 
 
-    public static int Result_Improved_02(ReadOnlySpan<char> input)
+    public int Result_Improved_02(ReadOnlySpan<char> input)
     {
         bool[] mul = new bool[4];
         char[] num1 = new char[3];
@@ -233,7 +232,7 @@ private static bool CheckIfCharIsNum(char input) => ((input - '0') >= 0 && (inpu
         OpenParen = 8
     }
 
-    private static int ParseNumber(char[] chars, int length)
+    private int ParseNumber(char[] chars, int length)
     {
         int number = 0;
         for (int i = 0; i < length; i++)
@@ -243,7 +242,7 @@ private static bool CheckIfCharIsNum(char input) => ((input - '0') >= 0 && (inpu
         return number;
     }
 
-    public static int Result_Improved_03(ReadOnlySpan<char> input)
+    public int Result_Improved_03(ReadOnlySpan<char> input)
     {
 
         char[] num1 = new char[3];
