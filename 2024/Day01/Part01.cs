@@ -4,31 +4,23 @@ public class Part01 : IPart
 {
     public string Result(Input input)
     {
-        int[] numbers = input.Text
-            .Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(int.Parse)
-            .ToArray();
-
-        int[] number01 = new int[numbers.Length / 2];
-        int[] number02 = new int[numbers.Length / 2];
-
-        int ind = 0;
-        for (int i = 0; i < numbers.Length; i += 2)
+        List<int> list01 = new List<int>();
+        List<int> list02 = new List<int>();
+        foreach (var item in input.SpanLines)
         {
-            number01[ind] = numbers[i];
-            number02[ind] = numbers[i + 1];
-            ind++;
+            var res = item.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            list01.Add(int.Parse((res[0])));
+            list02.Add(int.Parse((res[1])));
+        }
+        list01.Sort();
+        list02.Sort();
+        int distnace = 0;
+        for (int i = 0; i < list01.Count; i++)
+        {
+            distnace += Math.Abs(list01[i] - list02[i]);
         }
 
-        Array.Sort(number01);
-        Array.Sort(number02);
-        int distance = 0;
-        for (int i = 0; i < number01.Length; i++)
-        {
-            int localDistance = Math.Abs(number01[i] - number02[i]);
-            distance += localDistance;
-        }
-
-        return $"{distance}";
+        return distnace.ToString();
     }
 }

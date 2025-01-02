@@ -4,163 +4,49 @@ public class Part02 : IPart
 {
     public string Result(Input input)
     {
-        string[] lines = input.Text
-        .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-        .ToArray();
-
         int safeReports = 0;
-        foreach (string line in lines)
+        foreach (var item in input.SpanLines)
         {
-            int[] numbers = line
-                  .Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
-                  .Select(int.Parse)
-                  .ToArray();
-         
-            for (int i = 0; i < numbers.Length; i++)
+            List<int> ints = item.Split(' ').Select(int.Parse).ToList();
+            if (CheckIfRepoertIsSafe(ints))
             {
-                //TODO: Reference vs ValueType Bug --> Doku
-                var copyNumbers = numbers.ToList();
-                copyNumbers.RemoveAt(i);
-                int[] dumperedReports = copyNumbers.ToArray();
-                bool safe = CheckIfSafe(dumperedReports);
-                if (safe)
+                safeReports++;
+            }
+            else
+            {                   
+                for (int i = 0; i < ints.Count; i++)
                 {
-                    safeReports++;
-                    break;
-                }
-            }           
-
-        }
-        return $"{safeReports}";
-    }
-
-    public int Result_Improved(string input)
-    {
-        var data = InputParser(input);
-        int safeReports = 0;
-        foreach (int[] numbers in data)
-        {
-                ReadOnlySpan<int> span = new ReadOnlySpan<int>(numbers);
-            for (int i = 0; i < numbers.Length; i++)
-            {
-                var slicedArray = CreateSlicedSpan(span,i);
-                if (CheckIfSafeSpan(slicedArray))
-                {
-                    safeReports++;
-                    break;
+                    var safeInt = ints[i];
+                    ints.RemoveAt(i);
+                    if (CheckIfRepoertIsSafe(ints))
+                    {
+                        safeReports++;
+                        break;
+                    }
+                    ints.Insert(i,safeInt);
                 }
             }
         }
-        Console.WriteLine($"safeReports {safeReports}");
-        return safeReports;
-    }
-    private ReadOnlySpan<int> CreateSlicedSpan(ReadOnlySpan<int> span, int skipIndex)
-    {
-        if (skipIndex == 0)
-            return span.Slice(1); 
 
-        if (skipIndex == span.Length - 1)
-            return span.Slice(0, span.Length - 1); 
-
-   
-        return CombineSlices(span.Slice(0, skipIndex), span.Slice(skipIndex + 1));
+        return safeReports.ToString();
     }
-    private int[] CombineSlices(ReadOnlySpan<int> part1, ReadOnlySpan<int> part2)
-    {
-        int[] result = new int[part1.Length + part2.Length];
-        part1.CopyTo(result);
-        part2.CopyTo(result.AsSpan(part1.Length));
-        return result;
-    }
-    public int[][] InputParser(string input)
-    {
-        List<int[]> data = new List<int[]>();
 
-        foreach (var line in input.AsSpan().EnumerateLines())
+    private bool CheckIfRepoertIsSafe(List<int> ints)
+    {
+        bool? up = CheckIfUp(ints.First(), ints.Last());
+        if (up == null) return false;
+        for (int i = 0; i < ints.Count - 1; i++)
         {
-            var innerData = new List<int>();
-
-            foreach (var range in line.Split(' '))
-            {
-                innerData.Add(IntParser(line[range]));
-            }
-
-            data.Add(innerData.ToArray());
-        }
-
-        return data.ToArray();
-    }
-    // Simpler IntParser der perfomanter ist als Int.Parse()
-    // WARNUNG: Aufkosten von Robustheit(kein edgecases etc...)
-    // https://youtu.be/EWmufbVF2A4?feature=shared&t=880 
-    private int IntParser(ReadOnlySpan<Char> span)
-    {
-        int temp = 0;
-        for (int i = 0; i < span.Length; i++)
-        {
-            // Der ASCII-Wert des Zeichens (z. B. '3' → ASCII 51) wird von dem ASCII-Wert von '0' (ASCII 48) subtrahiert.
-            // Dadurch wird der numerische Wert des Zeichens erhalten (z. B. '3' → 3).
-            temp = temp * 10 + (span[i] - '0');
-        }
-        return temp;
-    }
-
-
-    private bool CheckIfSafe(int[] intArray)
-    {
-        
-        if (intArray.Length == 0) return false;
-
-        if (intArray.Length == 1) return true;
-
-        var direction = intArray[0] - intArray[1];
-        if (direction == 0) return false;
-
-        for (int i = 0; i < intArray.Length - 1; i++)
-        {
-            if (direction > 0)
-            {
-                var checking = intArray[i] - intArray[i + 1];
-                if (checking <= 0) return false;
-                if (Math.Abs(checking) > 3) return false;
-
-            }
-            else if (direction < 0)
-            {
-                var checking = intArray[i] - intArray[i + 1];
-                if (checking >= 0) return false;
-                if (Math.Abs(checking) > 3) return false;
-            }
+            if (CheckIfUp(ints[i], ints[i + 1]) != up) return false;
+            if (Math.Abs(ints[i + 1] - ints[i]) > 3) return false;
         }
         return true;
     }
-    private bool CheckIfSafeSpan(ReadOnlySpan<int> intSpan)
+    private bool? CheckIfUp(int start, int end)
     {
+        if (start == end) return null;
 
-        if (intSpan.Length == 0) return false;
-
-        if (intSpan.Length == 1) return true;
-
-        var direction = intSpan[0] - intSpan[1];
-        if (direction == 0) return false;
-
-        for (int i = 0; i < intSpan.Length - 1; i++)
-        {
-            if (direction > 0)
-            {
-                var checking = intSpan[i] - intSpan[i + 1];
-                if (checking <= 0) return false;
-                if (Math.Abs(checking) > 3) return false;
-
-            }
-            else if (direction < 0)
-            {
-                var checking = intSpan[i] - intSpan[i + 1];
-                if (checking >= 0) return false;
-                if (Math.Abs(checking) > 3) return false;
-            }
-        }
-        return true;
+        return end - start > 0 ? true : false;
     }
 
 }
