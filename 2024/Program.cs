@@ -2,7 +2,7 @@
 using System;
 
 
-string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day24/InputData/Input.txt");
+string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day24/InputData/InputCustom.txt");
 
 
 var inputText= File.ReadAllText(path);
