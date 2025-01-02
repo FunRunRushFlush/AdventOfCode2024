@@ -37,7 +37,8 @@ public class Part02Try
             string xkey = $"x{i:D2}";
             string ykey = $"y{i:D2}";
 
-            if (!Rule.TryGetValue(xkey, out int output)) break;
+            if (!Rule.TryGetValue(xkey, out int output)) 
+                break;
 
             if (Rule[ykey] + Rule[xkey] + MusterLoesung[i] >= 2)
             {
@@ -106,14 +107,14 @@ public class Part02Try
             {
                 string key = $"z{i:D2}";
                 if (!Rule.TryGetValue(key, out int output))
-                    //break;
+                    break;
 
                 if (MusterLoesung[i] != output)
                 {
                     if (i > bestNumOfMatches)
                         GlobalLog.LogLine($"{key} --> {MusterLoesung[i]} != {output}");
                     //break;
-                }
+                    }
 
                 if (MusterLoesung[i] == output) numOfMatches++;
             }
