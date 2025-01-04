@@ -1,8 +1,9 @@
-namespace Day14;
 
-/// <summary>
-/// Nachdem man weis nach was man sucht kann man es optimieren
-/// </summary>
+
+using System;
+using System.Numerics;
+
+namespace Day14;
 public class Part02 : IPart
 {
     private List<Robot> roboInfoList = new();
@@ -11,136 +12,167 @@ public class Part02 : IPart
 
     private int SecondLimit = 10000;
     private int[,] bathroom;
-
-    private HashSet<(int y, int x)> cluster = new();
-
-    private int BiggestCluster = 0;
-    private int BiggestClusterTime = 0;
+    int[] Cluster = new int[9];
 
     public string Result(Input input)
     {
-        long q1 = 0;
-        long q2 = 0;
-        long q3 = 0;
-        long q4 = 0;
         bathroom = new int[bathHeight, bathWidth];
         ParseInput(input.SpanLines);
-
-        for (int s = 0; s <= SecondLimit; s++)
+        double minFoundEntropie = double.MaxValue;
+        int secondOfMinEnttropie = 0;
+        List<(double Ent,int Sec)> entropieList = new List<(double, int)>();
+        int maxCluster = 0;
+        int second = 0;
+        for (int i = 1; i< SecondLimit;i++)
         {
             Array.Clear(bathroom, 0, bathroom.Length);
-            for (int r = 0; r < roboInfoList.Count; r++)
+            foreach (var robo in roboInfoList)
             {
-                var roboPos = CalculateRoboPosition(roboInfoList[r], s);
-                bathroom[roboPos.roboY, roboPos.roboX] += 1;
-                if (s == SecondLimit)
+                CalculatePosition(robo, 1);
+                //QuarterCalc(robo);
+                ClusterCalc(robo.Position);
+
+                //bathroom[(int)robo.Position.Y, (int)robo.Position.X]++;
+            }
+            //double foundEntropie = CalculateEntropie();
+            //entropieList.Add((foundEntropie,i));
+            //if (foundEntropie < minFoundEntropie)
+            //{
+            //    minFoundEntropie = foundEntropie;
+            //    secondOfMinEnttropie = i;
+            //}
+            
+            foreach (int cluster in Cluster)
+            {
+                if( cluster > maxCluster)
                 {
-                    if (roboPos.roboY < bathHeight / 2)
-                    {
-                        if (roboPos.roboX < bathWidth / 2) q1++;
-                        else if (roboPos.roboX > bathWidth / 2) q2++;
-                    }
-                    else if (roboPos.roboY > bathHeight / 2)
-                    {
-                        if (roboPos.roboX < bathWidth / 2) q4++;
-                        else if (roboPos.roboX > bathWidth / 2) q3++;
-                    }
+                    maxCluster = cluster;
+                    second = i;
                 }
             }
-            LookForRoboCluster(s);
-            //int currentClusterSize = cluster.Count;
-            //if (currentClusterSize > BiggestCluster)
-            //{
-            //    BiggestCluster = currentClusterSize;
-            //    BiggestClusterTime = s; 
-            //}
-
-            if (s == 225) DrawBathGrid(s);
+            Array.Clear(Cluster, 0, Cluster.Length);
         }
 
+        //entropieList = entropieList.OrderBy(x => x.Ent).ToList();
 
-        GlobalLog.LogLine($"BiggestCluster; {BiggestCluster}; BiggestClusterTime: {BiggestClusterTime} ");
-        return (q1 * q2 * q3 * q4).ToString();
+        //GlobalLog.LogLine("Top 50 Entropie entries");
+        //for (int i = 0; i < 50; i++)
+        //{
+        //    GlobalLog.LogLine(  entropieList[i].ToString());
+        //}
+        GlobalLog.LogLine($"Second: {second}");
+        return (second).ToString();
     }
 
-    private void LookForRoboCluster(int s)
+    private void ClusterCalc(Vector2 pos)
     {
+   
+        if (pos.Y >= 0 && pos.Y <= 34)
+        {
+            if (pos.X >= 0 && pos.X <= 33) Cluster[0]++; // Cluster01
+            if (pos.X >= 34 && pos.X <= 67) Cluster[1]++; // Cluster02
+            if (pos.X >= 68 && pos.X <= 100) Cluster[2]++; // Cluster03
+        }
+        else if (pos.Y >= 35 && pos.Y <= 69)
+        {
+            if (pos.X >= 0 && pos.X <= 33) Cluster[3]++; // Cluster04
+            if (pos.X >= 34 && pos.X <= 67) Cluster[4]++; // Cluster05
+            if (pos.X >= 68 && pos.X <= 100) Cluster[5]++; // Cluster06
+        }
+        else if (pos.Y >= 70 && pos.Y <= 102)
+        {
+            if (pos.X >= 0 && pos.X <= 33) Cluster[6]++; // Cluster07
+            if (pos.X >= 34 && pos.X <= 67) Cluster[7]++; // Cluster08
+            if (pos.X >= 68 && pos.X <= 100) Cluster[8]++; // Cluster09
+        }
+ 
+    }
+
+    private double CalculateEntropie()
+    {
+        var numOfRobos=roboInfoList.Count;
+        double entropie= 0;
         for (int y = 0; y < bathHeight; y++)
         {
             for (int x = 0; x < bathWidth; x++)
             {
-                if (cluster.Contains((y, x))) continue;
+                if (bathroom[y, x] == 0) continue;
 
-                CheckForNeighbors(y, x);
-                int currentClusterSize = cluster.Count;
-                if (currentClusterSize > BiggestCluster)
-                {
-                    BiggestCluster = currentClusterSize;
-                    BiggestClusterTime = s;
-                }
-                cluster.Clear();
+                double p = (double)bathroom[y, x] / (double)numOfRobos;
+                entropie += Math.Abs(p * Math.Log2(p));
+                
             }
+        }
+        return entropie;
+    }
+
+    //private void QuarterCalc(Robot robo)
+    //{
+    //    if (robo.Position.X < bathWidth / 2)
+    //    {
+    //        if (robo.Position.Y < bathHeight / 2)
+    //        {
+    //            Q1++;
+    //        }
+    //        else if (robo.Position.Y > bathHeight / 2)
+    //        {
+    //            Q2++;
+    //        }
+    //    }
+    //    else if (robo.Position.X > bathWidth / 2)
+    //    {
+    //        if (robo.Position.Y < bathHeight / 2)
+    //        {
+    //            Q3++;
+    //        }
+    //        else if (robo.Position.Y > bathHeight / 2)
+    //        {
+    //            Q4++;
+    //        }
+    //    }
+
+    //}
+
+    private void CalculatePosition(Robot robo, int seconds)
+    {
+        var vec = robo.Position + robo.Velocity * seconds;
+        robo.Position = CalcTeleportation(vec);
+        robo.Seconds += seconds;
+    }
+
+    private Vector2 CalcTeleportation(Vector2 vec)
+    {
+        float AdjustedX = (vec.X % bathWidth + bathWidth) % bathWidth;
+        float AdjustedY = (vec.Y % bathHeight + bathHeight) % bathHeight;
+
+        return new Vector2(AdjustedX, AdjustedY);
+    }
+
+    private void ParseInput(ReadOnlySpan<string> spanLines)
+    {
+        foreach (string line in spanLines)
+        {
+            int[] data = line.Split(new[] { ' ', ',', 'p', 'v', '=' }, StringSplitOptions.RemoveEmptyEntries)
+                                .Select(int.Parse).ToArray();
+            roboInfoList.Add(new Robot(new Vector2(data[0], data[1]), new Vector2(data[2], data[3])));
         }
     }
 
-
-    private void CheckForNeighbors(int y, int x)
+    private class Robot
     {
+        public Vector2 Position;
+        public Vector2 Velocity;
+        public int Seconds;
 
-        if (bathroom[y, x] > 0)
+        public Robot(Vector2 position, Vector2 velocity, int seconds = 0)
         {
-            if (cluster.Add((y, x)))
-            {
-                for (int dir = 0; dir < 4; dir++)
-                {
-                    var offsetPos = SetOffsetCoord((Direction)dir, (y, x));
-                    if (!CheckBounderys(offsetPos)) continue;
-                    CheckForNeighbors(offsetPos.Y, offsetPos.X);
-                }
-
-            }
-
-
+            Position = position;
+            Velocity = velocity;
+            Seconds = seconds;
         }
     }
-
-    private enum Direction
-    {
-        Up = 0,
-        Right = 1,
-        Down = 2,
-        Left = 3
-    }
-    private bool CheckBounderys((int Y, int X) pos)
-    {
-        if (pos.X < 0) return false;
-        if (pos.Y < 0) return false;
-        if (pos.X >= bathWidth) return false;
-        if (pos.Y >= bathHeight) return false;
-
-        return true;
-    }
-
-    private (int Y, int X) SetOffsetCoord(Direction direction, (int Y, int X) trailPos)
-    {
-        var dir = direction switch
-        {
-            Direction.Up => (-1, 0),
-            Direction.Right => (0, 1),
-            Direction.Down => (1, 0),
-            Direction.Left => (0, -1),
-            _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Invalid direction: {direction}")
-        };
-
-        int Y = trailPos.Y + dir.Item1;
-        int X = trailPos.X + dir.Item2;
-
-        return (Y, X);
-    }
-
-
     [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private void DrawBathGrid(int s)
+    private void DrawBathGrid(int s = 0)
     {
         GlobalLog.LogLine($"###################################################");
         GlobalLog.LogLine($"### Seconds = {s}###");
@@ -154,14 +186,14 @@ public class Part02 : IPart
                 {
                     drawPoint = bathroom[h, w].ToString();
                 }
-                if (bathWidth / 2 == w)
-                {
-                    drawPoint = "|";
-                }
-                if (bathHeight / 2 == h)
-                {
-                    drawPoint = "-";
-                }
+                //if (bathWidth / 2 == w)
+                //{
+                //    drawPoint = "|";
+                //}
+                //if (bathHeight / 2 == h)
+                //{
+                //    drawPoint = "-";
+                //}
 
                 Console.Write($"{drawPoint}");
             }
@@ -169,74 +201,4 @@ public class Part02 : IPart
         }
     }
 
-    private (int roboX, int roboY) CalculateRoboPosition(Robot robo, int s)
-    {
-
-        var roboX = robo.Pos.X + robo.Vel.X * s;
-        var roboY = robo.Pos.Y + robo.Vel.Y * s;
-
-        while (roboX >= bathWidth) roboX -= bathWidth;
-        while (roboX < 0) roboX += bathWidth;
-
-        while (roboY >= bathHeight) roboY -= bathHeight;
-        while (roboY < 0) roboY += bathHeight;
-
-        return (roboX, roboY);
-    }
-
-    private void ParseInput(ReadOnlySpan<string> input)
-    {
-        foreach (var line in input)
-        {
-
-            int pStart = line.IndexOf("p=") + 2;
-            int vStart = line.IndexOf("v=") + 2;
-
-
-            var pPart = line.AsSpan(pStart, line.IndexOf(' ', pStart) - pStart);
-            var vPart = line.AsSpan(vStart);
-
-
-            int commaP = pPart.IndexOf(',');
-            int pX = int.Parse(pPart[..commaP]);
-            int pY = int.Parse(pPart[(commaP + 1)..]);
-
-
-            int commaV = vPart.IndexOf(',');
-            int vX = int.Parse(vPart[..commaV]);
-            int vY = int.Parse(vPart[(commaV + 1)..]);
-
-            roboInfoList.Add(new Robot(new Position(pX, pY), new Position(vX, vY)));
-        }
-    }
-
-
-    private struct Position
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
-
-        public Position(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
-    }
-
-    private struct Robot
-    {
-        public Position StartPos { get; set; }
-        public Position Vel { get; set; }
-        public Position Pos { get; set; }
-        public int Time { get; set; }
-
-        public Robot(Position startPos, Position vel)
-        {
-            StartPos = startPos;
-            Vel = vel;
-            Pos = startPos;
-            Time = 0;
-        }
-    }
 }
-

@@ -43,9 +43,9 @@ public class Part01Old : IPart
                 }
             }
 
-            DrawBathGrid(s);
         }
-
+            DrawBathGrid(100);
+        GlobalLog.LogLine($"Q1:{q1}; Q2:{q2}; Q3:{q3}; Q4;{q4}");
         return (q1 * q2 * q3 * q4).ToString();
     }
 

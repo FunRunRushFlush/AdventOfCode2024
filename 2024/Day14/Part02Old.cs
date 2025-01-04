@@ -54,8 +54,10 @@ public class Part02Old : IPart
             //    BiggestCluster = currentClusterSize;
             //    BiggestClusterTime = s; 
             //}
-
-            if (s == 225) DrawBathGrid(s);
+            if (s == 6280) DrawBathGrid(s);
+            if (s == 6284) DrawBathGrid(s);
+            if (s == 6285) DrawBathGrid(s);
+            if (s == 6516) DrawBathGrid(s);
         }
 
 

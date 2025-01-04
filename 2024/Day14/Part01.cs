@@ -26,8 +26,11 @@ public class Part01 : IPart
         {
             CalculatePosition(robo, SecondLimit);
             QuarterCalc(robo);
-        }
 
+            bathroom[(int)robo.Position.Y, (int)robo.Position.X]++;
+        }
+        DrawBathGrid(SecondLimit);
+        GlobalLog.LogLine($"Q1:{Q1}; Q2:{Q2}; Q3:{Q3}; Q4;{Q4}");
         return (Q1*Q2*Q3*Q4).ToString();
     }
 
@@ -39,18 +42,18 @@ public class Part01 : IPart
             {
                 Q1++;
             }
-            else
+            else if (robo.Position.Y > bathHeight / 2)
             {
                 Q2++;
             }
         }
-        else
+        else if (robo.Position.X > bathWidth / 2)
         {
             if (robo.Position.Y < bathHeight / 2)
             {
                 Q3++;
             }
-            else
+            else if (robo.Position.Y > bathHeight / 2)
             {
                 Q4++;
             }
@@ -60,31 +63,17 @@ public class Part01 : IPart
 
     private void CalculatePosition(Robot robo, int seconds)
     {
-        var vec = robo.Position* robo.Velocity* seconds;
+        var vec = robo.Position + robo.Velocity * seconds;
         robo.Position = CalcTeleportation(vec);
         robo.Seconds += seconds;
     }
 
     private Vector2 CalcTeleportation(Vector2 vec)
     {
-        Vector2 res = new Vector2();
-        if (vec.X < 0)
-        {
-            res.X = bathWidth + (vec.X % bathWidth);
-        }
-        if (vec.X >= bathWidth)
-        {
-            res.X = (vec.X % bathWidth);
-        }
-        if (vec.Y < 0)
-        {
-            res.Y = bathHeight + (vec.Y % bathHeight);
-        }
-        if (vec.X >= bathWidth)
-        {
-            res.Y = (vec.Y % bathHeight);
-        }
-        return res;
+        float AdjustedX = (vec.X % bathWidth + bathWidth) % bathWidth;
+        float AdjustedY = (vec.Y % bathHeight + bathHeight) % bathHeight;
+
+        return new Vector2(AdjustedX, AdjustedY);
     }
 
     private void ParseInput(ReadOnlySpan<string> spanLines)
@@ -110,4 +99,34 @@ public class Part01 : IPart
             Seconds = seconds;
         }
     }
+    [System.Diagnostics.Conditional("LOGGING_ENABLED")]
+    private void DrawBathGrid(int s = 0)
+    {
+        GlobalLog.LogLine($"###################################################");
+        GlobalLog.LogLine($"### Seconds = {s}###");
+        GlobalLog.LogLine($"###################################################");
+        for (int h = 0; h < bathHeight; h++)
+        {
+            for (int w = 0; w < bathWidth; w++)
+            {
+                string drawPoint = ".";
+                if (bathroom[h, w] > 0)
+                {
+                    drawPoint = bathroom[h, w].ToString();
+                }
+                if (bathWidth / 2 == w)
+                {
+                    drawPoint = "|";
+                }
+                if (bathHeight / 2 == h)
+                {
+                    drawPoint = "-";
+                }
+
+                Console.Write($"{drawPoint}");
+            }
+            Console.WriteLine();
+        }
+    }
+
 }
