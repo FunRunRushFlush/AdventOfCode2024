@@ -1,11 +1,11 @@
 namespace Day15;
-public static class Part02
+public class Part02 : IPart
 {
 
-    private static string Instructions { get; set; }
-    private static char[,] Warehouse { get; set; }
-    private static int WarehouseHeight;
-    private static int WarehouseWidth;
+    private string Instructions { get; set; }
+    private char[,] Warehouse { get; set; }
+    private int WarehouseHeight;
+    private int WarehouseWidth;
 
     private const char StoneRightSide = ']';
     private const char StoneLeftSide = '[';
@@ -14,13 +14,13 @@ public static class Part02
     private const char smallStone = 'O';
     private const char freeSpace = '.';
 
-    private static Dictionary<(int Y,int X),char> tempRender = new Dictionary<(int Y,int X),char>();
+    private Dictionary<(int Y, int X), char> tempRender = new Dictionary<(int Y, int X), char>();
 
-    public static (int Y, int X) roboPos;
+    public (int Y, int X) roboPos;
 
-    public static long Result(string input)
+    public string Result(Input input)
     {
-        ParseInput(input);
+        ParseInput(input.Text);
         int insCounter = 0;
         long GPS = 0;
         DrawGrid(insCounter);
@@ -29,7 +29,7 @@ public static class Part02
             insCounter++;
             var pos = SetOffsetCoord((Direction)ins, roboPos);
             GlobalLog.LogLine($"ins: {(Direction)ins}");
-            CheckForStone(pos.Y, pos.X, ins);   
+            CheckForStone(pos.Y, pos.X, ins);
             tempRender.Clear();
 
             //DrawGrid(insCounter);
@@ -47,10 +47,10 @@ public static class Part02
             }
         }
         GlobalLog.LogLine($"GPS = {GPS}");
-        return GPS;
+        return GPS.ToString();
     }
     [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private static void DrawGrid(int s = 0)
+    private void DrawGrid(int s = 0)
     {
 
         GlobalLog.LogLine($"Move = {s}");
@@ -73,13 +73,13 @@ public static class Part02
         Console.WriteLine("-------------------------------------------");
         Console.WriteLine();
     }
-    private static void TryAddWithLog((int Y, int X)pos,char value)
+    private void TryAddWithLog((int Y, int X) pos, char value)
     {
         GlobalLog.LogLine($"tempRender.Add((y:{pos.Y},x:{pos.X}), {value}");
         tempRender.TryAdd(pos, value);
     }
 
-    private static int CheckForStone(int y, int x, int dir)
+    private int CheckForStone(int y, int x, int dir)
     {
         GlobalLog.LogLine($"CheckForStone: y:{y} x:{x}");
         var counter = 0;
@@ -90,7 +90,7 @@ public static class Part02
         var partChar = Warehouse[partOffSett.Y, partOffSett.X];
         TryAddWithLog((y, x), checkingTile);
         TryAddWithLog(partOffSett, partChar);
- 
+
 
         if (checkingTile == Wall)
         {
@@ -153,12 +153,12 @@ public static class Part02
                     else if ((Direction)dir == Direction.Right && d % 2 == 1)
                     {
 
-                            Warehouse[tempPos.Y, tempPos.X] = StoneLeftSide;
-                            offsetPos = SetOffsetCoord((Direction)dir, (tempPos.Y, tempPos.X));
-                            //tempPos = offsetPos;
-                            Warehouse[offsetPos.Y, offsetPos.X] = StoneRightSide;
+                        Warehouse[tempPos.Y, tempPos.X] = StoneLeftSide;
+                        offsetPos = SetOffsetCoord((Direction)dir, (tempPos.Y, tempPos.X));
+                        //tempPos = offsetPos;
+                        Warehouse[offsetPos.Y, offsetPos.X] = StoneRightSide;
 
-                        
+
                     }
 
                 }
@@ -170,28 +170,28 @@ public static class Part02
             var distance = Math.Abs(y - roboPos.Y) + Math.Abs(x - roboPos.X);
             Warehouse[roboPos.Y, roboPos.X] = freeSpace;
             var offsetPos = SetOffsetCoord((Direction)dir, (roboPos.Y, roboPos.X));
-            RenderNewStoneLocation( dir);
+            RenderNewStoneLocation(dir);
             roboPos = offsetPos;
             Warehouse[roboPos.Y, roboPos.X] = Player;
-            
+
         }
         return counter;
     }
 
-    private static void RenderNewStoneLocation(int dir)
+    private void RenderNewStoneLocation(int dir)
     {
-        foreach( var element in tempRender)
+        foreach (var element in tempRender)
         {
-            Warehouse[element.Key.Y,element.Key.X] = freeSpace;
+            Warehouse[element.Key.Y, element.Key.X] = freeSpace;
         }
         foreach (var element in tempRender)
         {
             var offsetPos = SetOffsetCoord((Direction)dir, element.Key);
-                Warehouse[offsetPos.Y, offsetPos.X] = element.Value;
+            Warehouse[offsetPos.Y, offsetPos.X] = element.Value;
         }
     }
 
-    private static int CheckForWideStone(int wY, int wX, int dir)
+    private int CheckForWideStone(int wY, int wX, int dir)
     {
         GlobalLog.LogLine($"CheckForWideStone: y:{wY} x:{wX}");
         var counter = 0;
@@ -200,8 +200,8 @@ public static class Part02
         var partDir = checkingTile == StoneLeftSide ? Direction.Right : Direction.Left;
         var partOffSett = SetOffsetCoord((Direction)partDir, (wY, wX));
         var partChar = Warehouse[partOffSett.Y, partOffSett.X];
-        
-                
+
+
         if (checkingTile == Wall)
         {
             GlobalLog.LogLine($"Wall: y:{wY} x:{wX}");
@@ -209,12 +209,12 @@ public static class Part02
         }
         else if (checkingTile == StoneLeftSide || checkingTile == StoneRightSide)
         {
-                TryAddWithLog((wY, wX), checkingTile);
-                TryAddWithLog(partOffSett, partChar);
+            TryAddWithLog((wY, wX), checkingTile);
+            TryAddWithLog(partOffSett, partChar);
             if (checkingTile == StoneLeftSide
                 && ((Direction)dir == Direction.Up || (Direction)dir == Direction.Down))
             {
-                
+
 
                 var offsetPos = SetOffsetCoord((Direction)dir, (wY, wX));
 
@@ -237,7 +237,7 @@ public static class Part02
         }
 
 
-        else if (checkingTile == freeSpace )
+        else if (checkingTile == freeSpace)
         {
             return 1;
         }
@@ -251,7 +251,7 @@ public static class Part02
         Down = 'v',
         Left = '<'
     }
-    private static bool CheckBounderys((int Y, int X) pos)
+    private bool CheckBounderys((int Y, int X) pos)
     {
         if (pos.X < 1) return false;
         if (pos.Y < 1) return false;
@@ -261,7 +261,7 @@ public static class Part02
         return true;
     }
 
-    private static (int Y, int X) SetOffsetCoord(Direction direction, (int Y, int X) trailPos)
+    private (int Y, int X) SetOffsetCoord(Direction direction, (int Y, int X) trailPos)
     {
         var dir = direction switch
         {
@@ -278,7 +278,7 @@ public static class Part02
         return (Y, X);
     }
 
-    private static void ParseInput(string input)
+    private void ParseInput(string input)
     {
         //TODO: DAFUQ: Environment.NewLine + Environment.NewLine = eien leere zeile
         var inputSplit = input

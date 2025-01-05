@@ -1,97 +1,125 @@
 
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace Day20;
-public class Part01
+public class Part01 : IPart
 {
-    private (int Y, int X) RaceStartPos;
-    private (int Y, int X) RaceEndPos;
-    private (int Y, int X) CarPos;
-    private Direction CarDirection;
+    private Vector2 CarStartPos;
+    private Vector2 CarEndPos;
+    private Vector2 CarPos;
 
-    private HashSet<((int Y, int X)Start, (int Y, int X)End)> SkipPos = new();
-    private int[,] RaceTimeMap;
-    private Dictionary<(int Y,int X),int> RaceTimeDic = new();
-    private int Racetime;
-    private int NumberOfCheats;
+    private Dir CarDir;
 
-    public void ParseOnly(ReadOnlySpan<string> input)
+    private const char RaceTile = '.';
+    Dictionary<Vector2, int> RaceTime = new Dictionary<Vector2, int>();
+    private int Seconds = 0;
+    private int Cheats = 0;
+
+    private Vector2 Up = new Vector2(0, -1);
+    private Vector2 Right = new Vector2(1, 0);
+    private Vector2 Down = new Vector2(0, 1);
+    private Vector2 Left = new Vector2(-1, 0);
+
+    public string Result(Input input)
     {
-        ParseInput(input);
-    }
+        ParseInput(input.Lines);
+        CarStarDir(input.Lines);
+        CarPos = new Vector2(CarStartPos.X, CarStartPos.Y);
+        RaceQualifier(input.Lines);
 
-    public long Result(ReadOnlySpan<string> input)
-    {
-        ParseInput(input);
-        RaceTimeMap = new int[input.Length,input[0].Length];
-        CarPos = RaceStartPos;
-        RaceTimeDic.Add(RaceStartPos, 0);
-        //StartDirection
-        for (int d = 0; d < 4; d++)
+        foreach (var time in RaceTime)
         {
-            var offSet = SetOffsetCoord((Direction)d, CarPos);
-            if (CheckForValidStepOption(offSet, input))
+            for (int i = 0; i < 4; i++)
             {
-                CarDirection = (Direction)d;
+                var cheatVec = time.Key + 2 * DirVec((Dir)i);
+                if (RaceTime.TryGetValue(cheatVec, out int sec))
+                {
+                    if ((sec - time.Value) - 2 >= 100) Cheats++;
+                }
+
             }
         }
+        return Cheats.ToString();
+    }
 
+    private void CarStarDir(string[] raceTrack)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            var carDirCheck = CarStartPos + DirVec((Dir)i);
+            if (raceTrack[(int)carDirCheck.Y][(int)carDirCheck.X] == RaceTile)
+            {
+                CarDir = (Dir)i;
+                break;
+            }
+        }
+    }
 
+    public enum Dir
+    {
+        up = 0,
+        right = 1,
+        down = 2,
+        left = 3,
+    }
+    private Vector2 DirVec(Dir index)
+    {
+        return index switch
+        {
+            Dir.up => Up,
+            Dir.right => Right,
+            Dir.down => Down,
+            Dir.left => Left,
+            _ => throw new ArgumentOutOfRangeException(nameof(index), "Index must be between 0 and 3.")
+        };
+    }
+
+    private void RaceQualifier(string[] raceTrack)
+    {
         while (true)
         {
-            if (CarPos == RaceEndPos) break;
-            for (int d = 0; d < 4; d++)
+            RaceTime.Add(CarPos, Seconds);
+
+            if (CarPos == CarEndPos) break;
+
+            var carDirCheck = CarPos + DirVec(CarDir);
+            if (raceTrack[(int)carDirCheck.Y][(int)carDirCheck.X] == RaceTile
+                || raceTrack[(int)carDirCheck.Y][(int)carDirCheck.X] == 'E')
             {
-                if (CarDirection == (Direction)((d + 2) % 4)) continue; 
-                var offSet = SetOffsetCoord((Direction)d, CarPos);
-                if(CheckForValidStepOption(offSet, input))
-                {
-                    Racetime++;
-                    RaceTimeMap[offSet.Y,offSet.X] = Racetime;
-                    RaceTimeDic.Add(offSet, Racetime);
-                    CarPos = offSet;
-                    CarDirection = (Direction)d;
-                    break;
-                }
-            }
-        }
-
-        foreach (var timeSlot in RaceTimeDic)
-        {
-                GlobalLog.LogLine($"offSet: Y:{timeSlot.Key.Y} X:{timeSlot.Key.X}");
-            for (int d = 0; d < 4; d++)
-            {
-                //if (CarDirection == (Direction)((d + 2) % 4)) continue;
-                var offSet = SetDoubleOffsetCoord((Direction)d, timeSlot.Key);
-
-                if (RaceTimeDic.ContainsKey(offSet))
-                {
-                    GlobalLog.LogLine($"timeSlot: {timeSlot.Value}");
-
-                    var test = RaceTimeDic[offSet] - timeSlot.Value -2;// -2 wegen cheatSteps
-
-                    if (test >= 100)
-                    {
-                        NumberOfCheats++;
-                    }
-
-
-                }
+                CarPos = carDirCheck;
+                Seconds++;
+                continue;
 
             }
+            Dir right = (Dir)(((int)CarDir + 1) % 4);
+            var carDirRightCheck = CarPos + DirVec(right);
+            if (raceTrack[(int)carDirRightCheck.Y][(int)carDirRightCheck.X] == RaceTile
+                || raceTrack[(int)carDirRightCheck.Y][(int)carDirRightCheck.X] == 'E')
+            {
+                CarPos = carDirRightCheck;
+                CarDir = right;
+                Seconds++;
+                continue;
+            }
+            Dir left = (Dir)(((int)CarDir + 3) % 4);
+            var carDirLeftCheck = CarPos + DirVec(left);
+            if (raceTrack[(int)carDirLeftCheck.Y][(int)carDirLeftCheck.X] == RaceTile || raceTrack[(int)carDirLeftCheck.Y][(int)carDirLeftCheck.X] == 'E')
+            {
+                CarPos = carDirLeftCheck;
+                CarDir = left;
+                Seconds++;
+                continue;
+            }
+
         }
-
-        DrawGrid(RaceTimeMap);
-
-        return NumberOfCheats;
     }
 
-
     [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private void DrawGrid(int[,] array)
+    private void DrawGrid(string[] array)
     {
-        var arrayHeight = array.GetLength(0);
-        var arrayWidth = array.GetLength(1);
+        var arrayHeight = array.Length;
+        var arrayWidth = array[0].Length;
 
         GlobalLog.LogLine($"DrawGrid");
 
@@ -102,11 +130,15 @@ public class Part01
                 string drawPoint = ".";
                 //if (array[h, w] > 0)
                 //{
-                drawPoint = array[h, w].ToString();
+                drawPoint = array[h][w].ToString();
                 //}
 
-                //TODO: $"[{array[h, w],3}]" syntax für besseren Print
-                Console.Write($"[{array[h, w],3}]");
+                if (RaceTime.ContainsKey(new Vector2(w, h)))
+                {
+                    drawPoint = "X";
+                }
+
+                Console.Write($"{drawPoint}");
             }
             Console.WriteLine();
         }
@@ -114,85 +146,26 @@ public class Part01
         Console.WriteLine();
     }
 
-    private void ParseInput(ReadOnlySpan<string> input)
+    private void ParseInput(string[] lines)
     {
-        bool sFound=false;
-        bool eFound=false;
-        for (int y = 0; y < input.Length; y++)
+        bool startFound = false;
+        bool endFound = false;
+        for (int y = 0; y < lines.Length; y++)
         {
-            if(!sFound)
-            {
-                var checkS = input[y].IndexOf('S');
-                if (checkS > -1)
-                {
-                    RaceStartPos = (y,checkS);
-                    sFound = true;
-                }
-            }
-            if (!eFound)
-            {
-                var checkE = input[y].IndexOf('E');
-                if (checkE > -1)
-                {
-                    RaceEndPos = (y, checkE);
-                    eFound = true;
-                }
-            }
+            if (startFound && endFound) break;
 
-            if (sFound && eFound) break;
+            var xS = lines[y].IndexOf('S');
+            var xE = lines[y].IndexOf('E');
+            if (xS >= 0)
+            {
+                CarStartPos = new Vector2(xS, y);
+                startFound = true;
+            }
+            if (xE >= 0)
+            {
+                CarEndPos = new Vector2(xE, y);
+                endFound = true;
+            }
         }
-    }
-
-    private enum Direction
-    {
-        Up = 0,
-        Right = 1,
-        Down = 2,
-        Left = 3
-    }
-
-    private bool CheckForValidStepOption((int Y, int X) pos, ReadOnlySpan<string> input)
-    {
-        if (pos.X < 0) return false;
-        if (pos.Y < 0) return false;
-        if (pos.X >= input[0].Length) return false;
-        if (pos.Y >= input.Length) return false;
-        if (input[pos.Y][pos.X] == '#') return false;
-
-        return true;
-    }
-
-    private (int Y, int X) SetOffsetCoord(Direction direction, (int Y, int X) trailPos)
-    {
-        var dir = direction switch
-        {
-            Direction.Up => (-1, 0),
-            Direction.Right => (0, 1),
-            Direction.Down => (1, 0),
-            Direction.Left => (0, -1),
-            _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Invalid direction: {direction}")
-        };
-
-        int Y = trailPos.Y + dir.Item1;
-        int X = trailPos.X + dir.Item2;
-
-        return (Y, X);
-    }
-
-    private (int Y, int X) SetDoubleOffsetCoord(Direction direction, (int Y, int X) trailPos)
-    {
-        var dir = direction switch
-        {
-            Direction.Up => (-2, 0),
-            Direction.Right => (0, 2),
-            Direction.Down => (2, 0),
-            Direction.Left => (0, -2),
-            _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Invalid direction: {direction}")
-        };
-
-        int Y = trailPos.Y + dir.Item1;
-        int X = trailPos.X + dir.Item2;
-
-        return (Y, X);
     }
 }

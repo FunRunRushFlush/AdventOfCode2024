@@ -1,5 +1,5 @@
 namespace Day22;
-public class Part02 :IPart
+public class Part02Old :IPart
 {
     //TODO: Dic von array funktioniert nicht wie ich gedacht habe, Ref- vs valuetype !!!
     //    int[] array1 = { 0, 0, 0, -1 };

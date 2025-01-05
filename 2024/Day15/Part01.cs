@@ -1,19 +1,19 @@
 namespace Day15;
-public static class Part01
+public class Part01 : IPart
 {
 
-    private static string Instructions { get; set; }
-    private static char[,] Warehouse { get; set; }
-    private static int WarehouseHeight;
-    private static int WarehouseWidth;
+    private string Instructions { get; set; }
+    private char[,] Warehouse { get; set; }
+    private int WarehouseHeight;
+    private int WarehouseWidth;
 
-    public static (int Y, int X) roboPos;
+    public (int Y, int X) roboPos;
 
-    public static long Result(string input)
+    public string Result(Input input)
     {
-        ParseInput(input);
+        ParseInput(input.Text);
         int insCounter = 0;
-        long GPS =0;
+        long GPS = 0;
         foreach (char ins in Instructions)
         {
             insCounter++;
@@ -23,21 +23,21 @@ public static class Part01
             //DrawGrid(insCounter);
         }
 
-        for (int y = 0; y < WarehouseHeight;y++)
+        for (int y = 0; y < WarehouseHeight; y++)
         {
-            for (int x = 0; x<WarehouseWidth;x++)
+            for (int x = 0; x < WarehouseWidth; x++)
             {
-                if (Warehouse[y,x]=='O')
+                if (Warehouse[y, x] == 'O')
                 {
                     GPS += y * 100 + x;
                 }
             }
         }
         GlobalLog.LogLine($"GPS = {GPS}");
-        return GPS;
+        return GPS.ToString();
     }
     [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private static void DrawGrid(int s = 0)
+    private void DrawGrid(int s = 0)
     {
 
         GlobalLog.LogLine($"Move = {s}");
@@ -51,7 +51,7 @@ public static class Part01
                 {
                     drawPoint = Warehouse[h, w].ToString();
                 }
-     
+
 
                 Console.Write($"{drawPoint}");
             }
@@ -61,26 +61,26 @@ public static class Part01
         Console.WriteLine();
     }
 
-    private static void CheckForStone(int y, int x,int dir)
+    private void CheckForStone(int y, int x, int dir)
     {
-        if (Warehouse[y,x] == '#')
+        if (Warehouse[y, x] == '#')
         {
             GlobalLog.LogLine($"Wall: y:{y} x:{x}");
             return;
         }
-        else if (Warehouse[y,x] == 'O')
+        else if (Warehouse[y, x] == 'O')
         {
             var offsetPos = SetOffsetCoord((Direction)dir, (y, x));
             CheckForStone(offsetPos.Y, offsetPos.X, dir);
         }
-        else if (Warehouse[y,x] == '.')
+        else if (Warehouse[y, x] == '.')
         {
-            var distance = Math.Abs(y-roboPos.Y) + Math.Abs(x - roboPos.X);
-                    Warehouse[roboPos.Y, roboPos.X] = '.';
-                    var offsetPos = SetOffsetCoord((Direction)dir, (roboPos.Y, roboPos.X));
-                    roboPos = offsetPos;
-                    Warehouse[roboPos.Y, roboPos.X] = '@';
-            if (distance >1)
+            var distance = Math.Abs(y - roboPos.Y) + Math.Abs(x - roboPos.X);
+            Warehouse[roboPos.Y, roboPos.X] = '.';
+            var offsetPos = SetOffsetCoord((Direction)dir, (roboPos.Y, roboPos.X));
+            roboPos = offsetPos;
+            Warehouse[roboPos.Y, roboPos.X] = '@';
+            if (distance > 1)
             {
                 var tempPos = roboPos;
                 for (int d = 1; d < distance; d++)
@@ -100,7 +100,7 @@ public static class Part01
         Down = 'v',
         Left = '<'
     }
-    private static bool CheckBounderys((int Y, int X) pos)
+    private bool CheckBounderys((int Y, int X) pos)
     {
         if (pos.X < 1) return false;
         if (pos.Y < 1) return false;
@@ -110,7 +110,7 @@ public static class Part01
         return true;
     }
 
-    private static (int Y, int X) SetOffsetCoord(Direction direction, (int Y, int X) trailPos)
+    private (int Y, int X) SetOffsetCoord(Direction direction, (int Y, int X) trailPos)
     {
         var dir = direction switch
         {
@@ -127,7 +127,7 @@ public static class Part01
         return (Y, X);
     }
 
-    private static void ParseInput(string input)
+    private void ParseInput(string input)
     {
         //TODO: DAFUQ: Environment.NewLine + Environment.NewLine = eine leere zeile
         var inputSplit = input
@@ -135,7 +135,7 @@ public static class Part01
 
 
         Instructions = inputSplit[1].Replace(Environment.NewLine, "").Trim();
-       
+
         //TODO: muss ich noch üben wie genau ich welchen Datentype bekomme
         // string[]; string[][]; char[]; char[][]; string[,] etc
         var rows = inputSplit[0].Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);

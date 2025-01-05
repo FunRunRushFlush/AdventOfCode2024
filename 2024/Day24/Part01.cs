@@ -1,6 +1,6 @@
 
 namespace Day24;
-public class Part01
+public class Part01 :IPart
 {
     private Dictionary<string, int> Rule = new Dictionary<string, int>();
     private List<GateLogic> Gates = new List<GateLogic>();
@@ -11,9 +11,9 @@ public class Part01
         ParseInput(input);
     }
 
-    public long Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
-        ParseInput(input);
+        ParseInput(input.Lines);
 
         bool loop = true;
         while (loop)
@@ -39,7 +39,7 @@ public class Part01
         }
 
 
-        return ConvertBitArrayToInt_String(bitArray);
+        return ConvertBitArrayToInt_String(bitArray).ToString();
     }
 
     private long ConvertBitArrayToInt_String(int[] bits)

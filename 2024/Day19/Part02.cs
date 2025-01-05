@@ -1,24 +1,24 @@
 
 namespace Day19;
-public class Part02
+public class Part02 : IPart
 {
     private HashSet<string> Designs = new();
     private Dictionary<string, long> memo = new();
 
-    public long Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
-        InputParser(input);
+        InputParser(input.Lines);
         long possibleLogos = 0;
 
-        for (int i = 2; i < input.Length; i++)
+        for (int i = 2; i < input.Lines.Length; i++)
         {
             GlobalLog.LogLine($"Line; {i}");
-            var line = input[i].AsSpan();
-            possibleLogos += CountCombinations(input[i]);
+            var line = input.Lines[i].AsSpan();
+            possibleLogos += CountCombinations(input.Lines[i]);
 
         }
 
-        return possibleLogos;
+        return possibleLogos.ToString();
     }
 
 

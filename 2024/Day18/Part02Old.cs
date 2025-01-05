@@ -1,10 +1,10 @@
 using Microsoft.CodeAnalysis;
 
 namespace Day18;
-public class Part01 : IPart
+public class Part02Old:IPart
 {
     //private int[,] MemoryField = new int[7,7];
-    private int[,] MemoryField = new int[71,71];
+    private int[,] MemoryField = new int[71, 71];
 
     //private int MaxAllowedBytes = 12;
     private int MaxAllowedBytes = 1024;
@@ -12,32 +12,70 @@ public class Part01 : IPart
     private int FieldWidth = 0;
     public string Result(Input input)
     {
-        InputParser(input.Lines);
-        FieldHeight= MemoryField.GetLength(0);
+            InputParser(input.Lines);
+            
+            FieldHeight = MemoryField.GetLength(0);
+            FieldWidth = MemoryField.GetLength(1);
+        var solution = 0;
+        while (true)
+        {
+            InputParser(input.Lines);
+
+            //DrawGrid(MemoryField);
+            //GlobalLog.LogLine($"MaxAllowedBytes: {MaxAllowedBytes}");
+            MemoryField[0, 0] = 1;
+            (int Y, int X) Pos = (0, 0);
+            TryToEscape(Pos, 1);
+            solution = MemoryField[FieldHeight - 1, FieldWidth - 1] - 1; //-1, da steplogik start=1 
+            if (solution ==-1) break;
+
+            MemoryField = new int[71, 71];
+            MaxAllowedBytes++;
+        }
+        DrawGrid(MemoryField);
+
+        return MaxAllowedBytes.ToString();
+    }
+    public long ResultBackwards(ReadOnlySpan<string> input)
+    {
+        MaxAllowedBytes = input.Length;
+        InputParser(input);
+        
+
+        FieldHeight = MemoryField.GetLength(0);
         FieldWidth = MemoryField.GetLength(1);
+        var solution = 0;
+        while (true)
+        {
+            InputParser(input);
+
+            //DrawGrid(MemoryField);
+            //GlobalLog.LogLine($"MaxAllowedBytes: {MaxAllowedBytes}");
+            MemoryField[0, 0] = 1;
+            (int Y, int X) Pos = (0, 0);
+            TryToEscape(Pos, 1);
+            solution = MemoryField[FieldHeight - 1, FieldWidth - 1] - 1; //-1, da steplogik start=1 
+            if (solution != -1) break;
+
+            MemoryField = new int[71, 71];
+            MaxAllowedBytes--;
+        }
         DrawGrid(MemoryField);
 
-        MemoryField[0,0] = 1;
-        (int Y, int X) Pos = (0,0);
-        TryToEscape(Pos,1);
-
-        DrawGrid(MemoryField);
-
-        var solution = MemoryField[FieldHeight - 1, FieldWidth - 1] - 1; //-1, da steplogik start=1 
-        return solution.ToString();
+        return MaxAllowedBytes;
     }
 
     private void TryToEscape((int Y, int X) pos, int step)
     {
-        var nextStep = step +1;
+        var nextStep = step + 1;
         for (int i = 0; i < 4; i++)
         {
             var offSet = SetOffsetCoord((Direction)i, pos);
             if (CheckForValidStepOption(offSet, nextStep))
             {
-       
+
                 MemoryField[offSet.Y, offSet.X] = nextStep;
-                TryToEscape(offSet,nextStep);
+                TryToEscape(offSet, nextStep);
             }
         }
     }
@@ -58,8 +96,8 @@ public class Part01 : IPart
         if (pos.Y < 0) return false;
         if (pos.X >= MemoryField.GetLength(1)) return false;
         if (pos.Y >= MemoryField.GetLength(0)) return false;
-        if(stepCount>= MemoryField[pos.Y,pos.X] && MemoryField[pos.Y, pos.X] != 0) return false;
-        if(MemoryField[FieldHeight-1, FieldWidth-1]>0 && MemoryField[FieldHeight - 1, FieldWidth - 1] < stepCount) return false;
+        if (stepCount >= MemoryField[pos.Y, pos.X] && MemoryField[pos.Y, pos.X] != 0) return false;
+        if (MemoryField[FieldHeight - 1, FieldWidth - 1] > 0 && MemoryField[FieldHeight - 1, FieldWidth - 1] < stepCount) return false;
 
         return true;
     }
@@ -113,7 +151,7 @@ public class Part01 : IPart
                 string drawPoint = ".";
                 //if (array[h, w] > 0)
                 //{
-                    drawPoint = array[h, w].ToString();
+                drawPoint = array[h, w].ToString();
                 //}
 
                 //TODO: $"[{array[h, w],3}]" syntax für besseren Print

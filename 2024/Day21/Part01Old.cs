@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 
 namespace Day21;
-public class Part01Old
+public class Part01Old :IPart
 {
     public void ParseOnly(ReadOnlySpan<string> input)
     {
@@ -14,15 +14,16 @@ public class Part01Old
     private static List<(int yDiff, int xDiff, bool lrFirst)> _rngDecisionsThisSim = new();
     private Dictionary<(int yDiff, int xDiff), DecisionStats> _decisionStats = new();
 
+    //TODO: um zusehen welche coinflips die minimalen werte erzeugt hat
     private class DecisionStats
     {
         public int LrFirstCount { get; set; }
         public int UdFirstCount { get; set; }
         public double SumSolutionsLrFirst { get; set; }
         public double SumSolutionsUdFirst { get; set; }
-        // falls man z. B. den Durchschnittswert bilden will oder weitere Statistiken
+       
     }
-    public long Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
         int sim = 0;
         int minSolution = int.MaxValue;
@@ -32,7 +33,7 @@ public class Part01Old
             string inputString = "";
             int solution = 0;
             //ParseInput(input);
-            foreach (var line in input)
+            foreach (var line in input.Lines)
             {
                 GlobalLog.LogLine($" ------------ {line} --------------");
                 DoorController door = new DoorController();
@@ -134,7 +135,7 @@ public class Part01Old
 
         GlobalLog.LogLine($"{minInputString.Length}");
         GlobalLog.LogLine($"{minInputString}");
-        return minInputString.Length;
+        return minInputString.Length.ToString();
     }
 
     private void ParseInput(ReadOnlySpan<string> input)

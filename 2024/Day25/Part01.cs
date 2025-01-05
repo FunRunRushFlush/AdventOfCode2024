@@ -1,6 +1,6 @@
 
 namespace Day25;
-public class Part01
+public class Part01:IPart
 {
     private HashSet<int[]> KeyDic = new HashSet<int[]>();
     private HashSet<int[]> LockDic = new HashSet<int[]>();
@@ -10,9 +10,9 @@ public class Part01
         ParseInput(input);
     }
 
-    public long Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
-        ParseInput(input);
+        ParseInput(input.Lines);
 
         foreach (var item in LockDic)
         {
@@ -30,7 +30,7 @@ public class Part01
                 
             }
         }
-        return Counter;
+        return Counter.ToString();
     }
 
     private void ParseInput(ReadOnlySpan<string> input)

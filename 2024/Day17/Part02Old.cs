@@ -1,47 +1,49 @@
-using System;
-using System.Numerics;
 
 namespace Day17;
-public class Part02 : IPart
+
+public class Part02Old : IPart
 {
     private long aReg;
     private long bReg;
     private long cReg;
     private long[] ProgramCode;
-
-    private List<long> OutList = new();
+    private HashSet<string> ProgramCodeHash = new HashSet<string>();
+    private long n=1_003_000_000_000_000;
+                    //72_338_647_597
+    private List<int> OutList = new();
     private long Pointer = 0;
+
+
+
 
     public string Result(Input input)
     {
         ParseInstructions(input.Lines);
+        //TODO: muss ich wiederholen!!!
+        string bits = "01110000010101000101101";
+        ulong fixedBits = Convert.ToUInt64(bits, 2); // 23 feste Bits, die ich schon gebrutforced habe
+        int fixedBitLength = bits.Length;      
+        int remainingBits = 64 - fixedBitLength;
+        ulong maxIterations = 1UL << remainingBits; // 2^(remainingBits)
 
-        string programmCodeAsString = string.Join(",", ProgramCode);
 
+        ProgramCodeHash.Add(string.Join(",", ProgramCode));
+        ulong aTemp = fixedBits;
+        var bTemp = bReg;
+        var cTemp = cReg;
+
+        bool innerLoop = true;
+
+        ulong index = 0;
         GlobalLog.LogLine($"aReg: {aReg}");
         GlobalLog.LogLine($"bReg: {bReg}");
         GlobalLog.LogLine($"cReg: {cReg}");
         GlobalLog.LogLine($"ProgramCode: {ProgramCode.Length}");
-
-        bool innerLoop = true;
-        ulong aTemp = 0;
-        var bTemp = bReg;
-        var cTemp = cReg;
-
-        ulong fixedBits =0;
-        int fixedBitsLength = 0;
-        ulong index = 0;
-        int foundOuterlist = 2;
-        bool firstFound=false;
-
         while (true)
-        {
+        { 
             aReg = (long)aTemp;
             bReg = bTemp;
             cReg = cTemp;
-
-            if ((aTemp / 8) % 8 != 5) innerLoop = false;
-
             while (innerLoop)
             {
                 if (Pointer >= ProgramCode.Length)
@@ -49,75 +51,59 @@ public class Part02 : IPart
                     innerLoop = false;
                     break;
                 }
-                if (OutList.Count > 0)
-                {
 
+                if(OutList.Count > 0)
+                {
+                    var ind = 0;
                     for (int i = 0; i < OutList.Count; i++)
                     {
                         if (OutList[i] != ProgramCode[i])
                         {
-                            if (i > foundOuterlist)
+                            if (ind > 13)
                             {
-
-
                                 GlobalLog.LogLine($"-----------I; {i} --------------");
-                                int bitLength = 64 - BitOperations.LeadingZeroCount(aTemp);
-                                int deleteBits = 7;
-           
-                                ulong mask = (1UL << (bitLength - deleteBits)) - 1;
-                                fixedBits = aTemp & mask;
-
-                                fixedBitsLength = 64 - BitOperations.LeadingZeroCount(fixedBits);
-                                GlobalLog.LogLine($"fixedBitsLength; {fixedBitsLength}");
-
-                                index = 0;
-                                foundOuterlist +=1;
-                                firstFound = true;
 
                                 GlobalLog.LogLine($"First Match: {aTemp}");
-                                GlobalLog.LogLine($"In Bits: {Convert.ToString((long)aTemp, 2)}");
-                                GlobalLog.LogLine($".Mod8: {aTemp % 8}");
-                                GlobalLog.LogLine($".div8: {aTemp / 8}");
-                                GlobalLog.LogLine($".div8.Mod8: {(aTemp / 8) % 8}");
+                                GlobalLog.LogLine($"In Bits: {Convert.ToString((long)aTemp, 2)}"); 
+                                GlobalLog.LogLine($".Mod8: {aTemp%8}");
+                                GlobalLog.LogLine($".div8: {aTemp /8}");
+                                GlobalLog.LogLine($".div8.Mod8: {(aTemp / 8)%8}");
 
                             }
-                            innerLoop = false;
+                            innerLoop= false;
                             break;
                         }
 
-                       
+                        ind = i;
                     }
                     if (!innerLoop) break;
                 }
-                if (!innerLoop) break;
+                if(!innerLoop) break;
                 OperationPicker(ProgramCode[Pointer], ProgramCode[Pointer + 1]);
                 Pointer += 2;
             }
-            if (OutList.Count>0 && programmCodeAsString == string.Join(',', OutList))
+
+            if (ProgramCodeHash.Contains(string.Join(',', OutList)))
             {
                 break;
             }
             OutList.Clear();
-
+            
             innerLoop = true;
             Pointer = 0;
 
             index += 1;
-            if (firstFound)
-            {
-                aTemp = (index << fixedBitsLength) | fixedBits;
-                //GlobalLog.LogLine($"In Bits: {Convert.ToString((long)aTemp, 2)}");
+            //TODO: Muss ich umbedingt wiederholen!!!
+            aTemp = (index << fixedBitLength) | fixedBits;
+            //Console.WriteLine(Convert.ToString((long)aTemp, 2).PadLeft(64, '0'));
 
-            }
-            else 
-            { 
-                aTemp = index;
-            }
-
-            //aTemp = index;
-
-
+            //GlobalLog.LogLine($"aReg: {aReg}");
         }
+
+        GlobalLog.LogLine($"bReg: {bReg}");
+        GlobalLog.LogLine($"cReg: {cReg}");
+        GlobalLog.LogLine($"ProgramCode: {ProgramCode.Length}");
+
 
 
         return aTemp.ToString();
@@ -134,23 +120,48 @@ public class Part02 : IPart
         throw new Exception();
     }
 
-
     private void OperationPicker(long opcode, long literalOperand)
     {
         long combo = ComboOperandPicker(literalOperand);
-
-        if (opcode == 0) AdvOperation(combo);
-        if (opcode == 1) BxlOperation(literalOperand);
-        if (opcode == 2) BstOperation(combo);
-        if (opcode == 3) JnzOperation(literalOperand);
-        if (opcode == 4) BxcOperation(combo);
-        if (opcode == 5) OutOperation(combo);
-        if (opcode == 6) BdvOperation(combo);
-        if (opcode == 7) CdvOperation(combo);
+        //TODO: Switch case!
+        if (opcode == 0)
+        {
+            AdvOperation(combo);
+        }
+        if (opcode == 1)
+        {
+            BxlOperation(literalOperand);
+        }
+        if (opcode == 2)
+        {
+            BstOperation(combo);
+        }
+        if (opcode == 3)
+        {
+            JnzOperation(literalOperand);
+        }
+        if (opcode == 4)
+        {
+            BxcOperation(combo);
+        }
+        if (opcode == 5)
+        {
+            OutOperation(combo);
+        }
+        if (opcode == 6)
+        {
+            BdvOperation(combo);
+        }
+        if (opcode == 7)
+        {
+            CdvOperation(combo);
+        }
     }
     private void AdvOperation(long combo)
     {
+        //TODO: alternativ: Math.Pow(2, combo);
         long denominator = 1 << (int)combo;
+        //denominator = (long)Math.Pow(2, combo);
         aReg = (long)(aReg / denominator);
     }
     private void BxlOperation(long literal)
@@ -177,7 +188,7 @@ public class Part02 : IPart
         //    """;
 
 
-        bReg = (long)combo & 7;
+        bReg = combo & 7;
     }
     private void JnzOperation(long literal)
     {
@@ -193,7 +204,8 @@ public class Part02 : IPart
 
     private void OutOperation(long combo)
     {
-        OutList.Add((long)combo & 7);
+        OutList.Add((int)(combo % 8));
+
     }
     private void BdvOperation(long combo)
     {

@@ -11,15 +11,15 @@ public class Benchmarks
 
     private Input _input;
 
-    private Day14.Part01 _part01;
-    private Day14.Part02 _part02;
-    private Day14.Part01Old _part01Old;
-    private Day14.Part02Old _part02Old;
+    private Day20.Part01 _part01;
+    private Day20.Part02 _part02;
+    private Day20.Part01Old _part01Old;
+    private Day20.Part02Old _part02Old;
 
     [GlobalSetup]
     public void Setup()
     {
-        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day14/InputData/Input.txt");
+        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day20/InputData/Input.txt");
         _input = new(
          File.ReadAllBytes(path),
          File.ReadAllText(path),
@@ -30,10 +30,10 @@ public class Benchmarks
     public void SetupIteration()
     {
         // Vor jedem Iterationslauf eine neue Instanz anlegen
-        _part01 = new Day14.Part01();
-        _part02 = new Day14.Part02();
-        _part01Old = new Day14.Part01Old();
-        _part02Old = new Day14.Part02Old();
+        _part01 = new Day20.Part01();
+        _part02 = new Day20.Part02();
+        _part01Old = new Day20.Part01Old();
+        _part02Old = new Day20.Part02Old();
     }
 
 

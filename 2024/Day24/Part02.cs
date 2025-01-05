@@ -15,9 +15,9 @@ public class Part02
         ParseInput(input);
     }
 
-    public long Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
-        ParseInput(input);
+        ParseInput(input.Lines);
 
         CalculateSupposedZBit();
         bool loop = true;
@@ -57,7 +57,7 @@ public class Part02
 
             bitArray[i] = output;
         }
-        return ConvertBitArrayToInt_String(bitArray);
+        return ConvertBitArrayToInt_String(bitArray).ToString();
     }
 
     private void CalculateGateList(List<GateLogic> gatesBackUp)

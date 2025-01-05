@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 
 namespace Day18;
-public class Part02
+public class Part02:IPart
 {
     //private int[,] MemoryField = new int[7,7];
     private int[,] MemoryField = new int[71, 71];
@@ -10,16 +10,16 @@ public class Part02
     private int MaxAllowedBytes = 1024;
     private int FieldHeight = 0;
     private int FieldWidth = 0;
-    public long Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
-            InputParser(input);
+            InputParser(input.Lines);
             
             FieldHeight = MemoryField.GetLength(0);
             FieldWidth = MemoryField.GetLength(1);
         var solution = 0;
         while (true)
         {
-            InputParser(input);
+            InputParser(input.Lines);
 
             //DrawGrid(MemoryField);
             //GlobalLog.LogLine($"MaxAllowedBytes: {MaxAllowedBytes}");
@@ -34,7 +34,7 @@ public class Part02
         }
         DrawGrid(MemoryField);
 
-        return MaxAllowedBytes;
+        return MaxAllowedBytes.ToString();
     }
     public long ResultBackwards(ReadOnlySpan<string> input)
     {

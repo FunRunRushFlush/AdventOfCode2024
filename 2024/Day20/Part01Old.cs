@@ -1,21 +1,20 @@
 
-using BenchmarkDotNet.Attributes;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace Day20;
-public class Part02Old :IPart
+public class Part01Old:IPart
 {
     private (int Y, int X) RaceStartPos;
     private (int Y, int X) RaceEndPos;
     private (int Y, int X) CarPos;
     private Direction CarDirection;
 
-
-    private Dictionary<(int Y, int X), int> RaceTimeDic = new();
+    private HashSet<((int Y, int X)Start, (int Y, int X)End)> SkipPos = new();
+    private int[,] RaceTimeMap;
+    private Dictionary<(int Y,int X),int> RaceTimeDic = new();
     private int Racetime;
+    private int NumberOfCheats;
 
-    private int CheatCounter;
     public void ParseOnly(ReadOnlySpan<string> input)
     {
         ParseInput(input);
@@ -24,7 +23,7 @@ public class Part02Old :IPart
     public string Result(Input input)
     {
         ParseInput(input.Lines);
-  
+        RaceTimeMap = new int[input.Lines.Length,input.Lines[0].Length];
         CarPos = RaceStartPos;
         RaceTimeDic.Add(RaceStartPos, 0);
         //StartDirection
@@ -43,11 +42,12 @@ public class Part02Old :IPart
             if (CarPos == RaceEndPos) break;
             for (int d = 0; d < 4; d++)
             {
-                if (CarDirection == (Direction)((d + 2) % 4)) continue;
+                if (CarDirection == (Direction)((d + 2) % 4)) continue; 
                 var offSet = SetOffsetCoord((Direction)d, CarPos);
-                if (CheckForValidStepOption(offSet, input.Lines))
+                if(CheckForValidStepOption(offSet, input.Lines))
                 {
                     Racetime++;
+                    RaceTimeMap[offSet.Y,offSet.X] = Racetime;
                     RaceTimeDic.Add(offSet, Racetime);
                     CarPos = offSet;
                     CarDirection = (Direction)d;
@@ -58,41 +58,74 @@ public class Part02Old :IPart
 
         foreach (var timeSlot in RaceTimeDic)
         {
-
-            CheatStamp20x20(timeSlot);
-        }
-
-
-        return CheatCounter.ToString();
-    }
-
-    private void CheatStamp20x20(KeyValuePair<(int Y, int X), int> timeSlot)
-    {
-        foreach (var raceTime in RaceTimeDic)
-        {
-            var test = Math.Abs(timeSlot.Key.Y - raceTime.Key.Y) + Math.Abs(timeSlot.Key.X - raceTime.Key.X);
-            if (test > 0 && test <= 20 && raceTime.Value - ((timeSlot.Value + test) ) >= 100)
+                GlobalLog.LogLine($"offSet: Y:{timeSlot.Key.Y} X:{timeSlot.Key.X}");
+            for (int d = 0; d < 4; d++)
             {
-                CheatCounter++;
+                //if (CarDirection == (Direction)((d + 2) % 4)) continue;
+                var offSet = SetDoubleOffsetCoord((Direction)d, timeSlot.Key);
+
+                if (RaceTimeDic.ContainsKey(offSet))
+                {
+                    GlobalLog.LogLine($"timeSlot: {timeSlot.Value}");
+
+                    var test = RaceTimeDic[offSet] - timeSlot.Value -2;// -2 wegen cheatSteps
+
+                    if (test >= 100)
+                    {
+                        NumberOfCheats++;
+                    }
+
+
+                }
+
             }
         }
+
+        DrawGrid(RaceTimeMap);
+
+        return NumberOfCheats.ToString();
     }
 
-   
-   
+
+    [System.Diagnostics.Conditional("LOGGING_ENABLED")]
+    private void DrawGrid(int[,] array)
+    {
+        var arrayHeight = array.GetLength(0);
+        var arrayWidth = array.GetLength(1);
+
+        GlobalLog.LogLine($"DrawGrid");
+
+        for (int h = 0; h < arrayHeight; h++)
+        {
+            for (int w = 0; w < arrayWidth; w++)
+            {
+                string drawPoint = ".";
+                //if (array[h, w] > 0)
+                //{
+                drawPoint = array[h, w].ToString();
+                //}
+
+                //TODO: $"[{array[h, w],3}]" syntax für besseren Print
+                Console.Write($"[{array[h, w],3}]");
+            }
+            Console.WriteLine();
+        }
+        Console.WriteLine("-------------------------------------------");
+        Console.WriteLine();
+    }
 
     private void ParseInput(ReadOnlySpan<string> input)
     {
-        bool sFound = false;
-        bool eFound = false;
+        bool sFound=false;
+        bool eFound=false;
         for (int y = 0; y < input.Length; y++)
         {
-            if (!sFound)
+            if(!sFound)
             {
                 var checkS = input[y].IndexOf('S');
                 if (checkS > -1)
                 {
-                    RaceStartPos = (y, checkS);
+                    RaceStartPos = (y,checkS);
                     sFound = true;
                 }
             }
@@ -146,35 +179,20 @@ public class Part02Old :IPart
         return (Y, X);
     }
 
-
-
-    [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private void DrawGrid(int[,] array)
+    private (int Y, int X) SetDoubleOffsetCoord(Direction direction, (int Y, int X) trailPos)
     {
-        var arrayHeight = array.GetLength(0);
-        var arrayWidth = array.GetLength(1);
-
-        GlobalLog.LogLine($"DrawGrid");
-
-        for (int h = 0; h < arrayHeight; h++)
+        var dir = direction switch
         {
-            for (int w = 0; w < arrayWidth; w++)
-            {
-                string drawPoint = ".";
-                //if (array[h, w] > 0)
-                //{
-                drawPoint = array[h, w].ToString();
-                //}
+            Direction.Up => (-2, 0),
+            Direction.Right => (0, 2),
+            Direction.Down => (2, 0),
+            Direction.Left => (0, -2),
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Invalid direction: {direction}")
+        };
 
-                //TODO: $"[{array[h, w],3}]" syntax für besseren Print
-                Console.Write($"[{array[h, w],3}]");
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine("-------------------------------------------");
-        Console.WriteLine();
+        int Y = trailPos.Y + dir.Item1;
+        int X = trailPos.X + dir.Item2;
+
+        return (Y, X);
     }
-
-
-
 }

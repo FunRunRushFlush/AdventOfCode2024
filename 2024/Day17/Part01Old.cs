@@ -1,5 +1,5 @@
 namespace Day17;
-public class Part01:IPart
+public class Part01Old:IPart
 {
     private long aReg;
     private long bReg;
@@ -30,8 +30,15 @@ public class Part01:IPart
         GlobalLog.LogLine($"cReg: {cReg}");
         GlobalLog.LogLine($"ProgramCode: {ProgramCode.Length}");
 
+        string solution = string.Empty;
+        foreach (long i in OutList)
+        {
+            GlobalLog.Log($"{i}, ");
+            solution += $"{i}";
+        }
+        GlobalLog.LogLine($"solution: {solution}");
 
-        return string.Join(",", OutList); ;
+        return solution;
     }
 
     private long ComboOperandPicker(long progValue)
@@ -45,30 +52,57 @@ public class Part01:IPart
         throw new Exception();
     }
 
-
     private void OperationPicker(long opcode, long literalOperand)
     {
         long combo = ComboOperandPicker(literalOperand);
-
-        if (opcode == 0) AdvOperation(combo);
-        if (opcode == 1) BxlOperation(literalOperand);        
-        if (opcode == 2) BstOperation(combo);
-        if (opcode == 3) JnzOperation(literalOperand);
-        if (opcode == 4) BxcOperation(combo);
-        if (opcode == 5) OutOperation(combo);
-        if (opcode == 6) BdvOperation(combo);
-        if (opcode == 7) CdvOperation(combo);        
+        //TODO: Switch case!
+        if (opcode == 0)
+        {
+            AdvOperation(combo);
+        }
+        if (opcode == 1)
+        {
+            BxlOperation(literalOperand);
+        }
+        if (opcode == 2)
+        {
+            BstOperation(combo);
+        }
+        if (opcode == 3)
+        {
+            JnzOperation(literalOperand);
+        }
+        if (opcode == 4)
+        {
+            BxcOperation(combo);
+        }
+        if (opcode == 5)
+        {
+            OutOperation(combo);
+        }
+        if (opcode == 6)
+        {
+            BdvOperation(combo);
+        }
+        if (opcode == 7)
+        {
+            CdvOperation(combo);
+        }
     }
     private void AdvOperation(long combo)
     {
         //TODO: alternativ: Math.Pow(2, combo);
         long denominator = 1 << (int)combo;
-        //denominator = (long)Math.Pow(2, combo);
+        denominator = (long)Math.Pow(2, combo);
         aReg = (long)(aReg/ denominator);
     }
     private void BxlOperation(long literal)
     {
-        bReg = bReg ^ literal;  
+        GlobalLog.LogLine($"literal: {literal}");
+        GlobalLog.LogLine($"BxlOperation-Before: {bReg}");
+        var test = bReg ^ literal;
+        bReg = test;
+        GlobalLog.LogLine($"BxlOperation-After: {bReg}");
     }
     private void BstOperation(long combo)
     {
@@ -90,7 +124,13 @@ public class Part01:IPart
         //    """;
 
 
-        bReg = (long)combo & 7;
+        GlobalLog.LogLine($"combo: {combo}");
+        var test = (long)(combo % 8);
+        var test02 = combo & 7;
+        GlobalLog.LogLine($"### BstOperation-Before: {bReg}");
+        GlobalLog.LogLine($"### BstOperation-Modulo: {test}");
+        bReg = test02;
+        GlobalLog.LogLine($"### BstOperation-After: {bReg}");
     }
     private void JnzOperation(long literal)
     {
@@ -106,7 +146,7 @@ public class Part01:IPart
 
     private void OutOperation(long combo)
     {
-        OutList.Add((long)combo & 7);
+        OutList.Add((long)(combo % 8));
     }
     private void BdvOperation(long combo)
     {

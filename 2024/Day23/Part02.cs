@@ -1,7 +1,7 @@
 using System.Xml;
 
 namespace Day23;
-public class Part02
+public class Part02:IPart
 {
     private Dictionary<string, HashSet<string>> LanDic = new Dictionary<string, HashSet<string>>();
     HashSet<string> SetOf3 = new();
@@ -15,9 +15,9 @@ public class Part02
         ParseInput(input);
     }
 
-    public string Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
-        ParseInput(input);
+        ParseInput(input.Lines);
 
 
         foreach (var startNode in LanDic)

@@ -3,16 +3,16 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Day21;
-public class Part01Try
+public class Part02Old : IPart
 {
     private int NumOfControllerRobots = 25;
 
     private static Dictionary<(string, int), long> Cache = new();
-    public long Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
         string inputString = "";
         long solution = 0;
-        foreach (var line in input)
+        foreach (var line in input.Lines)
         {
             GlobalLog.LogLine($" ------------ {line} --------------");
             DoorController door = new DoorController();
@@ -46,10 +46,10 @@ public class Part01Try
             totalNumOfInputs = 0;
         }
 
-        //26705_8991850960 too hogh
+        //26705_8991850960 zu hoch
         //263617786809000 <---- RICHTIG!!!
         GlobalLog.LogLine($"Final solution: {solution}");
-        return solution;
+        return solution.ToString();
     }
 
     private long GetNumberOfRoboInputs(List<char> inputList, int roboChain)

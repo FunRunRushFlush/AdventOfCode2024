@@ -1,5 +1,5 @@
 namespace Day22;
-public class Part01:IPart
+public class Part01Old:IPart
 {
     private int MaxSteps = 2000;
 

@@ -1,5 +1,5 @@
 namespace Day23;
-public class Part01
+public class Part01 :IPart
 {
     private Dictionary<string, HashSet<string>> LanDic = new Dictionary<string, HashSet<string>>();
             HashSet<string> SetOf3 = new();
@@ -11,9 +11,9 @@ public class Part01
         ParseInput(input);
     }
 
-    public long Result(ReadOnlySpan<string> input)
+    public string Result(Input input)
     {
-        ParseInput(input);
+        ParseInput(input.Lines);
         var setOfT = LanDic.Where(x => x.Key.StartsWith('t')).ToArray();
 
         foreach (var startNode in setOfT) 
@@ -41,7 +41,7 @@ public class Part01
             GlobalLog.LogLine(ele);
         }
 
-        return SetOf3.Count;
+        return SetOf3.Count.ToString();
     }
 
 

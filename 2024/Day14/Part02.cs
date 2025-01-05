@@ -4,6 +4,10 @@ using System;
 using System.Numerics;
 
 namespace Day14;
+
+
+//TODO: anscheined kann man hier https://en.wikipedia.org/wiki/Chinese_remainder_theorem verwenden
+//muss ich mir noch anschauen
 public class Part02 : IPart
 {
     private List<Robot> roboInfoList = new();

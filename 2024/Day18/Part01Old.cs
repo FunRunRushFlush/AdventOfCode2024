@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 
 namespace Day18;
-public class Part01 : IPart
+public class Part01Old : IPart
 {
     //private int[,] MemoryField = new int[7,7];
     private int[,] MemoryField = new int[71,71];
