@@ -1,11 +1,15 @@
 
 namespace Day24;
-public class Part01 :IPart
+public class Part01Old :IPart
 {
     private Dictionary<string, int> Rule = new Dictionary<string, int>();
     private List<GateLogic> Gates = new List<GateLogic>();
 
     private int StartIndex;
+    public void ParseOnly(ReadOnlySpan<string> input)
+    {
+        ParseInput(input);
+    }
 
     public string Result(Input input)
     {

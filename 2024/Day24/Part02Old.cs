@@ -1,20 +1,25 @@
 
+
 namespace Day24;
-public class Part01 :IPart
+public class Part02Old:IPart
 {
     private Dictionary<string, int> Rule = new Dictionary<string, int>();
+    private Dictionary<string, int> ZAddRule = new Dictionary<string, int>();
+    private Dictionary<string, int> failedZ = new Dictionary<string, int>();
     private List<GateLogic> Gates = new List<GateLogic>();
+    private List<GateLogic> GatesBackUp = new List<GateLogic>();
 
-    private int StartIndex;
+
+
 
     public string Result(Input input)
     {
         ParseInput(input.Lines);
 
+        CalculateSupposedZBit();
         bool loop = true;
         while (loop)
         {
-
             for (int i = Gates.Count - 1; i >= 0; i--)
             {
                 var gate = Gates[i];
@@ -23,19 +28,62 @@ public class Part01 :IPart
                     CalculateGateLogic(gate);
                 }
             }
-                if (Gates.Count == 0) break;
+            if (Gates.Count == 0) break;
         }
+        //CalculateGateList(GatesBackUp);
+        foreach(var gate in GatesBackUp)
+        {
+
+        }
+
+        var test = GatesBackUp.Where(x => x.OutputVar01.StartsWith('z')).ToList();
+
+        foreach(var ele in ZAddRule)
+        {
+            if (ele.Value != Rule[ele.Key])
+            {
+                failedZ.Add(ele.Key,ele.Value);
+            }
+        }
+
         int[] bitArray = new int[64];
-        for(int i=0; i<bitArray.Length; i++)
+        for (int i = 0; i < bitArray.Length; i++)
         {
             string key = $"z{i:D2}";
             if (!Rule.TryGetValue(key, out int output)) break;
-            
+
             bitArray[i] = output;
         }
-
-
         return ConvertBitArrayToInt_String(bitArray).ToString();
+    }
+
+    private void CalculateGateList(List<GateLogic> gatesBackUp)
+    {
+        foreach (var gate in gatesBackUp)
+        {
+
+        }
+    }
+
+    private void CalculateSupposedZBit()
+    {
+        for (int i = 0; i < Rule.Count; i++)
+        {
+            string xkey = $"x{i:D2}";
+            string ykey = $"y{i:D2}";
+            if (!Rule.TryGetValue(xkey, out int xOut)) break;
+            if (!Rule.TryGetValue(ykey, out int yOut)) break;
+
+            if (xOut != yOut)
+            {
+                ZAddRule.Add($"z{i:D2}", 1);
+            }
+            else
+            {
+                ZAddRule.Add($"z{i:D2}", 0);
+            }
+
+        }
     }
 
     private long ConvertBitArrayToInt_String(int[] bits)
@@ -47,10 +95,9 @@ public class Part01 :IPart
     private void CalculateGateLogic(GateLogic gate)
     {
         var solution = 0;
-        if(gate.Operator == Operator.And)
+        if (gate.Operator == Operator.And)
         {
             if (Rule[gate.InputVar01] + Rule[gate.InputVar02] == 2) solution = 1;
-         
         }
         if (gate.Operator == Operator.Xor)
         {
@@ -63,6 +110,8 @@ public class Part01 :IPart
 
         Rule.Add(gate.OutputVar01, solution);
         Gates.Remove(gate);
+        gate.Value01 = solution;
+        GatesBackUp.Add(gate);
     }
 
     private void ParseInput(ReadOnlySpan<string> input)

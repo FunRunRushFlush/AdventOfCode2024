@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Numerics;
+using System.Threading.Tasks;
 namespace Day22;
 public class Part02 :IPart
 {
@@ -8,45 +11,43 @@ public class Part02 :IPart
     //    Console.WriteLine(array1 == array2); // False (Referenzvergleich)
     //  Console.WriteLine(array1.SequenceEqual(array2)); // True (Inhaltsvergleich)
 
-    private Dictionary<string, int> Sequence=new Dictionary<string,int>();
+
+    private Dictionary<int, int> Sequence = new();
     private int MaxSteps = 2000;
 
-    public void ParseOnly(ReadOnlySpan<int> input)
-    {
-        //ParseInput(input);
-    }
     public string Result(Input input)
     {
-        long solution = 0;
-        //ParseInput(input);
+        var banana = 0;
+            HashSet<int> forbidenSequence = new();
+            Queue<int> sequence = new Queue<int>();
         foreach (var item in input.Lines)
         {
-            HashSet<string> forbidenSequence = new();
-            Queue<int> sequence = new Queue<int>();
+            forbidenSequence.Clear();
+            sequence.Clear();
             var temp = long.Parse(item);
             int newOneDigit = 0;
-            int oneDigit = (int)temp%10;
-            
-            
+            int oneDigit = (int)temp % 10;
+
             for (var i = 0; i < MaxSteps; i++)
             {
-
                 temp = CalculateSecretNum(temp);
-                newOneDigit =(int) temp % 10;
+                newOneDigit = (int)temp % 10;
                 if (sequence.Count >= 4)
                 {
                     sequence.Enqueue(newOneDigit - oneDigit);
                     sequence.Dequeue();
 
-                    var text = string.Join(',',sequence);
-                    if (forbidenSequence.Add(text))
+                    //var text = string.Join(',', sequence);
+                    int hash = GenerateHashFromQueue(sequence);
+
+                    if (forbidenSequence.Add(hash))
                     {
-                        if(!Sequence.TryAdd(text, newOneDigit))
+                        if (!Sequence.TryAdd(hash, newOneDigit))
                         {
-                            Sequence[text] += newOneDigit; 
+                            Sequence[hash] += newOneDigit;
+                            banana = Math.Max(banana, Sequence[hash]);
                         }
                     }
-
                 }
                 else
                 {
@@ -55,40 +56,54 @@ public class Part02 :IPart
                 //GlobalLog.LogLine($"{temp%10}");
 
                 oneDigit = newOneDigit;
-                
             }
+        }
 
-            
-            
-        }
-        var banana = 0;
-        foreach (var item in Sequence)
-        {
-            banana = Math.Max(banana, item.Value);
-        }
-        
         return banana.ToString();
     }
 
+
+    //TODO: irgendwie keine andere Art gefundem, wie ich den Inhalt einer Queue simple hashen kann --> ohne extra einen string zu erstellen
+    int GenerateHashFromQueue(Queue<int> queue)
+    {
+        int hash = 17; // Startwert für den Hash
+        int basePrime = 31; // Basis (Primzahl) für die Gewichtung
+
+        foreach (var item in queue)
+        {
+            hash = hash * basePrime + item.GetHashCode();
+        }
+
+        return hash;
+    }
+
+
+
     private long CalculateSecretNum(long secretNum)
     {
-        secretNum = Mult(secretNum, 64);
-        secretNum = Div(secretNum, 32);
-        secretNum = Mult(secretNum, 2048);
+
+        secretNum = Mult(secretNum, 6);//64 = 2^6 => 6 für bitshift
+        secretNum = Div(secretNum, 5); //32 = 2^5 => 5 für bitshift
+        secretNum = Mult(secretNum, 11);//2048 = 2^11 => 11 für bitshift
+
         return secretNum;
     }
+
 
     private long Mix(long secretNum, long value)
     {
         return (secretNum ^ value);
     }
+
     private long Prune(long secretNum, long modulo = 16777216)
     {
-        return (secretNum % modulo);
+        //modulo = 16777216 => & = 16777216 -1
+        return (secretNum & (16777215));
     }
+
     private long Div(long secretNum, int div)
     {
-        long value = secretNum / div;
+        long value = secretNum >> div;
         secretNum = Mix(secretNum, value);
         secretNum = Prune(secretNum);
         return secretNum;
@@ -96,12 +111,11 @@ public class Part02 :IPart
 
     private long Mult(long secretNum, int mult)
     {
-        long value = secretNum * mult;
+        long value = secretNum << mult;
         secretNum = Mix(secretNum, value);
         secretNum = Prune(secretNum);
         return secretNum;
     }
-
 
 }
 

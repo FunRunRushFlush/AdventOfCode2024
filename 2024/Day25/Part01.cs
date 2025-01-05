@@ -5,10 +5,7 @@ public class Part01:IPart
     private HashSet<int[]> KeyDic = new HashSet<int[]>();
     private HashSet<int[]> LockDic = new HashSet<int[]>();
     private int Counter;
-    public void ParseOnly(ReadOnlySpan<string> input)
-    {
-        ParseInput(input);
-    }
+
 
     public string Result(Input input)
     {

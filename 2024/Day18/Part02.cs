@@ -1,140 +1,131 @@
-using Microsoft.CodeAnalysis;
+using BenchmarkDotNet.Attributes;
+using System.Numerics;
 
 namespace Day18;
-public class Part02:IPart
+public class Part02 : IPart
 {
-    //private int[,] MemoryField = new int[7,7];
-    private int[,] MemoryField = new int[71, 71];
+    private int[,] Map;
+    private int[,] StepMap;
 
-    //private int MaxAllowedBytes = 12;
-    private int MaxAllowedBytes = 1024;
-    private int FieldHeight = 0;
-    private int FieldWidth = 0;
+    private int MapWidth = 71;
+    private int MapHeight = 71;
+
+    private Vector2 StartPos;
+    private Vector2 EndPos;
+
+    private int MinSteps;
+
+    //private int ParseLimit = 1024;
+
+
+    private Vector2 Up = new Vector2(0, -1);
+    private Vector2 Right = new Vector2(1, 0);
+    private Vector2 Down = new Vector2(0, 1);
+    private Vector2 Left = new Vector2(-1, 0);
+
+
+
     public string Result(Input input)
     {
-            InputParser(input.Lines);
-            
-            FieldHeight = MemoryField.GetLength(0);
-            FieldWidth = MemoryField.GetLength(1);
-        var solution = 0;
-        while (true)
+        ParseInput(input.Lines);
+        StartPos = Vector2.Zero;
+        EndPos = new Vector2(MapWidth - 1, MapHeight - 1);
+        StepMap = new int[MapWidth, MapHeight];
+        int lastXCoord = 0;
+        int lastYCoord = 0;
+        for (int i = input.Lines.Length-1; i >=0; i--)
         {
-            InputParser(input.Lines);
+            var coords = input.Lines[i].Split(',').Select(int.Parse).ToArray();
+            Map[coords[1], coords[0]] = 0;
+            MinSteps = SearchBestPath(StartPos, EndPos);
 
-            //DrawGrid(MemoryField);
-            //GlobalLog.LogLine($"MaxAllowedBytes: {MaxAllowedBytes}");
-            MemoryField[0, 0] = 1;
-            (int Y, int X) Pos = (0, 0);
-            TryToEscape(Pos, 1);
-            solution = MemoryField[FieldHeight - 1, FieldWidth - 1] - 1; //-1, da steplogik start=1 
-            if (solution ==-1) break;
-
-            MemoryField = new int[71, 71];
-            MaxAllowedBytes++;
-        }
-        DrawGrid(MemoryField);
-
-        return MaxAllowedBytes.ToString();
-    }
-    public long ResultBackwards(ReadOnlySpan<string> input)
-    {
-        MaxAllowedBytes = input.Length;
-        InputParser(input);
-        
-
-        FieldHeight = MemoryField.GetLength(0);
-        FieldWidth = MemoryField.GetLength(1);
-        var solution = 0;
-        while (true)
-        {
-            InputParser(input);
-
-            //DrawGrid(MemoryField);
-            //GlobalLog.LogLine($"MaxAllowedBytes: {MaxAllowedBytes}");
-            MemoryField[0, 0] = 1;
-            (int Y, int X) Pos = (0, 0);
-            TryToEscape(Pos, 1);
-            solution = MemoryField[FieldHeight - 1, FieldWidth - 1] - 1; //-1, da steplogik start=1 
-            if (solution != -1) break;
-
-            MemoryField = new int[71, 71];
-            MaxAllowedBytes--;
-        }
-        DrawGrid(MemoryField);
-
-        return MaxAllowedBytes;
-    }
-
-    private void TryToEscape((int Y, int X) pos, int step)
-    {
-        var nextStep = step + 1;
-        for (int i = 0; i < 4; i++)
-        {
-            var offSet = SetOffsetCoord((Direction)i, pos);
-            if (CheckForValidStepOption(offSet, nextStep))
+            if (MinSteps > 0)
             {
+                lastXCoord = coords[0];
+                lastYCoord = coords[1];
+                break;
+            }
 
-                MemoryField[offSet.Y, offSet.X] = nextStep;
-                TryToEscape(offSet, nextStep);
+            Array.Clear(StepMap);
+        }
+
+        return $"{lastXCoord},{lastYCoord}";
+    }
+
+    //TODO: BFS-Search ! -- muss ich noch paar mal üben
+    private int SearchBestPath(Vector2 startPos, Vector2 endPos)
+    {
+        Queue<(Vector2, int)> searchQue = new();
+        searchQue.Enqueue((startPos, 0));
+
+        StepMap[(int)startPos.Y, (int)startPos.X] = 0;
+
+        while (searchQue.Count > 0)
+        {
+            var (pos, step) = searchQue.Dequeue();
+
+            if (pos == endPos)
+            {
+                return step;
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                var stepCoord = pos + DirVec((Dir)i);
+                if (IsValidStep(stepCoord, step + 1))
+                {
+                    StepMap[(int)stepCoord.Y, (int)stepCoord.X] = step + 1;
+                    searchQue.Enqueue((stepCoord, step + 1));
+                }
             }
         }
+        return -1;
+
     }
 
-
-
-    private enum Direction
+    private bool IsValidStep(Vector2 pos, int step)
     {
-        Up = 0,
-        Right = 1,
-        Down = 2,
-        Left = 3
-    }
+        int y = (int)pos.Y;
+        int x = (int)pos.X;
 
-    private bool CheckForValidStepOption((int Y, int X) pos, int stepCount)
-    {
-        if (pos.X < 0) return false;
-        if (pos.Y < 0) return false;
-        if (pos.X >= MemoryField.GetLength(1)) return false;
-        if (pos.Y >= MemoryField.GetLength(0)) return false;
-        if (stepCount >= MemoryField[pos.Y, pos.X] && MemoryField[pos.Y, pos.X] != 0) return false;
-        if (MemoryField[FieldHeight - 1, FieldWidth - 1] > 0 && MemoryField[FieldHeight - 1, FieldWidth - 1] < stepCount) return false;
+        if (y < 0 || y >= MapHeight) return false;
+        if (x < 0 || x >= MapWidth) return false;
+
+        if (Map[y, x] == -1) return false;
+        if (StepMap[y, x] > 0) return false;
 
         return true;
     }
 
-    private (int Y, int X) SetOffsetCoord(Direction direction, (int Y, int X) trailPos)
+
+    private void ParseInput(string[] lines)
     {
-        var dir = direction switch
+        Map = new int[MapHeight, MapWidth];
+        for (int i = 0; i < lines.Length; i++)
         {
-            Direction.Up => (-1, 0),
-            Direction.Right => (0, 1),
-            Direction.Down => (1, 0),
-            Direction.Left => (0, -1),
-            _ => throw new ArgumentOutOfRangeException(nameof(direction), $"Invalid direction: {direction}")
-        };
-
-        int Y = trailPos.Y + dir.Item1;
-        int X = trailPos.X + dir.Item2;
-
-        return (Y, X);
-    }
-
-    private void InputParser(ReadOnlySpan<string> input)
-    {
-        var limit = MaxAllowedBytes > input.Length ? input.Length : MaxAllowedBytes;
-        for (int i = 0; i < limit; i++)
-        {
-            ReadOnlySpan<char> line = input[i].AsSpan();
-            int commaIndex = line.IndexOf(',');
-            var xSpan = line.Slice(0, commaIndex);
-            var ySpan = line.Slice(commaIndex + 1);
-
-            int x = int.Parse(xSpan);
-            int y = int.Parse(ySpan);
-
-            MemoryField[y, x] = -1;
+            var coords = lines[i].Split(',').Select(int.Parse).ToArray();
+            Map[coords[1], coords[0]] = -1;
         }
     }
+
+    public enum Dir
+    {
+        up = 0,
+        right = 1,
+        down = 2,
+        left = 3,
+    }
+    private Vector2 DirVec(Dir index)
+    {
+        return index switch
+        {
+            Dir.up => Up,
+            Dir.right => Right,
+            Dir.down => Down,
+            Dir.left => Left,
+            _ => throw new ArgumentOutOfRangeException(nameof(index), "Index must be between 0 and 3.")
+        };
+    }
+
 
     [System.Diagnostics.Conditional("LOGGING_ENABLED")]
     private void DrawGrid(int[,] array)
@@ -148,11 +139,11 @@ public class Part02:IPart
         {
             for (int w = 0; w < arrayWidth; w++)
             {
-                string drawPoint = ".";
-                //if (array[h, w] > 0)
-                //{
-                drawPoint = array[h, w].ToString();
-                //}
+                string drawPoint = "#";
+                if (array[h, w] > 0)
+                {
+                    drawPoint = array[h, w].ToString();
+                }
 
                 //TODO: $"[{array[h, w],3}]" syntax für besseren Print
                 Console.Write($"[{array[h, w],3}]");
@@ -162,24 +153,4 @@ public class Part02:IPart
         Console.WriteLine("-------------------------------------------");
         Console.WriteLine();
     }
-
-    public long ResultOld(ReadOnlySpan<string> input)
-    {
-        InputParserOld(input);
-        DrawGrid(MemoryField);
-        return 0;
-    }
-
-    private void InputParserOld(ReadOnlySpan<string> input)
-    {
-        var limit = MaxAllowedBytes > input.Length ? input.Length : MaxAllowedBytes;
-        for (int i = 0; i < limit; i++)
-        {
-            //(int X,int Y)Pos = (input[i][0],input[i][2]);
-            var pos = input[i].Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(int.Parse).ToArray();
-            MemoryField[pos[1], pos[0]] = -1;
-        }
-    }
-
 }

@@ -1,121 +1,69 @@
 
-
 namespace Day24;
-public class Part02
+public class Part02 : IPart
 {
-    private Dictionary<string, int> Rule = new Dictionary<string, int>();
-    private Dictionary<string, int> ZAddRule = new Dictionary<string, int>();
-    private Dictionary<string, int> failedZ = new Dictionary<string, int>();
-    private List<GateLogic> Gates = new List<GateLogic>();
-    private List<GateLogic> GatesBackUp = new List<GateLogic>();
-
-
-    public void ParseOnly(ReadOnlySpan<string> input)
-    {
-        ParseInput(input);
-    }
+    private Dictionary<string, (GateLogic? AsOutGate,List<GateLogic> CalcNodes)> WireChain = new();
+    private HashSet<string> BadNodes = new();
 
     public string Result(Input input)
     {
         ParseInput(input.Lines);
 
-        CalculateSupposedZBit();
-        bool loop = true;
-        while (loop)
+
+        foreach (var chain in WireChain)
         {
-            for (int i = Gates.Count - 1; i >= 0; i--)
+            if (chain.Key.StartsWith('y') || chain.Key.StartsWith('x')) continue;
+
+            if (!CheckForValidChain(chain))
             {
-                var gate = Gates[i];
-                if (Rule.ContainsKey(gate.InputVar01) && Rule.ContainsKey(gate.InputVar02))
-                {
-                    CalculateGateLogic(gate);
-                }
-            }
-            if (Gates.Count == 0) break;
-        }
-        //CalculateGateList(GatesBackUp);
-        foreach(var gate in GatesBackUp)
-        {
-
-        }
-
-        var test = GatesBackUp.Where(x => x.OutputVar01.StartsWith('z')).ToList();
-
-        foreach(var ele in ZAddRule)
-        {
-            if (ele.Value != Rule[ele.Key])
-            {
-                failedZ.Add(ele.Key,ele.Value);
+                BadNodes.Add(chain.Key);
             }
         }
 
-        int[] bitArray = new int[64];
-        for (int i = 0; i < bitArray.Length; i++)
-        {
-            string key = $"z{i:D2}";
-            if (!Rule.TryGetValue(key, out int output)) break;
+        var sortedList = BadNodes.OrderBy(x => x).ToList();
 
-            bitArray[i] = output;
-        }
-        return ConvertBitArrayToInt_String(bitArray).ToString();
+        return string.Join(',', sortedList);
     }
 
-    private void CalculateGateList(List<GateLogic> gatesBackUp)
+    private bool CheckForValidChain(KeyValuePair<string, (GateLogic? AsOutGate, List<GateLogic> CalcNodes)> chain)
     {
-        foreach (var gate in gatesBackUp)
+        bool valid = true;
+        var asOutGate = chain.Value.AsOutGate.Value;
+        var firstOperator = asOutGate.GateOp;
+        Operator secondOperator;
+        foreach (var ele in chain.Value.CalcNodes)
         {
-
-        }
-    }
-
-    private void CalculateSupposedZBit()
-    {
-        for (int i = 0; i < Rule.Count; i++)
-        {
-            string xkey = $"x{i:D2}";
-            string ykey = $"y{i:D2}";
-            if (!Rule.TryGetValue(xkey, out int xOut)) break;
-            if (!Rule.TryGetValue(ykey, out int yOut)) break;
-
-            if (xOut != yOut)
+            if (!ele.OutputVar01.StartsWith('z') && !BadNodes.Contains(ele.OutputVar01) 
+                && !asOutGate.InputVar01.Contains("x00") )
             {
-                ZAddRule.Add($"z{i:D2}", 1);
-            }
-            else
-            {
-                ZAddRule.Add($"z{i:D2}", 0);
-            }
-
+                secondOperator = ele.GateOp;
+                return CheckForValidChainOpCombo(firstOperator, secondOperator);
+            } 
         }
+
+
+        return valid;
     }
 
-    private long ConvertBitArrayToInt_String(int[] bits)
+    private bool CheckForValidChainOpCombo(Operator firstOperator, Operator secondOperator)
     {
-        string bitString = string.Join("", bits.Reverse());
-        // bits.Reverse(), damit bits[0] das am wenigsten signifikante Bit ist
-        return Convert.ToInt64(bitString, 2);
-    }
-    private void CalculateGateLogic(GateLogic gate)
-    {
-        var solution = 0;
-        if (gate.Operator == Operator.And)
+        if (firstOperator == secondOperator)
         {
-            if (Rule[gate.InputVar01] + Rule[gate.InputVar02] == 2) solution = 1;
-        }
-        if (gate.Operator == Operator.Xor)
-        {
-            if (Rule[gate.InputVar01] != Rule[gate.InputVar02]) solution = 1;
-        }
-        if (gate.Operator == Operator.Or)
-        {
-            if (Rule[gate.InputVar01] == 1 || Rule[gate.InputVar02] == 1) solution = 1;
+            return false;
         }
 
-        Rule.Add(gate.OutputVar01, solution);
-        Gates.Remove(gate);
-        gate.Value01 = solution;
-        GatesBackUp.Add(gate);
+        if (firstOperator == Operator.Or && secondOperator == Operator.Xor)
+        {
+            return false;
+        }
+        if (secondOperator == Operator.Or && firstOperator == Operator.Xor)
+        {
+            return false;
+        }
+
+        return true;
     }
+
 
     private void ParseInput(ReadOnlySpan<string> input)
     {
@@ -129,7 +77,6 @@ public class Part02
                     rules = false;
                     continue;
                 }
-                RuleExtractor(input[i]);
             }
             else
             {
@@ -142,7 +89,28 @@ public class Part02
     {
         var inp = line.Split(' ');
         var op = GetOperator(inp[1]);
-        Gates.Add(new GateLogic(inp[0], op, inp[2], inp[4]));
+        var gate = new GateLogic(inp[0], op, inp[2], inp[4]);
+        if(!gate.CheckIfGateIsValid())
+        {
+            BadNodes.Add(gate.OutputVar01);
+        }
+        if(!gate.OutputVar01.StartsWith('z')
+            || gate.InputVar01 != "y00"
+            || gate.InputVar01 != "x00")
+        {
+            if(!WireChain.TryAdd(gate.OutputVar01, (gate, new List<GateLogic>())))
+            {
+                WireChain[gate.OutputVar01] = (gate, WireChain[gate.OutputVar01].CalcNodes);
+            }
+            if (!WireChain.TryAdd(gate.InputVar01, (null, new List<GateLogic>() { gate})))
+            {
+                WireChain[gate.InputVar01] = (WireChain[gate.InputVar01].AsOutGate, new List<GateLogic>(WireChain[gate.InputVar01].CalcNodes) { gate });
+            }
+            if (!WireChain.TryAdd(gate.InputVar02, (null, new List<GateLogic>() { gate })))
+            {
+                WireChain[gate.InputVar02] = (WireChain[gate.InputVar02].AsOutGate, new List<GateLogic>(WireChain[gate.InputVar02].CalcNodes) { gate });
+            }
+        }       
     }
 
     private Operator GetOperator(string operatorString)
@@ -152,38 +120,56 @@ public class Part02
             "AND" => Operator.And,
             "XOR" => Operator.Xor,
             "OR" => Operator.Or,
-            _ => throw new NotImplementedException()
+            _ => Operator.None
         };
     }
-    private void RuleExtractor(string line)
-    {
-        var test = line.IndexOf(':');
-        Rule.Add(line.Substring(0, test), int.Parse(line.Substring(test + 1)));
-    }
-
 
     private struct GateLogic
     {
         public string InputVar01;
-        public Operator Operator;
+        public Operator GateOp;
         public string InputVar02;
         public string OutputVar01;
         public int? Value01;
 
-
         public GateLogic(string inputVar01, Operator oper, string inputVar02, string outputVar01, int? value01 = null)
         {
             InputVar01 = inputVar01;
-            Operator = oper;
+            GateOp = oper;
             InputVar02 = inputVar02;
             OutputVar01 = outputVar01;
             Value01 = value01;
+        }
+
+        public bool CheckIfGateIsValid()
+        { 
+            bool valid = true;
+            if(InputVar01.StartsWith('y') || InputVar01.StartsWith('x'))
+            {
+                if(GateOp == Operator.Or) valid = false;
+
+                if (GateOp != Operator.Xor && OutputVar01.StartsWith('z')) valid = false;
+
+            }
+            else if (OutputVar01.StartsWith('z') )
+            {                
+                if (GateOp != Operator.Xor && OutputVar01 != "z45") //edgecase
+                    valid = false;
+            }
+            if (!(InputVar01.StartsWith('x') || InputVar01.StartsWith('y')
+               || InputVar02.StartsWith('x') || InputVar02.StartsWith('y')))
+            {
+                if (GateOp == Operator.Xor && !OutputVar01.StartsWith('z')) 
+                    valid = false;
+            }
+            return valid;
         }
     }
 
 
     private enum Operator
     {
+        None,
         And,
         Or,
         Xor
