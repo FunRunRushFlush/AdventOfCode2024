@@ -13,8 +13,8 @@ public class Benchmarks
 
     private Day24.Part01 _part01;
     private Day24.Part02 _part02;
-    private Day24.Part01Old _part01Old;
-    private Day24.Part02Old _part02Old;
+    //private Day24.Part01Old _part01Old;
+    //private Day24.Part02Old _part02Old;
 
     [GlobalSetup]
     public void Setup()
@@ -32,8 +32,8 @@ public class Benchmarks
         // Vor jedem Iterationslauf eine neue Instanz anlegen
         _part01 = new Day24.Part01();
         _part02 = new Day24.Part02();
-        _part01Old = new Day24.Part01Old();
-        _part02Old = new Day24.Part02Old();
+        //_part01Old = new Day24.Part01Old();
+        //_part02Old = new Day24.Part02Old();
     }
 
 
@@ -48,15 +48,15 @@ public class Benchmarks
         _part02.Result(_input);
     }
 
-    [Benchmark]
-    public void Part01Old()
-    {
-        _part01Old.Result(_input);
-    }
-    [Benchmark]
-    public void Part02Old()
-    {
-        _part02Old.Result(_input);
-    }
+    //[Benchmark]
+    //public void Part01Old()
+    //{
+    //    _part01Old.Result(_input);
+    //}
+    //[Benchmark]
+    //public void Part02Old()
+    //{
+    //    _part02Old.Result(_input);
+    //}
 
 }

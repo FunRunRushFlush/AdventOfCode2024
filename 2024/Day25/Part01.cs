@@ -1,6 +1,6 @@
-
+﻿
 namespace Day25;
-public class Part01:IPart
+public class Part01 : IPart
 {
     private HashSet<int[]> KeyDic = new HashSet<int[]>();
     private HashSet<int[]> LockDic = new HashSet<int[]>();
@@ -24,7 +24,7 @@ public class Part01:IPart
 
                     if (i == item.Length - 1) Counter++;
                 }
-                
+
             }
         }
         return Counter.ToString();
@@ -32,7 +32,7 @@ public class Part01:IPart
 
     private void ParseInput(ReadOnlySpan<string> input)
     {
-        for(int i=0; i<input.Length;i+=8)
+        for (int i = 0; i < input.Length; i += 8)
         {
             var sliceInput = input.Slice(i, 7);
             if (input[i][0] == '#')
@@ -51,9 +51,9 @@ public class Part01:IPart
     private void ParseLock(ReadOnlySpan<string> sliceInput)
     {
         int[] Lock = new int[5];
-        for (int y = 1; y < sliceInput.Length-1; y++)
+        for (int y = 1; y < sliceInput.Length - 1; y++)
         {
-            for(var x = 0; x < sliceInput[y].Length; x++)
+            for (var x = 0; x < sliceInput[y].Length; x++)
             {
                 if (sliceInput[y][x] == '#') Lock[x]++;
             }
@@ -64,7 +64,7 @@ public class Part01:IPart
     private void ParseKey(ReadOnlySpan<string> sliceInput)
     {
         int[] Key = new int[5];
-        for (int y = 1; y < sliceInput.Length-1; y++)
+        for (int y = 1; y < sliceInput.Length - 1; y++)
         {
             for (var x = 0; x < sliceInput[y].Length; x++)
             {

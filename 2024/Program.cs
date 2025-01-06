@@ -11,11 +11,11 @@ Input input = new(
 
 
 BenchmarkRunner.Run<DayBenchmark>();
-//BenchmarkRunner.Run<Benchmarks>();
+BenchmarkRunner.Run<Benchmarks>();
 
 
 Day24.Part01 dayP01 = new();
-Day24.Part01Old dayP01Old = new();
+//Day24.Part01Old dayP01Old = new();
 Day24.Part02 dayP02 = new();
 //Day24.Part02Old dayP02Old = new();
 

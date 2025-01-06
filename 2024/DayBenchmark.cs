@@ -6,31 +6,34 @@ using BenchmarkDotNet.Exporters;
 using System;
 using System.IO;
 
-[ShortRunJob]
+//[ShortRunJob]
 [MemoryDiagnoser]
 [RankColumn]
-
 public class DayBenchmark
 {
-
-
-    [Params("Day01", "Day02", "Day03", "Day04", "Day05", "Day06", "Day07", "Day08", "Day09", "Day10", "Day11", "Day12", "Day13", "Day14", "Day15", "Day16", "Day17", "Day18", "Day19", "Day20", "Day21","Day22", "Day23", "Day25")]
+    [Params("Day01", "Day02", "Day03", "Day04", "Day05", "Day06", "Day07", "Day08", "Day09", "Day10", "Day11", "Day12", "Day13", "Day14", "Day15", "Day16", "Day17", "Day18", "Day19", "Day20", "Day21","Day22", "Day23", "Day24", "Day25")]
     public string Day { get; set; }
 
     private Input _input;
-    private string[] inputLines;
     private IPart part01Instance;
     private IPart part02Instance;
+
 
     [GlobalSetup]
     public void Setup()
     {
         string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{Day}/InputData/Input.txt");
+        if (!File.Exists(path))
+        {
+            throw new FileNotFoundException($"Input file for {Day} not found at {path}");
+        }
+
         _input = new(
             File.ReadAllBytes(path),
             File.ReadAllText(path),
             File.ReadAllLines(path));
 
+        Console.WriteLine($"Setup completed for {Day}");
     }
 
     private IPart CreateInstance(string typeName)
