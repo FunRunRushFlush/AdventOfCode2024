@@ -1,27 +1,17 @@
-using Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsWPF;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
-
 namespace Day12;
 
 public class Part02 : IPart
 {
     private Dictionary<(int Y, int X), char> region;
     private Dictionary<(int Y, int X), char> allRegion;
-    private Dictionary<(int Y, int X), char> border;
     private string[] field;
-    private int FenceCounter = 0;
 
     public string Result(Input input)
     {
         region = new Dictionary<(int Y, int X), char>();
         allRegion = new Dictionary<(int Y, int X), char>();
-        List<int> OuterCorner = new();
-        border = new();
-        //Dictionary<(int Y, int X), (bool Visited, HashSet<Direction> BorderDir)> border = new();
-        HashSet<Direction> tempBorderList = new HashSet<Direction>();
         field = input.Lines.ToArray();
+
         int boundery = 0;
         int fence = 0;
         int dicCounterIndex = 0;
@@ -37,87 +27,28 @@ public class Part02 : IPart
                 CheckForRegion(postion, input.Lines[y][x]);
                 foreach (var cel in region)
                 {
-                    //GlobalLog.Log($"region-cel: Y:{cel.Key.Y} X:{cel.Key.X}");
-                    var counter = 0;
-                    for (int dir = 0; dir < 4; dir++)
+                    var corner = 0;
+                    for (int i = 0; i < 4; i++)
                     {
-                        var offsetPos = SetOffsetCoord((Direction)dir, cel.Key);
-                        if (!region.ContainsKey(offsetPos))
+                        corner += CheckForCorner(i, cel.Key);
+                        if (corner > 0)
                         {
-                            border.TryAdd(offsetPos, '#');
-                            //{
-                            OuterCorner.Add(dir);
-                            //}
-                            //else
-                            //{
-                            //    counter++;
-                            //}
-
-
+                            region[cel.Key] = char.Parse(corner.ToString());
+                            GlobalLog.LogLine($"FoundCorner: region = {cel.Key.ToString()} Postion {i};");
                         }
                     }
-                    counter += CornerChecker(OuterCorner, cel.Key);
-                    if (counter != 0)
-                        GlobalLog.LogLine($"Fence -CornerChecker(DirCounter):{counter}");
-                    fence += counter;
-                    if (counter != 0)
-                        region[cel.Key] = char.Parse(counter.ToString());
-                    OuterCorner.Clear();
-
-                }
-                foreach (var cel in border)
-                {
-                    GlobalLog.LogLine($"Border-cel: Y:{cel.Key.Y} X:{cel.Key.X}");
-                    var counter = 0;
-                    for (int dir = 0; dir < 4; dir++)
-                    {
-                        var offsetPos = SetOffsetCoord((Direction)dir, cel.Key);
-                        if (region.ContainsKey(offsetPos))
-                        {
-                            OuterCorner.Add(dir);
-                        }
-                    }
-                    counter += CornerChecker(OuterCorner);
-                    if (counter != 0)
-                        GlobalLog.LogLine($"Fence -CornerChecker(DirCounter):{counter}");
-                    fence += counter;
-                    if (counter != 0)
-                        border[cel.Key] = char.Parse(counter.ToString());
-                    OuterCorner.Clear();
+                    fence += corner;
 
                 }
 
-                //for (int h = -1; h <= input.Length; h++)
-                //{
-                //    for (int w = -1; w <= input[0].Length; w++)
-                //    {
-                //        string drawPoint = ".";
-                //        if (region.TryGetValue((h, w), out char c))
-                //        {
-                //            drawPoint = c.ToString();
-                //        }
-                //        else if (border.TryGetValue((h, w), out char b))
-                //        {
-                //            drawPoint = b.ToString();
-                //        }
 
-                //        Console.Write($"{drawPoint}");
-                //    }
-                //    Console.WriteLine();
-                //}
-
-
-
-
-
-                //GlobalLog.Log($"FenceCounter: {fence}");
                 var tempPrice = fence * region.Count;
                 GlobalLog.LogLine($"###################################################");
-                GlobalLog.LogLine($"### Price: {tempPrice} = {region.Count} * {fence}; ###");
+                GlobalLog.LogLine($"### Price: {tempPrice} = {region.Count} * {fence}; Char={input.Lines[y][x]} Y:{y} X:{x} ###");
                 GlobalLog.LogLine($"###################################################");
 
-                Price += tempPrice;
 
+                Price += tempPrice;
                 fence = 0;
                 foreach (var item in region)
                 {
@@ -127,43 +58,118 @@ public class Part02 : IPart
                     }
                 }
                 region.Clear();
-                border.Clear();
             }
+
+
         }
         return Price.ToString();
     }
 
-    private int CornerChecker(List<int> dirCounter, (int Y, int X)? cel = null)
+
+    private int CheckForCorner(int slot, (int Y, int X) pos)
     {
-
-        if (dirCounter.Count <= 1) return 0;
-        if (dirCounter.Count == 2)
+        GlobalLog.LogLine($"CheckForCorner: slot:{slot}, posY:{pos.Y} posX:{pos.X} ");
+        if (slot == 0)
         {
-            if ((dirCounter[0] + dirCounter[1]) % 2 == 0) return 0;
-
-            if (cel != null)
+            if (region.ContainsKey((pos.Y, pos.X + 1))
+                && !region.ContainsKey((pos.Y + 1, pos.X + 1))
+                && region.ContainsKey((pos.Y + 1, pos.X)))
             {
-                var positionToCheck = cel.Value;
-                foreach (var item in dirCounter)
-                {
-                    positionToCheck = SetOffsetCoord((Direction)item, positionToCheck);
-                }
-
-                if (region.ContainsKey(positionToCheck)) return 0;
+                return 1;
             }
-            return 1;
+
+            if (!region.ContainsKey((pos.Y, pos.X + 1))
+                && !region.ContainsKey((pos.Y + 1, pos.X + 1))
+                && !region.ContainsKey((pos.Y + 1, pos.X)))
+            {
+                return 1;
+            }
+
+            //edgecase: Part02_05Example_368
+            if (!region.ContainsKey((pos.Y, pos.X + 1))
+                && region.ContainsKey((pos.Y + 1, pos.X + 1))
+                && !region.ContainsKey((pos.Y + 1, pos.X)))
+            {
+                return 1;
+            }
+
         }
+        if (slot == 1)
+        {
+            if (region.ContainsKey((pos.Y, pos.X - 1))
+                  && !region.ContainsKey((pos.Y + 1, pos.X - 1))
+                  && region.ContainsKey((pos.Y + 1, pos.X)))
+            {
+                return 1;
+            }
 
-        if (dirCounter.Count == 3) return 2;
+            if (!region.ContainsKey((pos.Y, pos.X - 1))
+                   && !region.ContainsKey((pos.Y + 1, pos.X - 1))
+                   && !region.ContainsKey((pos.Y + 1, pos.X)))
+            {
+                return 1;
+            }
+            //edgecase: Part02_05Example_368
+            if (!region.ContainsKey((pos.Y, pos.X - 1))
+             && region.ContainsKey((pos.Y + 1, pos.X - 1))
+             && !region.ContainsKey((pos.Y + 1, pos.X)))
+            {
+                return 1;
+            }
+        }
+        if (slot == 2)
+        {
+            if (!region.ContainsKey((pos.Y - 1, pos.X - 1))
+                  && region.ContainsKey((pos.Y - 1, pos.X))
+                  && region.ContainsKey((pos.Y, pos.X - 1)))
+            {
+                return 1;
+            }
 
-        return 4;
+            if (!region.ContainsKey((pos.Y - 1, pos.X - 1))
+                  && !region.ContainsKey((pos.Y - 1, pos.X))
+                  && !region.ContainsKey((pos.Y, pos.X - 1)))
+            {
+                return 1;
+            }
+            //edgecase: Part02_05Example_368
+            if (region.ContainsKey((pos.Y - 1, pos.X - 1))
+              && !region.ContainsKey((pos.Y - 1, pos.X))
+              && !region.ContainsKey((pos.Y, pos.X - 1)))
+            {
+                return 1;
+            }
+        }
+        if (slot == 3)
+        {
+            if (region.ContainsKey((pos.Y - 1, pos.X))
+                  && !region.ContainsKey((pos.Y - 1, pos.X + 1))
+                  && region.ContainsKey((pos.Y, pos.X + 1)))
+            {
+                return 1;
+            }
+
+            if (!region.ContainsKey((pos.Y - 1, pos.X))
+                  && !region.ContainsKey((pos.Y - 1, pos.X + 1))
+                  && !region.ContainsKey((pos.Y, pos.X + 1)))
+            {
+                return 1;
+            }
+            //edgecase: Part02_05Example_368
+            if (!region.ContainsKey((pos.Y - 1, pos.X))
+              && region.ContainsKey((pos.Y - 1, pos.X + 1))
+              && !region.ContainsKey((pos.Y, pos.X + 1)))
+            {
+                return 1;
+            }
+
+        }
+        return 0;
     }
-
-
 
     private void CheckForRegion((int y, int x) postion, char v)
     {
-        GlobalLog.LogLine($"CheckForRegion: Y:{postion.y} X:{postion.x} and Char:{v}");
+        //GlobalLog.Log($"CheckForRegion: Y:{postion.y} X:{postion.x} and Char:{v}");
         if (field[postion.y][postion.x] == v)
         {
             if (region.TryAdd(postion, v))
@@ -186,18 +192,7 @@ public class Part02 : IPart
         Down = 2,
         Left = 3
     }
-    private enum ExtendedDirection
-    {
-        UpLeft = 0,
-        Up = 1,
-        UpRight = 2,
-        Right = 3,
-        DownRight = 4,
-        Down = 5,
-        DownLeft = 6,
-        Left = 7,
 
-    }
 
 
     private bool CheckBounderys((int Y, int X) pos)

@@ -53,6 +53,9 @@
 	  <None Update="Day17\InputData\InputSecAcc.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
+	  <None Update="Day24\InputData\InputSecAcc.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 

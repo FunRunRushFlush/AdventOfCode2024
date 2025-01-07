@@ -173,69 +173,67 @@ public class Part01 :IPart
 
                 if (Position.Y + yDiff == 0 && yDiff != 0 && Position.X == 0)
                 {
-                    GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
-
+                    //GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
                     dirInputs.AddRange(lrList);
                     dirInputs.AddRange(udList);
                 }
                 else if (Position.X + xDiff == 0 && xDiff != 0 && Position.Y == 0)
                 {
-                        GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
-                        dirInputs.AddRange(udList);
+                    //GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    dirInputs.AddRange(udList);
                     dirInputs.AddRange(lrList);
                 }
                 else if (yDiff == 1 && xDiff == 1)
                 {
-                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    //GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
                     dirInputs.AddRange(udList);
                     dirInputs.AddRange(lrList);
                 }
                 else if (yDiff == -1 && xDiff == -1)
                 {
-                    GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
-
+                    //GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
                     dirInputs.AddRange(lrList);
                     dirInputs.AddRange(udList);
                 }
                 else if (yDiff == 0 && xDiff == -1)
                 {
-                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    //GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
                     dirInputs.AddRange(udList);
                     dirInputs.AddRange(lrList);
                 }
                 else if (Math.Abs(yDiff) == 1 && xDiff == 0)
                 {
-                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    //GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
                     dirInputs.AddRange(udList);
                     dirInputs.AddRange(lrList);
                 }
                 else if (Math.Abs(yDiff) == 0 && xDiff == 0)
                 {
-                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    //GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
                     dirInputs.AddRange(udList);
                     dirInputs.AddRange(lrList);
                 }
                 else if (Math.Abs(yDiff) == 0 && xDiff == 1)
                 {
-                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    //GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
                     dirInputs.AddRange(udList);
                     dirInputs.AddRange(lrList);
                 }
                 else if (yDiff == -1 && xDiff == 1)
                 {
-                    GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    //GlobalLog.LogLine($"Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
                     dirInputs.AddRange(udList);
                     dirInputs.AddRange(lrList);
                 }
                 else if (yDiff == 1 && xDiff == -1)
                 {
-                    GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    //GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
                     dirInputs.AddRange(lrList);
                     dirInputs.AddRange(udList);
                 }
                 else if (yDiff == -3 && xDiff == -1)
                 {
-                    GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                    //GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
 
                     dirInputs.AddRange(lrList);
                     dirInputs.AddRange(udList);

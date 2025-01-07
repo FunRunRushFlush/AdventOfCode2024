@@ -34,7 +34,7 @@ public class Part02 : IPart
         foreach (var ele in chain.Value.CalcNodes)
         {
             if (!ele.OutputVar01.StartsWith('z') && !BadNodes.Contains(ele.OutputVar01) 
-                && !asOutGate.InputVar01.Contains("x00") )
+                && !asOutGate.InputVar01.Contains("x00") && !asOutGate.InputVar01.Contains("y00"))
             {
                 secondOperator = ele.GateOp;
                 return CheckForValidChainOpCombo(firstOperator, secondOperator);
