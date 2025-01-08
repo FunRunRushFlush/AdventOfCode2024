@@ -86,8 +86,8 @@ public class Part02 : IPart
                 }
             }
 
-            //    Maze[(int)pos.Y, (int)pos.X] = 'X';
-            //if(score % 100==0)
+            Maze[(int)pos.Y, (int)pos.X] = 'X';
+            //if (score % 100 == 0)
             //{
             //    DrawGrid(Maze);
             //    Console.ReadLine();
@@ -121,6 +121,7 @@ public class Part02 : IPart
                 queue.Enqueue((riVec, right, score + 1001, new(path) { riVec }), score + 1001);
             }
         }
+        DrawGridV2(Maze, UniqueTiles);
 
         return UniqueTiles.Count;
     }
@@ -157,6 +158,39 @@ public class Part02 : IPart
         }
         return startPos;
     }
+    [System.Diagnostics.Conditional("LOGGING_ENABLED")]
+    private void DrawGridV2(char[,] array, HashSet<Vector2> uniqueTiles)
+    {
+        var arrayHeight = array.GetLength(0);
+        var arrayWidth = array.GetLength(1);
+
+        GlobalLog.LogLine($"DrawGrid");
+
+        for (int h = 0; h < arrayHeight; h++)
+        {
+            for (int w = 0; w < arrayWidth; w++)
+            {
+                string drawPoint = ".";
+                //if (array[h, w] > 0)
+                //{
+                drawPoint = array[h, w].ToString();
+                //}
+                if(uniqueTiles.Contains(new Vector2(h,w)))
+                {
+                    drawPoint = "@";
+                }
+
+                //TODO: $"[{array[h, w],3}]" syntax für besseren Print
+                //Console.Write($"[{array[h, w],3}]");
+                Console.Write($"{drawPoint}");
+
+            }
+            Console.WriteLine();
+        }
+        Console.WriteLine("-------------------------------------------");
+        Console.WriteLine();
+    }
+
     [System.Diagnostics.Conditional("LOGGING_ENABLED")]
     private void DrawGrid(char[,] array)
     {

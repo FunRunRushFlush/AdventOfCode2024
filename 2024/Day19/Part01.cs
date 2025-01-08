@@ -14,7 +14,8 @@ public class Part01:IPart
         {
             GlobalLog.LogLine($"Line; {i}");
             var line = input.Lines[i].AsSpan();
-            possibleLogos += CountCombinations(input.Lines[i]);
+            if (CountCombinations(input.Lines[i]) > 0) possibleLogos++;
+            //possibleLogos += CountCombinations(input.Lines[i]);
            int index = 0;
             List<int> nodeStart = new List<int>();
             

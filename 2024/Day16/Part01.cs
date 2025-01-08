@@ -29,7 +29,7 @@ public class Part01 : IPart
         Dir startDir = Dir.right;
   
         SearchBestPath(startPosition, startDir);
-
+        DrawGrid(Maze);
         return Score.ToString();
     }
 
@@ -172,7 +172,7 @@ public class Part01 : IPart
 
                 //TODO: $"[{array[h, w],3}]" syntax für besseren Print
                 //Console.Write($"[{array[h, w],3}]");
-                Console.Write($"{array[h, w]}");
+                Console.Write($"{drawPoint}");
 
             }
             Console.WriteLine();
