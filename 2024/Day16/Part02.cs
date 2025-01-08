@@ -11,6 +11,8 @@ public class Part02 : IPart
     private const char Tile = '.';
 
     private char[,] Maze;
+    private int[,] MazeScore;
+
     private HashSet<Vector2> WallSet = new HashSet<Vector2>();
     private int Score = int.MaxValue;
     private Vector2 EndPosition;
@@ -24,7 +26,7 @@ public class Part02 : IPart
     public string Result(Input input)
     {
         var test = ParseInputDebug(input.Lines);
-
+        MazeScore = new int[input.Lines.Length, input.Lines[0].Length];
         var startPosition = ParseInput(input.Lines);
         Dir startDir = Dir.right;
 
@@ -86,6 +88,7 @@ public class Part02 : IPart
                 }
             }
 
+            MazeScore[(int)pos.Y, (int)pos.X] = score;
             Maze[(int)pos.Y, (int)pos.X] = 'X';
             //if (score % 100 == 0)
             //{
@@ -100,6 +103,8 @@ public class Part02 : IPart
                 {
                     UniqueTiles.Add(step);
                 }
+                DrawGrid(MazeScore);
+                DrawGridV2(Maze, UniqueTiles);
                 GlobalLog.LogLine($"Found the End: {score}");
                 continue;
             }
@@ -177,12 +182,22 @@ public class Part02 : IPart
                 //}
                 if(uniqueTiles.Contains(new Vector2(h,w)))
                 {
+                    Console.ForegroundColor = ConsoleColor.Green;
+
                     drawPoint = "@";
+                Console.Write($"{drawPoint}");
+                    Console.ForegroundColor = ConsoleColor.White;
+
                 }
+                else
+                {
+
+                Console.Write($"{drawPoint}");
+                }
+
 
                 //TODO: $"[{array[h, w],3}]" syntax für besseren Print
                 //Console.Write($"[{array[h, w],3}]");
-                Console.Write($"{drawPoint}");
 
             }
             Console.WriteLine();
@@ -192,7 +207,7 @@ public class Part02 : IPart
     }
 
     [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private void DrawGrid(char[,] array)
+    private void DrawGrid(int[,] array)
     {
         var arrayHeight = array.GetLength(0);
         var arrayWidth = array.GetLength(1);
@@ -211,7 +226,7 @@ public class Part02 : IPart
 
                 //TODO: $"[{array[h, w],3}]" syntax für besseren Print
                 //Console.Write($"[{array[h, w],3}]");
-                Console.Write($"{array[h, w]}");
+                Console.Write($"[{array[h, w],6}]");
 
             }
             Console.WriteLine();

@@ -43,7 +43,7 @@ public class Part02Old :IPart
                     {
                         reindeerList.Add(reindeer);
                     }
-                    GlobalLog.LogLine($"Remove RTeindeer");
+                    //GlobalLog.LogLine($"Remove RTeindeer");
                     newReindeers.Remove(reindeer);
                 }
             }
@@ -79,10 +79,20 @@ public class Part02Old :IPart
             for (int w = 0; w < maze[0].Length; w++)
             {
 
+                if (WalkedSolutions.Contains((h, w)))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write($"[{PointMap[h, w],6}],");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+
+                    Console.Write($"[{PointMap[h, w],6}],");
+                }
 
 
 
-                Console.Write($"[{PointMap[h, w]}],");
             }
             Console.WriteLine();
         }
@@ -109,7 +119,7 @@ public class Part02Old :IPart
             WalkedPath = walkedPath != null
                    ? new HashSet<(int Y, int X)>(walkedPath) { (Y, X) }
                    : new HashSet<(int Y, int X)> { (Y, X) };
-            GlobalLog.LogLine($"New Reindeer: Y:{Y} X:{X} Score:{score}");
+            //GlobalLog.LogLine($"New Reindeer: Y:{Y} X:{X} Score:{score}");
         }
 
         public bool CheckForStuckState() => ImStuck;
