@@ -1,147 +1,105 @@
 ﻿
 
-using System;
-using System.Linq;
-
 namespace Day21;
-public class Part01 :IPart
+public class Part01 : IPart
 {
-    public void ParseOnly(ReadOnlySpan<string> input)
-    {
-        ParseInput(input);
-    }
+    private int NumOfControllerRobots = 2;
 
-    private static List<(int yDiff, int xDiff, bool lrFirst)> _rngDecisionsThisSim = new();
-    private Dictionary<(int yDiff, int xDiff), DecisionStats> _decisionStats = new();
-
-    //TODO: um zusehen welche coinflips die minimalen werte erzeugt hat
-    private class DecisionStats
-    {
-        public int LrFirstCount { get; set; }
-        public int UdFirstCount { get; set; }
-        public double SumSolutionsLrFirst { get; set; }
-        public double SumSolutionsUdFirst { get; set; }
-       
-    }
+    private static Dictionary<(string, int), long> Cache = new();
     public string Result(Input input)
     {
-        int sim = 0;
-        int minSolution = int.MaxValue;
-        string minInputString = string.Empty;
-        while (sim < 1_0)
+        string inputString = "";
+        long solution = 0;
+        foreach (var line in input.Lines)
         {
-            string inputString = "";
-            int solution = 0;
-            //ParseInput(input);
-            foreach (var line in input.Lines)
+            GlobalLog.LogLine($" ------------ {line} --------------");
+            DoorController door = new DoorController();
+            List<RobotController> robots = new List<RobotController>();
+
+
+            long totalNumOfInputs = 0;
+            foreach (char code in line)
             {
-                GlobalLog.LogLine($" ------------ {line} --------------");
-                DoorController door = new DoorController();
-                List<RobotController> robots = new List<RobotController>();
+                GlobalLog.LogLine($"door: {code}");
+                int sim = 0;
+                long minNumOfInputs = long.MaxValue;
+                //while (sim < 1_00)
+                //{
+                var inputList = door.ReadNextInput(code);
 
+                var numOfInputs = GetNumberOfRoboInputs(inputList, 0);
 
-                for (int i = 0; i < 10; i++)
-                {
-                    robots.Add(new RobotController());
-                }
+                minNumOfInputs = numOfInputs < minNumOfInputs ? numOfInputs : minNumOfInputs;
+                //    sim++;
+                //}
+                totalNumOfInputs += numOfInputs;
 
+                GlobalLog.LogLine($"    {minNumOfInputs}");
+                GlobalLog.LogLine($"    {totalNumOfInputs}");
 
-                foreach (char code in line)
-                {
-                    GlobalLog.LogLine($"code: {code}");
-                    var inputList = door.ReadNextInput(code);
-
-                    foreach (var robot in robots)
-                    {
-                       
-                        inputList = robot.ReadNextInput(inputList);
-                        GlobalLog.LogLine($"robot : {inputList.Count} ");
-                        GlobalLog.LogLine($"robot : {string.Join("", inputList)} ");
-                    }
-
-                    inputString += string.Join("", inputList);
-                }
-                solution += inputString.Length * int.Parse(line.Substring(0, line.Length - 1));
-
-                GlobalLog.LogLine($"{inputString}");
-                GlobalLog.LogLine($"{inputString.Length}");
-                GlobalLog.LogLine($"solution: {solution}");
-                if (string.IsNullOrEmpty(minInputString))
-                {
-                      minInputString = inputString;
-                }
-                if (minInputString.Length > inputString.Length)
-                {
-                    minInputString = inputString;
-                }
-
-            foreach (var dec in _rngDecisionsThisSim)
-            {
-                var key = (dec.yDiff, dec.xDiff);
-                if (!_decisionStats.TryGetValue(key, out var stats))
-                {
-                    stats = new DecisionStats();
-                    _decisionStats[key] = stats;
-                }
-
-                if (dec.lrFirst)
-                {
-                    stats.LrFirstCount++;
-                    stats.SumSolutionsLrFirst += inputString.Length;
-                }
-                else
-                {
-                    stats.UdFirstCount++;
-                    stats.SumSolutionsUdFirst += inputString.Length; ;
-                }
             }
-            _rngDecisionsThisSim.Clear();
-                inputString = string.Empty;
-            }
-
-            if (Math.Min(minSolution, solution) < minSolution)
-            {
-                GlobalLog.LogLine($"{sim}");
-                minSolution = Math.Min(minSolution, solution);
-                GlobalLog.LogLine($"{minSolution}");
-                GlobalLog.LogLine($"{minInputString.Length}");
-                GlobalLog.LogLine($"{minInputString}");
-                Console.WriteLine($"{minInputString.Length}");
-            }
-
-
-            sim++;
-            
-            GlobalLog.LogLine($"----------------Next Sim---------------");
-            //if (sim%10 ==0) GlobalLog.LogLine($"solution: {sim}");
+            solution += totalNumOfInputs * int.Parse(line.Substring(0, line.Length - 1));
+            GlobalLog.LogLine($"totalNumOfInputs: {totalNumOfInputs}");
+            GlobalLog.LogLine($"solution: {solution}");
+            totalNumOfInputs = 0;
         }
 
-        foreach (var kvp in _decisionStats)
-        {
-            var key = kvp.Key; // (yDiff, xDiff)
-            var stats = kvp.Value;
-            double avgLr = stats.LrFirstCount > 0
-               ? stats.SumSolutionsLrFirst / stats.LrFirstCount
-               : 0;
-            double avgUd = stats.UdFirstCount > 0
-               ? stats.SumSolutionsUdFirst / stats.UdFirstCount
-               : 0;
-
-            Console.WriteLine(
-                $"(yDiff={key.yDiff}, xDiff={key.xDiff}) => " +
-                $"LR-first: avg={avgLr:0.##}, count={stats.LrFirstCount} || " +
-                $"UD-first: avg={avgUd:0.##}, count={stats.UdFirstCount}");
-        }
-
-        GlobalLog.LogLine($"{minInputString.Length}");
-        GlobalLog.LogLine($"{minInputString}");
-        return minInputString.Length.ToString();
+        //26705_8991850960 too hogh
+        //263617786809000 <---- RICHTIG!!!
+        GlobalLog.LogLine($"Final solution: {solution}");
+        return solution.ToString();
     }
 
-    private void ParseInput(ReadOnlySpan<string> input)
+    private long GetNumberOfRoboInputs(List<char> inputList, int roboChain)
+    {
+        GlobalLog.LogLine($"GetNumberOfRoboInputs: {inputList.Count}");
+        if (roboChain == NumOfControllerRobots)
+        {
+            return inputList.Count;
+        }
+        if (Cache.TryGetValue((string.Join(',', inputList), roboChain), out long cachedResult))
+        {
+            return cachedResult;
+        }
+
+        long result = 0;
+
+        var chunks = ParseInputListIntoChunks(inputList);
+
+        foreach (var chunk in chunks)
+        {
+            result += GetNumberOfRoboInputs(chunk, roboChain + 1);
+        }
+        Cache[(string.Join(',', inputList), roboChain)] = result;
+        return result;
+
+    }
+
+    private List<List<char>> ParseInputListIntoChunks(List<char> inputList)
     {
 
+        RobotController robot = new RobotController();
+        inputList = robot.ReadNextInput(inputList);
 
+        List<List<char>> result = new List<List<char>>();
+        List<char> currentChunk = new List<char>();
+
+        foreach (char c in inputList)
+        {
+            currentChunk.Add(c);
+
+            if (c == 'A')
+            {
+                result.Add(new List<char>(currentChunk));
+                currentChunk.Clear();
+            }
+        }
+        if (currentChunk.Count > 0)
+        {
+            result.Add(currentChunk);
+        }
+
+        return result;
     }
 
     private class RobotController
@@ -156,7 +114,6 @@ public class Part01 :IPart
         public RobotController()
         {
             Position = ControllerDic['A']; //A
-
         }
 
         public List<char> ReadNextInput(List<char> inputs)
@@ -174,6 +131,7 @@ public class Part01 :IPart
                 if (Position.Y + yDiff == 0 && yDiff != 0 && Position.X == 0)
                 {
                     //GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
+
                     dirInputs.AddRange(lrList);
                     dirInputs.AddRange(udList);
                 }
@@ -192,6 +150,7 @@ public class Part01 :IPart
                 else if (yDiff == -1 && xDiff == -1)
                 {
                     //GlobalLog.LogLine($"Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
+
                     dirInputs.AddRange(lrList);
                     dirInputs.AddRange(udList);
                 }
@@ -238,24 +197,24 @@ public class Part01 :IPart
                     dirInputs.AddRange(lrList);
                     dirInputs.AddRange(udList);
                 }
-                else
-                {
-                    Random test = new Random();
-                    bool lrFirst = test.Next(2) == 0;
-                    _rngDecisionsThisSim.Add((yDiff, xDiff, lrFirst));
-                    if (lrFirst)
-                    {
-                        GlobalLog.LogLine($"RNG Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
-                        dirInputs.AddRange(lrList);
-                        dirInputs.AddRange(udList);
-                    }
-                    else
-                    {
-                        GlobalLog.LogLine($"RNG Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
-                        dirInputs.AddRange(udList);
-                        dirInputs.AddRange(lrList);
-                    }
-                }
+                //else
+                //{
+                //    Random test = new Random();
+                //    bool lrFirst = test.Next(2) == 0;
+                //    //_rngDecisionsThisSim.Add((yDiff, xDiff, lrFirst));
+                //    if (lrFirst)
+                //    {
+                //        GlobalLog.LogLine($"RNG Robo: Lr-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                //        dirInputs.AddRange(lrList);
+                //        dirInputs.AddRange(udList);
+                //    }
+                //    else
+                //    {
+                //        GlobalLog.LogLine($"RNG Robo: Ud-First: yDiff:{yDiff}, xDiff:{xDiff}");
+                //        dirInputs.AddRange(udList);
+                //        dirInputs.AddRange(lrList);
+                //    }
+                //}
 
                 dirInputs.Add('A');
 
@@ -371,6 +330,21 @@ public class Part01 :IPart
                 dirInputs.AddRange(lrList);
                 dirInputs.AddRange(udList);
             }
+            else if (yDiff == 1 && xDiff == 0)
+            {
+                dirInputs.AddRange(udList);
+                dirInputs.AddRange(lrList);
+            }
+            else if (yDiff == 2 && xDiff == 1)
+            {
+                dirInputs.AddRange(udList);
+                dirInputs.AddRange(lrList);
+            }
+            else if (yDiff == -3 && xDiff == 0)
+            {
+                dirInputs.AddRange(lrList);
+                dirInputs.AddRange(udList);
+            }
             else
             {
                 Random test = new Random();
@@ -447,4 +421,3 @@ public class Part01 :IPart
 
 
 }
-
