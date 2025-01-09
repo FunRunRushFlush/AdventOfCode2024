@@ -1,9 +1,12 @@
-TODO:
+Learnings/ToDos:
+
 Pathfinding Algos:
 - Breadth-First Search (BFS)
 - Depth-First Search (DFS)
 - Dijkstra
 - A* (A-Stern)
+
+Recursion with Caching
 
 Parser:
 - Span vs array vs list
