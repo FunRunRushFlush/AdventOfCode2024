@@ -5,7 +5,7 @@ My first attempt at [Advent of Code 2024](https://adventofcode.com/2024) challen
 ## About
 
 This is my first year participating in Advent of Code. 
-As a beginner programmer, Im tying to us this challenge to learn some basics
+As a beginner programmer, Im tying to use this challenge to learn some basics
 
 Learnings:
 - Basic C# programming/syntax
