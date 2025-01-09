@@ -5,10 +5,12 @@ using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Exporters;
 using System;
 using System.IO;
+using BenchmarkDotNet.Columns;
 
 //[ShortRunJob]
 [MemoryDiagnoser]
 [RankColumn]
+[Config(typeof(Config))]
 public class DayBenchmark
 {
     [Params("Day01", "Day02", "Day03", "Day04", "Day05", "Day06", "Day07", "Day08", "Day09", "Day10", "Day11", "Day12", "Day13", "Day14", "Day15", "Day16", "Day17", "Day18", "Day19", "Day20", "Day21","Day22", "Day23", "Day24", "Day25")]
@@ -18,6 +20,19 @@ public class DayBenchmark
     private IPart part01Instance;
     private IPart part02Instance;
 
+    private class Config : ManualConfig
+    {
+        public Config()
+        {
+            AddColumnProvider(DefaultColumnProviders.Instance); // Add default columns
+            AddExporter(CsvExporter.Default);                  // Optional: Export to CSV
+            AddExporter(MarkdownExporter.GitHub);             // Optional: Export to Markdown
+
+            SummaryStyle = BenchmarkDotNet.Reports.SummaryStyle.Default
+                .WithTimeUnit(Perfolizer.Horology.TimeUnit.Millisecond) // Force results in milliseconds
+                .WithRatioStyle(BenchmarkDotNet.Columns.RatioStyle.Percentage); // Optional: Use percentage for ratios
+        }
+    }
 
     [GlobalSetup]
     public void Setup()

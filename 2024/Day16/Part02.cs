@@ -11,7 +11,6 @@ public class Part02 : IPart
     private const char Tile = '.';
 
     private char[,] Maze;
-    private int[,] MazeScore;
 
     private HashSet<Vector2> WallSet = new HashSet<Vector2>();
     private int Score = int.MaxValue;
@@ -26,7 +25,6 @@ public class Part02 : IPart
     public string Result(Input input)
     {
         var test = ParseInputDebug(input.Lines);
-        MazeScore = new int[input.Lines.Length, input.Lines[0].Length];
         var startPosition = ParseInput(input.Lines);
         Dir startDir = Dir.right;
 
@@ -35,35 +33,7 @@ public class Part02 : IPart
         return uniqueTiles.ToString();
     }
 
-    private void SearchBestPathOld(Vector2 pos, Dir dir, int score)
-    {
-        Maze[(int)pos.Y, (int)pos.X] = 'X';
-        //DrawGrid(Maze);
-        //Console.ReadLine();
-
-        if (Score < score) return;
-        if (pos == EndPosition)
-        {
-            Score = score;
-            return;
-        }
-
-        if (!WallSet.Contains(pos + DirVec(dir)))
-        {
-            SearchBestPathOld(pos + DirVec(dir), dir, score + 1);
-        }
-        Dir left = (Dir)(((int)dir + 3) % 4);
-        Dir right = (Dir)(((int)dir + 1) % 4);
-        if (!WallSet.Contains(pos + DirVec(left)))
-        {
-            SearchBestPathOld(pos + DirVec(left), left, score + 1001);
-        }
-        if (!WallSet.Contains(pos + DirVec(right)))
-        {
-            SearchBestPathOld(pos + DirVec(right), right, score + 1001);
-        }
-
-    }
+ 
     private int SearchBestPath(Vector2 startPos, Dir startDir)
     {
         var queue = new PriorityQueue<(Vector2 Pos, Dir Dir, int Score,HashSet<Vector2> Path), int>();
@@ -78,7 +48,7 @@ public class Part02 : IPart
             if (Score < score) continue;
             if (!visited.TryAdd((pos, dir), score))
             {
-                if (visited[(pos, dir)] > score)
+                if (visited[(pos, dir)] >= score)
                 {
                     visited[(pos, dir)] = score;
                 }
@@ -88,14 +58,7 @@ public class Part02 : IPart
                 }
             }
 
-            MazeScore[(int)pos.Y, (int)pos.X] = score;
-            Maze[(int)pos.Y, (int)pos.X] = 'X';
-            //if (score % 100 == 0)
-            //{
-            //    DrawGrid(Maze);
-            //    Console.ReadLine();
 
-            //}
             if (pos == EndPosition)
             {
                 Score = score;
@@ -103,8 +66,7 @@ public class Part02 : IPart
                 {
                     UniqueTiles.Add(step);
                 }
-                DrawGrid(MazeScore);
-                DrawGridV2(Maze, UniqueTiles);
+
                 GlobalLog.LogLine($"Found the End: {score}");
                 continue;
             }
@@ -126,7 +88,7 @@ public class Part02 : IPart
                 queue.Enqueue((riVec, right, score + 1001, new(path) { riVec }), score + 1001);
             }
         }
-        DrawGridV2(Maze, UniqueTiles);
+
 
         return UniqueTiles.Count;
     }
@@ -162,77 +124,6 @@ public class Part02 : IPart
             }
         }
         return startPos;
-    }
-    [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private void DrawGridV2(char[,] array, HashSet<Vector2> uniqueTiles)
-    {
-        var arrayHeight = array.GetLength(0);
-        var arrayWidth = array.GetLength(1);
-
-        GlobalLog.LogLine($"DrawGrid");
-
-        for (int h = 0; h < arrayHeight; h++)
-        {
-            for (int w = 0; w < arrayWidth; w++)
-            {
-                string drawPoint = ".";
-                //if (array[h, w] > 0)
-                //{
-                drawPoint = array[h, w].ToString();
-                //}
-                if(uniqueTiles.Contains(new Vector2(h,w)))
-                {
-                    Console.ForegroundColor = ConsoleColor.Green;
-
-                    drawPoint = "@";
-                Console.Write($"{drawPoint}");
-                    Console.ForegroundColor = ConsoleColor.White;
-
-                }
-                else
-                {
-
-                Console.Write($"{drawPoint}");
-                }
-
-
-                //TODO: $"[{array[h, w],3}]" syntax für besseren Print
-                //Console.Write($"[{array[h, w],3}]");
-
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine("-------------------------------------------");
-        Console.WriteLine();
-    }
-
-    [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private void DrawGrid(int[,] array)
-    {
-        var arrayHeight = array.GetLength(0);
-        var arrayWidth = array.GetLength(1);
-
-        GlobalLog.LogLine($"DrawGrid");
-
-        for (int h = 0; h < arrayHeight; h++)
-        {
-            for (int w = 0; w < arrayWidth; w++)
-            {
-                string drawPoint = ".";
-                //if (array[h, w] > 0)
-                //{
-                drawPoint = array[h, w].ToString();
-                //}
-
-                //TODO: $"[{array[h, w],3}]" syntax für besseren Print
-                //Console.Write($"[{array[h, w],3}]");
-                Console.Write($"[{array[h, w],6}]");
-
-            }
-            Console.WriteLine();
-        }
-        Console.WriteLine("-------------------------------------------");
-        Console.WriteLine();
     }
 
 

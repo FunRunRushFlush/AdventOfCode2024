@@ -27,15 +27,15 @@ public class Part01 : IPart
 
         var startPosition = ParseInput(input.Lines);
         Dir startDir = Dir.right;
-  
+
         SearchBestPath(startPosition, startDir);
-        DrawGrid(Maze);
+        //DrawGrid(Maze);
         return Score.ToString();
     }
 
     private void SearchBestPathOld(Vector2 pos, Dir dir, int score)
     {
-        Maze[(int)pos.Y,(int) pos.X] = 'X';
+        Maze[(int)pos.Y, (int)pos.X] = 'X';
         //DrawGrid(Maze);
         //Console.ReadLine();
 
@@ -76,19 +76,19 @@ public class Part01 : IPart
             var (pos, dir, score) = queue.Dequeue();
 
             if (Score < score) continue;
-            if(!visited.TryAdd((pos, dir), score))
+            if (!visited.TryAdd((pos, dir), score))
             {
                 if (visited[(pos, dir)] > score)
                 {
                     visited[(pos, dir)] = score;
                 }
-                else 
+                else
                 {
                     continue;
                 }
             }
 
-            //    Maze[(int)pos.Y, (int)pos.X] = 'X';
+            //Maze[(int)pos.Y, (int)pos.X] = 'X';
             //if(score % 100==0)
             //{
             //    DrawGrid(Maze);
@@ -98,19 +98,21 @@ public class Part01 : IPart
             if (pos == EndPosition)
             {
                 Score = score;
+                DrawGrid(Maze, visited);
+
                 GlobalLog.LogLine($"Found the End: {score}");
                 continue;
             }
 
             if (!WallSet.Contains(pos + DirVec(dir)))
             {
-                queue.Enqueue((pos + DirVec(dir), dir, score + 1),score + 1);
+                queue.Enqueue((pos + DirVec(dir), dir, score + 1), score + 1);
             }
             Dir left = (Dir)(((int)dir + 3) % 4);
             Dir right = (Dir)(((int)dir + 1) % 4);
             if (!WallSet.Contains(pos + DirVec(left)))
             {
-                queue.Enqueue((pos + DirVec(left), left, score + 1001),score + 1001);
+                queue.Enqueue((pos + DirVec(left), left, score + 1001), score + 1001);
             }
             if (!WallSet.Contains(pos + DirVec(right)))
             {
@@ -128,7 +130,7 @@ public class Part01 : IPart
         {
             for (int x = 0; x < lines[0].Length; x++)
             {
-                if (lines[y][x] == Wall) WallSet.Add( new Vector2(x, y));
+                if (lines[y][x] == Wall) WallSet.Add(new Vector2(x, y));
                 if (lines[y][x] == End) EndPosition = new Vector2(x, y);
                 if (lines[y][x] == Start) startPos = new Vector2(x, y);
             }
@@ -137,14 +139,14 @@ public class Part01 : IPart
     }
     private Vector2 ParseInputDebug(string[] lines)
     {
-        Maze = new char[lines.Length,lines[0].Length];
+        Maze = new char[lines.Length, lines[0].Length];
         Vector2 startPos = new Vector2();
         for (int y = 0; y < lines.Length; y++)
         {
             for (int x = 0; x < lines[0].Length; x++)
             {
-                if (lines[y][x] == Wall) Maze[y,x]=Wall;
-                if (lines[y][x] == End) Maze[y, x]= End;
+                if (lines[y][x] == Wall) Maze[y, x] = Wall;
+                if (lines[y][x] == End) Maze[y, x] = End;
                 if (lines[y][x] == Start) Maze[y, x] = Start;
                 if (lines[y][x] == Tile) Maze[y, x] = Tile;
 
@@ -153,7 +155,7 @@ public class Part01 : IPart
         return startPos;
     }
     [System.Diagnostics.Conditional("LOGGING_ENABLED")]
-    private void DrawGrid(char[,] array)
+    private void DrawGrid(char[,] array, Dictionary<(Vector2 Pos, Dir Dir), int> visited)
     {
         var arrayHeight = array.GetLength(0);
         var arrayWidth = array.GetLength(1);
@@ -169,10 +171,30 @@ public class Part01 : IPart
                 //{
                 drawPoint = array[h, w].ToString();
                 //}
+                foreach (var c in visited)
+                {
+                    if (c.Key.Pos == new Vector2(h, w))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        drawPoint = "X";
+
+                    }
+                }
 
                 //TODO: $"[{array[h, w],3}]" syntax für besseren Print
                 //Console.Write($"[{array[h, w],3}]");
-                Console.Write($"{drawPoint}");
+                if (drawPoint == "X")
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write($"{drawPoint}");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else
+                {
+                    Console.Write($"{drawPoint}");
+                }
+
+
 
             }
             Console.WriteLine();
@@ -189,19 +211,19 @@ public class Part01 : IPart
         down = 2,
         left = 3,
     }
-        private Vector2 DirVec(Dir index)
+    private Vector2 DirVec(Dir index)
+    {
+        return index switch
         {
-            return index switch
-            {
-                Dir.up => Up,
-                Dir.right => Right,
-                Dir.down => Down,
-                Dir.left => Left,
-                _ => throw new ArgumentOutOfRangeException(nameof(index), "Index must be between 0 and 3.")
-            };
-        }
-    
+            Dir.up => Up,
+            Dir.right => Right,
+            Dir.down => Down,
+            Dir.left => Left,
+            _ => throw new ArgumentOutOfRangeException(nameof(index), "Index must be between 0 and 3.")
+        };
+    }
 
-  
-       
+
+
+
 }

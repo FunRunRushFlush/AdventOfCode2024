@@ -8,7 +8,7 @@ namespace Day14;
 
 //TODO: anscheined kann man hier https://en.wikipedia.org/wiki/Chinese_remainder_theorem verwenden
 //muss ich mir noch anschauen
-public class Part02 : IPart
+public class Part02Test : IPart
 {
     private List<Robot> roboInfoList = new();
     private int bathWidth = 101;
@@ -32,12 +32,13 @@ public class Part02 : IPart
             Array.Clear(bathroom, 0, bathroom.Length);
             foreach (var robo in roboInfoList)
             {
-                CalculatePosition(robo, 1);
+                CalculatePosition(robo, -1);
                 //QuarterCalc(robo);
                 ClusterCalc(robo.Position);
+
+                //bathroom[(int)robo.Position.Y, (int)robo.Position.X]++;
             }
 
-            
             foreach (int cluster in Cluster)
             {
                 if( cluster > maxCluster)
@@ -53,7 +54,7 @@ public class Part02 : IPart
         GlobalLog.LogLine($"Second: {second}");
         GlobalLog.LogLine($"MaxCluster: {maxCluster}");
 
-        return (second).ToString();
+        return (bathWidth*bathHeight - second).ToString();
     }
 
     private void ClusterCalc(Vector2 pos)
