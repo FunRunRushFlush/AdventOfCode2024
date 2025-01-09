@@ -24,13 +24,13 @@ public class DayBenchmark
     {
         public Config()
         {
-            AddColumnProvider(DefaultColumnProviders.Instance); // Add default columns
-            AddExporter(CsvExporter.Default);                  // Optional: Export to CSV
-            AddExporter(MarkdownExporter.GitHub);             // Optional: Export to Markdown
+            AddColumnProvider(DefaultColumnProviders.Instance);
+            AddExporter(CsvExporter.Default);                
+            AddExporter(MarkdownExporter.GitHub);             
 
             SummaryStyle = BenchmarkDotNet.Reports.SummaryStyle.Default
-                .WithTimeUnit(Perfolizer.Horology.TimeUnit.Millisecond) // Force results in milliseconds
-                .WithRatioStyle(BenchmarkDotNet.Columns.RatioStyle.Percentage); // Optional: Use percentage for ratios
+                .WithTimeUnit(Perfolizer.Horology.TimeUnit.Millisecond) 
+                .WithRatioStyle(BenchmarkDotNet.Columns.RatioStyle.Percentage);
         }
     }
 
