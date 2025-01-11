@@ -11,6 +11,8 @@
 	<ItemGroup>
 		<PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
 		<PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.2" />
+		<PackageReference Include="Spectre.Console" Version="0.49.1" />
+		<PackageReference Include="System.Windows.Extensions" Version="9.0.0" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -33,6 +35,12 @@
 
 	<ItemGroup>
 	  <None Update="Day01\InputData\Part01Example.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Day01\Yu-Gi-Oh_Life_Points_FinalPart.wav">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Day01\Yu-Gi-Oh_Life_Points_Loop.wav">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Day07\InputData\Part01Example_01.txt">
@@ -60,6 +68,9 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Day24\InputData\InputSecAcc.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Day01\Yu-Gi-Oh_Life_Points.wav">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
