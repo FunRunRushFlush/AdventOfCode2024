@@ -28,7 +28,7 @@ public class Part01Animation : IPart
             .Start(ctx =>
             {
 
-                var coocking = new Panel(Animation_CoockingRecipe())
+                var coocking = new Panel(Animation_CookingRecipe())
                                     .Expand()
                                     .Border(BoxBorder.Rounded);
 
@@ -153,7 +153,7 @@ public class Part01Animation : IPart
         return sb.ToString();
     }
 
-    private Panel Animation_CoockingRecipe()
+    private Panel Animation_CookingRecipe()
     {
         var steps = new List<string>
     {

@@ -138,7 +138,6 @@ public class Part01 : IPart
         }
     }
 
-
     enum Dir
     {
         Up = 0,

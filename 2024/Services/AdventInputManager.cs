@@ -123,28 +123,65 @@ public class AdventInputManager
                 .Title("[green]Select an option to obtain inputs:[/]")
                 .AddChoices("Copy & Paste", "Input File"));
 
+        //if (inputTypeSelection == "Copy & Paste")
+        //{
+        //    AnsiConsole.Markup("[yellow]Please paste your input directly into the command line.[/]\n");
+        //    AnsiConsole.Markup("[red]To finish entering input, type '__END' (without quotes) on a new line.[/]\n");
+        //    AnsiConsole.Markup("[dim]Example:\n" +
+        //                       "1234 5678\n" +
+        //                       "8765 4321\n" +
+        //                       "...\n" +
+        //                       "5555 9989\n" +
+        //                       "__END[/]\n\n");
+        //    var manualInputBuilder = new StringBuilder();
+        //    string? line;
+
+        //    while ((line = Console.ReadLine()) != null && line.Trim().ToUpper() != "__END")
+        //    {
+        //        manualInputBuilder.AppendLine(line.TrimEnd());
+        //    }
+
+        //    string manualInput = manualInputBuilder.ToString().Trim();
+        //    if (string.IsNullOrEmpty(manualInput))
+        //    {
+        //        throw new InvalidOperationException("No input provided");
+        //    }
+
+        //    SetInput(day, manualInput);
+        //}
         if (inputTypeSelection == "Copy & Paste")
         {
-            AnsiConsole.Markup("[yellow]Please paste your input directly into the command line.[/]\n");
-            AnsiConsole.Markup("[red]To finish entering input, type '__END' (without quotes) on a new line.[/]\n");
-            AnsiConsole.Markup("[dim]Example:\n" +
-                               "1234 5678\n" +
-                               "8765 4321\n" +
-                               "...\n" +
-                               "5555 9989\n" +
-                               "__END[/]\n\n");
-            var manualInputBuilder = new StringBuilder();
-            string? line;
 
-            while ((line = Console.ReadLine()) != null && line.Trim().ToUpper() != "__END")
+            AnsiConsole.MarkupLine("[yellow]Start typing your input. Press [bold]ESC[/] to finish.[/]");
+            var manualInputBuilder = new StringBuilder();
+
+            while (true)
             {
-                manualInputBuilder.AppendLine(line.TrimEnd());
+                var keyInfo = Console.ReadKey(intercept: true);
+
+                if (keyInfo.Key == ConsoleKey.Escape)
+                {
+                    AnsiConsole.MarkupLine("\n[green]Input completed! Processing...[/]");
+                    break;
+                }
+
+                if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    manualInputBuilder.AppendLine();
+                    Console.WriteLine();
+                }
+                else
+                {
+                    manualInputBuilder.Append(keyInfo.KeyChar);
+                    Console.Write(keyInfo.KeyChar);
+                }
             }
 
             string manualInput = manualInputBuilder.ToString().Trim();
             if (string.IsNullOrEmpty(manualInput))
             {
-                throw new InvalidOperationException("No input provided");
+                AnsiConsole.MarkupLine("[red]No input provided![/]");
+                return null;
             }
 
             SetInput(day, manualInput);
