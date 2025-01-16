@@ -149,32 +149,59 @@ public class AdventInputManager
 
         //    SetInput(day, manualInput);
         //}
+        //if (inputTypeSelection == "Copy & Paste")
+        //{
+
+        //    AnsiConsole.MarkupLine("[yellow]Start typing your input. Press [bold]ESC[/] to finish.[/]");
+        //    var manualInputBuilder = new StringBuilder();
+
+        //    while (true)
+        //    {
+        //        var keyInfo = Console.ReadKey(intercept: true);
+
+        //        if (keyInfo.Key == ConsoleKey.Escape)
+        //        {
+        //            AnsiConsole.MarkupLine("\n[green]Input completed! Processing...[/]");
+        //            break;
+        //        }
+
+        //        if (keyInfo.Key == ConsoleKey.Enter)
+        //        {
+        //            manualInputBuilder.AppendLine();
+        //            Console.WriteLine();
+        //        }
+        //        else
+        //        {
+        //            manualInputBuilder.Append(keyInfo.KeyChar);
+        //            Console.Write(keyInfo.KeyChar);
+        //        }
+        //    }
+
+        //    string manualInput = manualInputBuilder.ToString().Trim();
+        //    if (string.IsNullOrEmpty(manualInput))
+        //    {
+        //        AnsiConsole.MarkupLine("[red]No input provided![/]");
+        //        return null;
+        //    }
+
+        //    SetInput(day, manualInput);
+        //}
         if (inputTypeSelection == "Copy & Paste")
         {
+            AnsiConsole.MarkupLine("[yellow]Paste your input line by line. Type [bold]:exit[/] on a new line to finish input.[/]");
+                AnsiConsole.Markup("[dim]Example:\n" +
+                                   "1234 5678\n" +
+                                   "8765 4321\n" +
+                                   "...\n" +
+                                   "5555 9989\n" +
+                                   ":exit [/]\n\n");
 
-            AnsiConsole.MarkupLine("[yellow]Start typing your input. Press [bold]ESC[/] to finish.[/]");
             var manualInputBuilder = new StringBuilder();
+            string? line;
 
-            while (true)
+            while ((line = Console.ReadLine()) != null && line.Trim().ToLower() != ":exit")
             {
-                var keyInfo = Console.ReadKey(intercept: true);
-
-                if (keyInfo.Key == ConsoleKey.Escape)
-                {
-                    AnsiConsole.MarkupLine("\n[green]Input completed! Processing...[/]");
-                    break;
-                }
-
-                if (keyInfo.Key == ConsoleKey.Enter)
-                {
-                    manualInputBuilder.AppendLine();
-                    Console.WriteLine();
-                }
-                else
-                {
-                    manualInputBuilder.Append(keyInfo.KeyChar);
-                    Console.Write(keyInfo.KeyChar);
-                }
+                manualInputBuilder.AppendLine(line);
             }
 
             string manualInput = manualInputBuilder.ToString().Trim();
