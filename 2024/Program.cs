@@ -22,7 +22,6 @@ try
         return;
     }
 
-
     var services = ConfigureServices();
     var serviceProvider = services.BuildServiceProvider();
 
@@ -38,9 +37,6 @@ try
 
         return services;
     }
-
-    
-
 
 }
 catch (Exception ex)
