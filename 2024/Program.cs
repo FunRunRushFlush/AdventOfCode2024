@@ -1,50 +1,66 @@
 ﻿using BenchmarkDotNet.Running;
-using System;
-
-
-string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day14/InputData/InputSecAcc.txt");
-//string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Day14/InputData/Input.txt");
-
-
-Input input = new(
-      File.ReadAllBytes(path),
-      File.ReadAllText(path),
-      File.ReadAllLines(path));
-
-
-BenchmarkRunner.Run<DayBenchmark>();
-//BenchmarkRunner.Run<Benchmarks>();
-
-
-Day14.Part01 dayP01 = new();
-//Day14.Part01Old dayP01Old = new();
-Day14.Part02 dayP02 = new();
-
-Day14.Part02Old dayP02Old = new();
-Day14.Part02Test dayP02Test = new();
-
-
-//var solution = dayP01.Result(input);
-//var solutionOld = dayP01Old.Result(input);
-var solution02 = dayP02.Result(input);
-var solution02Try = dayP02Test.Result(input);
-
-//var solution02Old = dayP02Old.Result(input);
+using Microsoft.Extensions.DependencyInjection;
+using Spectre.Console;
 
 
 
+try
+{
+    if (args.Length > 0)
+    {
+        if (args.Contains("--help", StringComparer.OrdinalIgnoreCase) || args.Contains("-h", StringComparer.OrdinalIgnoreCase))
+        {
+            DisplayHelp();
+            return;
+        }
+        if (args.Contains("benchmark", StringComparer.OrdinalIgnoreCase))
+        {
+            AnsiConsole.MarkupLine("[yellow]Starting benchmark tests...[/]");
+            BenchmarkRunner.Run<DayBenchmark>();
+            AnsiConsole.MarkupLine("[green]Benchmarks completed successfully.[/]");
+            return;
+        }
+    }
+    else
+    {
 
-Console.WriteLine($"solution : {solution02Try}");
-//Console.WriteLine($"solution : {solutionOld}");
+        var services = ConfigureServices();
+        var serviceProvider = services.BuildServiceProvider();
 
-Console.WriteLine($"solution : {solution02}");
-//Console.WriteLine($"solution : {solution02Old}");
-//Console.WriteLine($"solution Block : {solution02Block}");
+        var solver = serviceProvider.GetRequiredService<AdventSolver>();
+        await solver.RunAsync();
+
+        static ServiceCollection ConfigureServices()
+        {
+            var services = new ServiceCollection();
+
+            services.AddSingleton<AdventInputManager>();
+            services.AddSingleton<AdventSolver>();
+
+            return services;
+        }
+
+    }
+
+
+}
+catch (Exception ex)
+{
+    AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything);
+    AnsiConsole.Markup("[red]An unexpected error occurred.[/]");
+}
 
 
 
-
-
-
-
+static void DisplayHelp()
+{
+    AnsiConsole.MarkupLine("[bold green]Usage:[/]");
+    AnsiConsole.MarkupLine("[yellow]dotnet run [options][/]");
+    AnsiConsole.MarkupLine("\nOptions:");
+    AnsiConsole.MarkupLine("[cyan]  benchmark[/]       Run the benchmarking tests (must be in Release mode!).");
+    AnsiConsole.MarkupLine("[cyan]  --help, -h[/]      Display this help message.");
+    AnsiConsole.MarkupLine("\nExamples:");
+    AnsiConsole.MarkupLine("[grey]  dotnet run -c Release benchmark[/]");
+    AnsiConsole.MarkupLine("[grey]  dotnet run[/]");
+}
 

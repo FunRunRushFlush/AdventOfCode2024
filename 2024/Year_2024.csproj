@@ -11,11 +11,16 @@
 	<ItemGroup>
 		<PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
 		<PackageReference Include="CommunityToolkit.HighPerformance" Version="8.3.2" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+		<PackageReference Include="Spectre.Console" Version="0.49.1" />
+		<PackageReference Include="System.Windows.Extensions" Version="9.0.0" />
 	</ItemGroup>
 
+	<!-- Uncomment if needed to Debug		
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 		<DefineConstants>LOGGING_ENABLED</DefineConstants>
-	</PropertyGroup>
+	</PropertyGroup>	
+	-->
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<DefineConstants></DefineConstants>
@@ -26,40 +31,52 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="Day*/InputData/Input.txt">
+		<None Include="Days/Day*/InputData/Input.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Day01\InputData\Part01Example.txt">
+	  <None Update="Days\Day01\InputData\Input.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Day07\InputData\Part01Example_01.txt">
+	  <None Update="Days\Day01\InputData\Part01Example.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Day09\InputData\InputSecAcc.txt">
+	  <None Update="Days\Day01\Yu-Gi-Oh_Life_Points_FinalPart.wav">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Day14\InputData\InputSecAcc.txt">
+	  <None Update="Days\Day01\Yu-Gi-Oh_Life_Points_Loop.wav">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Day14\InputData\Part01Example.txt">
+	  <None Update="Days\Day07\InputData\Part01Example_01.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Day16\InputData\InputSecAcc.txt">
+	  <None Update="Days\Day09\InputData\InputSecAcc.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Day17\InputData\InputSecAcc_A.txt">
+	  <None Update="Days\Day14\InputData\InputSecAcc.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Day17\InputData\InputSecAcc.txt">
+	  <None Update="Days\Day14\InputData\Part01Example.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Day21\InputData\InputSecAcc.txt">
+	  <None Update="Days\Day16\InputData\InputSecAcc.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Day24\InputData\InputSecAcc.txt">
+	  <None Update="Days\Day17\InputData\InputSecAcc_A.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Days\Day17\InputData\InputSecAcc.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Days\Day21\InputData\InputSecAcc.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Days\Day24\InputData\InputSecAcc.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Days\Day01\Yu-Gi-Oh_Life_Points.wav">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
