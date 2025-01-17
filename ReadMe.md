@@ -36,18 +36,6 @@ This tool is equipped with (some) animations, benchmarks, and interactive input 
 
 
 
-
-
-
-## 📚 How to Use
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/<your-username>/AdventOfCode2024Solver.git
-cd AdventOfCode2024Solver/2024
-```
-
-
 ## 📚 How to Use
 
 ### 1. Clone the Repository
@@ -73,10 +61,11 @@ dotnet run
 #### Benchmark Mode
 To analyze performance:
 ```bash
-dotnet run -- benchmark
+dotnet run -c Release -- benchmark
 ```
 
 > **Note**: Benchmarking requires the following setup:
+> - **Release mode**: Benchmarking requires the Release setup
 > - **Input Files**: Ensure files are located in `Days/{Day}/InputData/Input.txt`. Each file should contain the appropriate input data for the specific day. (I still need to find a better solution)
 
 ---
