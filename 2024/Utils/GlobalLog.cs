@@ -1,4 +1,4 @@
-﻿// Wird Global in der csproj gesteuert
+﻿// Is managed Globaly in the csproj config
 //< PropertyGroup >
 //    < DefineConstants > LOGGING_ENABLED </ DefineConstants >
 //</ PropertyGroup >

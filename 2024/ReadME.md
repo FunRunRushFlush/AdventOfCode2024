@@ -1,17 +1,29 @@
-Learnings/ToDos:
+# Advent of Code 2024 Solutions
 
-Pathfinding Algos:
-- Breadth-First Search (BFS)
-- Depth-First Search (DFS)
-- Dijkstra
-- A* (A-Stern)
+My first attempt at [Advent of Code 2024](https://adventofcode.com/2024) challenges, implemented in C# as a learning experience
 
-Recursion with Caching
+## About
 
-Parser:
-- Span vs array vs list
-- Mem Alocation
+This is my first year participating in Advent of Code. 
+As a beginner programmer, Im tying to use this challenge to learn some basics
 
+Learnings:
+- Basic C# programming/syntax
+- basic Datastructures 
+- basic problem-solving skills
+- Get familiar with Benchmarking 
+
+## Project Structure
+
+The solution contains:
+- `2024/` - Main solution code for each day
+- Each day's solution is in its own folder (Day01-Day25)
+
+## Benchmark
+
+### 2024
+
+After some optimization of my solutions, I achieved a total runtime of approximately **750ms** for all days combined (on my machine ^^)
 
 ```
 
@@ -76,3 +88,4 @@ InvocationCount=1  UnrollFactor=1
 | Part02 | Day24 |   0.1651 ms | 0.0032 ms | 0.0078 ms |   0.1653 ms |    8 |          - |          - |         - |     264304 B |
 | **Part01** | **Day25** |   **0.4189 ms** | **0.0172 ms** | **0.0493 ms** |   **0.4009 ms** |   **13** |          **-** |          **-** |         **-** |      **56112 B** |
 | Part02 | Day25 |   0.0000 ms | 0.0000 ms | 0.0001 ms |   0.0000 ms |    1 |          - |          - |         - |         64 B |
+

@@ -16,9 +16,11 @@
 		<PackageReference Include="System.Windows.Extensions" Version="9.0.0" />
 	</ItemGroup>
 
+	<!-- Uncomment if needed to Debug		
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 		<DefineConstants>LOGGING_ENABLED</DefineConstants>
-	</PropertyGroup>
+	</PropertyGroup>	
+	-->
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<DefineConstants></DefineConstants>
@@ -29,12 +31,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="Day*/InputData/Input.txt">
+		<None Include="Days/Day*/InputData/Input.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="Days\Day01\InputData\Input.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Days\Day01\InputData\Part01Example.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
