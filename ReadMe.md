@@ -2,7 +2,7 @@
 
 
 A **C# application** designed to solve the daily challenges of Advent of Code 2024.
-This tool is equipped with (some) animations, benchmarks, and interactive input options to make solving challenges engaging.
+This tool is equipped with (some) animations, benchmarks, and interactive input options to make solving challenges engaging
 
 ---
 
@@ -11,10 +11,6 @@ This tool is equipped with (some) animations, benchmarks, and interactive input 
 - **Interactive Input Options**: Supports session tokens, file uploads, or manual input.
 - **Solution**: Analyze the performance of your solutions with detailed reports.
 - **Solution Animations**: Watch step-by-step solutions in action. (only few implemted right now)
-
----
-
-
 
 
 ## 📸 Overview
