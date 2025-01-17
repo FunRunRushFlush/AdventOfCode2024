@@ -57,7 +57,7 @@ dotnet run
 #### Benchmark Mode
 To analyze performance:
 ```bash
-dotnet run -c Release -- benchmark
+dotnet run -c Release --benchmark
 ```
 
 > **Note**: Benchmarking requires the following setup:
