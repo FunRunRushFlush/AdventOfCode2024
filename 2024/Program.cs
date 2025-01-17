@@ -8,11 +8,6 @@ try
 {
     if (args.Length > 0)
     {
-        if (args.Contains("--help", StringComparer.OrdinalIgnoreCase) || args.Contains("-h", StringComparer.OrdinalIgnoreCase))
-        {
-            DisplayHelp();
-            return;
-        }
         if (args.Contains("benchmark", StringComparer.OrdinalIgnoreCase))
         {
             AnsiConsole.MarkupLine("[yellow]Starting benchmark tests...[/]");
@@ -20,27 +15,31 @@ try
             AnsiConsole.MarkupLine("[green]Benchmarks completed successfully.[/]");
             return;
         }
+        
+        DisplayHelp();  
+        
+        Console.ReadKey(true);
+        return;
     }
-    else
+
+
+    var services = ConfigureServices();
+    var serviceProvider = services.BuildServiceProvider();
+
+    var solver = serviceProvider.GetRequiredService<AdventSolver>();
+    await solver.RunAsync();
+
+    static ServiceCollection ConfigureServices()
     {
+        var services = new ServiceCollection();
 
-        var services = ConfigureServices();
-        var serviceProvider = services.BuildServiceProvider();
+        services.AddSingleton<AdventInputManager>();
+        services.AddSingleton<AdventSolver>();
 
-        var solver = serviceProvider.GetRequiredService<AdventSolver>();
-        await solver.RunAsync();
-
-        static ServiceCollection ConfigureServices()
-        {
-            var services = new ServiceCollection();
-
-            services.AddSingleton<AdventInputManager>();
-            services.AddSingleton<AdventSolver>();
-
-            return services;
-        }
-
+        return services;
     }
+
+    
 
 
 }
@@ -55,12 +54,11 @@ catch (Exception ex)
 static void DisplayHelp()
 {
     AnsiConsole.MarkupLine("[bold green]Usage:[/]");
-    AnsiConsole.MarkupLine("[yellow]dotnet run [options][/]");
+    AnsiConsole.MarkupLine("[yellow]dotnet run <options>[/]");
     AnsiConsole.MarkupLine("\nOptions:");
     AnsiConsole.MarkupLine("[cyan]  benchmark[/]       Run the benchmarking tests (must be in Release mode!).");
-    AnsiConsole.MarkupLine("[cyan]  --help, -h[/]      Display this help message.");
     AnsiConsole.MarkupLine("\nExamples:");
-    AnsiConsole.MarkupLine("[grey]  dotnet run -c Release benchmark[/]");
-    AnsiConsole.MarkupLine("[grey]  dotnet run[/]");
+    AnsiConsole.MarkupLine("[dim]  dotnet run -c Release benchmark[/]");
+    AnsiConsole.MarkupLine("[dim]  dotnet run  (runs the basic program)[/]");
 }
 
