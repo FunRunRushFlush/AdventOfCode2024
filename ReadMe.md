@@ -36,7 +36,7 @@ This tool is equipped with (some) animations, benchmarks, and interactive input 
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/AdventOfCode2024Solver.git
+git clone https://github.com/FunRunRushFlush/AdventOfCode2024Solver.git
 cd AdventOfCode2024Solver/2024
 ```
 
